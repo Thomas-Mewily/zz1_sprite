@@ -53,3 +53,10 @@ SDL_Rect* get_frame(animation* a, int time)
     }
     return a->sprite_sheet->lst_frame[frame_id];
 }
+
+void free_sprite_sheet(sprite_sheet* s)
+{
+    free(s->lst_frame);
+    SDL_DestroyTexture(s->sprite_sheet);
+    free(s);
+}
