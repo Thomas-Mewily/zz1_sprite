@@ -11,6 +11,7 @@
 #include "util/color.h"
 #include "util/rectangle.h"
 #include "util/vertex.h"
+#include "util/animSprite.h"
 
 #include "context/context.h"
 
