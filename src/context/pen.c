@@ -155,3 +155,19 @@ void pen_texture(context* c, texture* t, rect src, rectf dest)
 {
     SDL_RenderCopyF(c->renderer, t, &src, &dest);
 }
+
+void pen_texture_at(context* c, texture* t, rect src, float x, float y, float scaleX, float scaleY)
+{
+    pen_texture(c, t, src, rectanglef(x, y, texture_width(t)*scaleX,  texture_width(t)*scaleY));
+}
+
+
+void pen_animation_at(context* c, animation* a, float x, float y, float scaleX, float scaleY, timer t)
+{
+    pen_animation(c, a, rectanglef(x, y, texture_width(a->sprite_sheet->t)/a->nb_frame*scaleX, texture_height(a->sprite_sheet->t)*scaleY), t);
+}
+
+void pen_animation(context* c, animation* a, rectf dest, timer t)
+{
+    pen_texture(c, a->sprite_sheet->t, *animation_get_frame(a, t), dest);
+}

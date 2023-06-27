@@ -22,6 +22,8 @@ typedef struct
 
     Uint8* kb_state;
 
+    timer tick;
+
     float  pen_x;
     float  pen_y;
     float  pen_scale;

@@ -76,7 +76,10 @@ int main(int argc, char *argv[])
 
     bool stop = false;
 
-    texture* t = texture_create(c, "asset/knight_ko.png");
+    //texture* t = texture_create(c, "asset/knight_ko.png");
+
+    sprite_sheet* ss = sprite_sheet_create(c, "asset/knight_ko.png", 24, 32);
+    anim* knight = animation_create(ss, frequence_s(10));
 
     while (!stop)
     {
@@ -116,7 +119,9 @@ int main(int argc, char *argv[])
 
         draw_triangle(c);
 
-        pen_texture(c, t, texture_rect(t), window_rectf(c));
+        pen_animation_at(c, knight, 200, 200, 2, 2, c->tick);
+        //pen_animation()
+        //pen_texture(c, t, texture_rect(t), window_rectf(c));
         
         //draw_texture(c, t);
 
@@ -125,6 +130,10 @@ int main(int argc, char *argv[])
         context_draw(c);
     }
 
+    sprite_sheet_free(ss);
+    animation_free(knight);
+
+    //texture_free(t);
 
     unload(c);
 

@@ -10,6 +10,8 @@ void pen_clear(context* c);
 void pen_mode(context* c, uint32 mode);
 
 void pen_texture(context* c, texture* t, rect src, rectf dest);
+void pen_animation_at(context* c, animation* a, float x, float y, float scaleX, float scaleY, timer t);
+void pen_animation(context* c, animation* a, rectf dest, timer t);
 
 bool pen_is_down(context*  c);
 void pen_down(context* c);

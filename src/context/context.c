@@ -64,6 +64,8 @@ void context_update(context* c)
 
     c->mouse_flag = SDL_GetMouseState(&(c->mouse_x), &(c->mouse_y));
     c->kb_state = SDL_GetKeyboardState(NULL);
+
+    c->tick = SDL_GetTicks();
 }
 
 void context_draw(context* c)
