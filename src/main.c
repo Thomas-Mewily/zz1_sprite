@@ -32,7 +32,7 @@ void draw_triangle(context* c)
 {
     //pen_triangle_colored(c, 10, 10, color_red, 10, 90, color_blue, 40, 60, color_green);
     int delta = 200;
-    pen_triangle_colored(c, 10, 10, color_red, 10, 10+delta, color_blue, 10+delta/2, delta*2/3, color_black);
+    //pen_triangle_colored(c, 10, 10, color_red, 10, 10+delta, color_blue, 10+delta/2, delta*2/3, color_black);
 
 
     float x = c->screen_width/4;

@@ -108,7 +108,7 @@ void pen_oval(context* c, float x, float y, float radius_x, float radius_y)
         }
     }
 }
-
+/*
 void pen_triangle(context* c, float x1, float y1,
                               float x2, float y2,
                               float x3, float y3
@@ -133,7 +133,7 @@ void pen_triangle_colored(context* c, float x1, float y1, color c1,
     };
 
     if( SDL_RenderGeometry(c->renderer, NULL, triangleVertex, 3, NULL, 0) < 0 ) {SDL_Log("%s\n", SDL_GetError());}
-}
+}*/
 
 bool pen_is_down(context*  c)
 {
