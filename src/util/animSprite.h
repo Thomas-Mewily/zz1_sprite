@@ -29,9 +29,9 @@ struct animation{
 
 sprite_sheet* create_sprite_sheet(context* c,const char* filename, int w, int h);
 
-animation* create_animation(sprite_sheet* sprite_sheet, int* lstFrame, bool loop);
+animation* create_animation(sprite_sheet* sprite_sheet);
 
-void get_frame(animation* s);
+SDL_Rect* get_frame(animation* a);
 
 
 #endif
