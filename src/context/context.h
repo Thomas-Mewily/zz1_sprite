@@ -20,7 +20,7 @@ typedef struct
     int mouse_y;
     int32 mouse_flag;
 
-    SDL_Texture* texture_error;
+    Uint8* kb_state;
 
     float  pen_x;
     float  pen_y;

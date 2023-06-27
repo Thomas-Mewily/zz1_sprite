@@ -88,55 +88,6 @@ int main(int argc, char *argv[])
             switch (event.type)
             {
                 case SDL_QUIT: stop = true; break;
-                /*
-                
-
-                case SDL_KEYDOWN:
-                case SDL_KEYUP:
-                {
-                    #define speed 10
-                    bool isPress = event.type == SDL_KEYDOWN;
-                    switch (event.key.keysym.sym)
-                    {
-                        #define target(x, y) { target_x = x*(screen.w-window_width); target_y = (1-y)*(screen.h-window_height); need_target = true; } break;
-
-                        case SDLK_7: case SDLK_KP_7: target(   0,   1); break;
-                        case SDLK_8: case SDLK_KP_8: target( 0.5,   1); break;
-                        case SDLK_9: case SDLK_KP_9: target(   1,   1); break;
-                        case SDLK_4: case SDLK_KP_4: target(   0, 0.5); break;
-                        case SDLK_5: case SDLK_KP_5: target( 0.5, 0.5); break;
-                        case SDLK_6: case SDLK_KP_6: target(   1, 0.5); break;
-                        case SDLK_1: case SDLK_KP_1: target(   0,   0); break;
-                        case SDLK_2: case SDLK_KP_2: target( 0.5,   0); break;
-                        case SDLK_3: case SDLK_KP_3: target(   1,   0); break;
-                        
-                        case SDLK_ESCAPE: stop = true; break;
-                        case SDLK_SPACE: 
-                        {
-                            SDL_SetWindowPosition(window2, window_get_x(window), window_get_y(window));
-                        }break;
-  
-                        case SDLK_RIGHT:  case SDLK_f:  window_move(window, +speed, 0     ); break;
-                        case SDLK_LEFT :  case SDLK_s:  window_move(window, -speed, 0     ); break;
-                        case SDLK_UP   :  case SDLK_e:  window_move(window,      0, +speed); break;
-                        case SDLK_DOWN :  case SDLK_d:  window_move(window,      0, -speed); break;
-
-                        case SDLK_F5: case SDLK_p: window_animation = !window_animation; break;
-                        case SDLK_DELETE:
-                        case SDLK_CLEAR:
-                        case SDLK_CARET:
-                            break;
-                            
-                        case SDLK_F11:
-                            if(event.type == SDL_KEYDOWN)
-                            { 
-                                window_change_fullscreen(window);
-                            }
-                        break;
-                            
-                        default: break;
-                    }
-                } break;*/
                 default: break;
             }
         }
