@@ -9,6 +9,8 @@ void pen_color(context* c, color co);
 void pen_clear(context* c);
 void pen_mode(context* c, uint32 mode);
 
+void pen_texture(context* c, texture* t, rect src, rectf dest);
+
 bool pen_is_down(context*  c);
 void pen_down(context* c);
 void pen_up(context* c);
@@ -18,13 +20,13 @@ void pen_goto_with_color(context* c, float x, float y, color co);
 void pen_move(context* c, float step);
 void pen_rotate(context* c, angle a);
 
-void pen_rect(context* c, rect r);
+void pen_rect(context* c, rectf r);
 void pen_line(context* c, float x1, float y1, float x2, float y2);
 void pen_dot(context* c, float x, float y);
 
 void pen_pixel(context* c, float x, float y);
 void pen_pixel_line(context* c, float x1, float y1, float x2, float y2);
-void pen_pixel_rect(context* c, rect r);
+void pen_pixel_rect(context* c, rectf r);
 
 void pen_oval(context* c, float x, float y, float radius_x, float radius_y);
 void pen_circle(context* c, float x, float y, float radius);

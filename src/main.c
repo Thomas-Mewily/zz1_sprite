@@ -25,8 +25,10 @@ void init()
 
 void unload()
 {
+    IMG_Quit();
     SDL_Quit();
 }
+
 
 void draw_triangle(context* c)
 {
@@ -61,6 +63,7 @@ void draw_triangle(context* c)
 }
 
 
+
 int main(int argc, char *argv[])
 {
     (void)argc;
@@ -72,6 +75,8 @@ int main(int argc, char *argv[])
     window_center_coef(c, 0.5, 0.5);
 
     bool stop = false;
+
+    texture* t = texture_create(c, "asset/knight_ko.png");
 
     while (!stop)
     {
@@ -153,13 +158,16 @@ int main(int argc, char *argv[])
         pen_color(c, hsv(360*lenX/(c->window_width/2), 1 , 1));
         pen_oval(c, c->window_width*3/4, c->window_height/2, lenY, lenX);
 
-        draw_triangle(c);
+
 
         pen_color(c, color_white);
         pen_line(c, c->window_width/2, c->window_height/2, c->mouse_x, c->mouse_y);
 
+        draw_triangle(c);
 
-
+        pen_texture(c, t, texture_rect(t), window_rectf(c));
+        
+        //draw_texture(c, t);
 
         //printf("%x\n", c->mouse_flag);
 

@@ -6,7 +6,7 @@ void testVec(){
     //vec_push(v, color, rgb(1,2,3));
     vec_push(v, int, 1);
     vec_push(v, int, 2);
-
+    
     //vec_printf_int(v);
     vec_free_lazy(v);
 }

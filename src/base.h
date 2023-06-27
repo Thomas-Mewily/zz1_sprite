@@ -13,6 +13,9 @@
 #include "util/vertex.h"
 
 #include "context/context.h"
+
+#include "util/texture.h"
+
 #include "context/window.h"
 #include "context/pen.h"
 

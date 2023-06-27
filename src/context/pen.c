@@ -56,22 +56,22 @@ void pen_clear(context* c) { SDL_RenderClear(c->renderer); }
 // todo : affected by pen size
 void pen_line(context* c, float x1, float y1, float x2, float y2) { pen_pixel_line(c, x1, y1, x2, y2); }
 void pen_dot(context* c, float x, float y) { pen_pixel(c, x, y); }
-void pen_rect(context* c, rect r) { pen_pixel_rect(c, r); }
+void pen_rect(context* c, rectf r) { pen_pixel_rect(c, r); }
 
 #define X(x) apply_x_offset(c, x)
 #define Y(y) apply_y_offset(c, y)
 
-int apply_x_offset(context* c, float x) { return (x-c->pen_x)*c->pen_scale; }
-int apply_y_offset(context* c, float y) { return (y-c->pen_y)*c->pen_scale; }
+float apply_x_offset(context* c, float x) { return (x-c->pen_x)*c->pen_scale; }
+float apply_y_offset(context* c, float y) { return (y-c->pen_y)*c->pen_scale; }
 
-rect apply_offset(context* c, rect r)
+rectf apply_offset(context* c, rectf r)
 {
-    return rectangle(X(r.x), Y(r.y), r.w*c->pen_scale, r.h*c->pen_scale);
+    return rectanglef(X(r.x), Y(r.y), r.w*c->pen_scale, r.h*c->pen_scale);
 }
 
 void pen_pixel(context* c, float x, float y) { SDL_RenderDrawPointF(c->renderer, X(x), Y(y)); }
 void pen_pixel_line(context* c, float x1, float y1, float x2, float y2) { SDL_RenderDrawLineF(c->renderer, X(x1), Y(y1), X(x2), Y(y2)); }
-void pen_pixel_rect(context* c, rect r) { r = apply_offset(c, r); SDL_RenderFillRectF(c->renderer, &r); }
+void pen_pixel_rect(context* c, rectf r) { r = apply_offset(c, r); SDL_RenderFillRectF(c->renderer, &r); }
 void pen_circle(context* c, float x, float y, float radius) { pen_oval(c, x, y, radius, radius); }
 void pen_oval(context* c, float x, float y, float radius_x, float radius_y)
 {
@@ -81,8 +81,8 @@ void pen_oval(context* c, float x, float y, float radius_x, float radius_y)
         for(int rx = 0; rx <= radius_x; rx+=stepPrecision)
         {
             int height = ((float)(radius_y))*sqrt(1-(1-rx/(float)radius_x)*(1-rx/(float)radius_x));
-            pen_rect(c, rectangle(x-radius_x+rx,y-height, stepPrecision, 2*height));
-            pen_rect(c, rectangle(x+radius_x-rx,y-height, stepPrecision, 2*height));
+            pen_rect(c, rectanglef(x-radius_x+rx,y-height, stepPrecision, 2*height));
+            pen_rect(c, rectanglef(x+radius_x-rx,y-height, stepPrecision, 2*height));
         }
     }else if((c->pen_mode) & PEN_MODE_HOLLOW)
     {
@@ -149,4 +149,9 @@ void pen_up(context* c)
 {
     check(c->_pen_is_down == true);
     c->_pen_is_down = false;
+}
+
+void pen_texture(context* c, texture* t, rect src, rectf dest)
+{
+    SDL_RenderCopyF(c->renderer, t, &src, &dest);
 }
