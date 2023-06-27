@@ -22,6 +22,8 @@ typedef struct
 
     SDL_Texture* texture_error;
 
+    timer tick;
+
     float  pen_x;
     float  pen_y;
     float  pen_scale;

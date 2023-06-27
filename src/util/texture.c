@@ -54,7 +54,7 @@ texture* texture_create(context* c, char *path)
     return my_texture;
 }
 
-void texture_unload(texture* t)
+void texture_free(texture* t)
 {
     SDL_DestroyTexture(t);
 }

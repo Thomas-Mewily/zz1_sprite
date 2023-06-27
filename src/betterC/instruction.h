@@ -4,4 +4,6 @@
 #define twice(x) x x
 #define unless(cond) if(!(cond))
 
+#define field(type, name1, name2) union { type name1; type name2; }
+
 #endif
