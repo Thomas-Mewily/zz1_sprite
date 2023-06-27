@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
         }
 
         pen_mode(c, PEN_MODE_FILLED);
-        pen_color(c, color_white);
+        //pen_color(c, color_white);
         pen_color(c, rgb(100, 30, 150));
         pen_clear(c);
 
