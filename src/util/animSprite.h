@@ -33,5 +33,7 @@ animation* create_animation(sprite_sheet* sprite_sheet);
 
 SDL_Rect* get_frame(animation* a);
 
+void free_sprite_sheet(sprite_sheet* s);
+
 
 #endif
