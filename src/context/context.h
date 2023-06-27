@@ -20,6 +20,8 @@ typedef struct
     int mouse_y;
     int32 mouse_flag;
 
+    SDL_Texture* texture_error;
+
     float  pen_x;
     float  pen_y;
     float  pen_scale;
