@@ -206,7 +206,8 @@ void pen_text_at(context* c, const char* text, float x, float y, float pixel_lig
 {
     int offset_x = 0; int offset_y = 0;
     float step = pixel_ligne_height/LETTER_HEIGHT* LETTER_WIDTH;
-    for (int i = 0; i < strlen(text); i++)
+    int text_length = (int)strlen(text);
+    for (int i = 0; i < text_length; i++)
     {
         char letter = text[i];
         if (letter == '\n')
@@ -228,8 +229,9 @@ void pen_text_at_center(context* c, const char* text, float x, float y, float pi
 
     int w = 0, h = 0; 
     int step = pixel_ligne_height/LETTER_HEIGHT* LETTER_WIDTH;
+    int text_length = (int)strlen(text);
     //Trouve les dimensions du texte à afficher
-    for (int i = 0; i < strlen(text); i++)
+    for (int i = 0; i < text_length; i++)
     {
         int cur_w = 0;
         char letter = text[i];
