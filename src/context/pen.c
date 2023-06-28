@@ -165,13 +165,13 @@ void pen_texture(context* c, texture* t, rect src, rectf dest)
 
 void pen_texture_at(context* c, texture* t, rect src, float x, float y, float scaleX, float scaleY)
 {
-    pen_texture(c, t, src, rectanglef(x, y, texture_width(t)*scaleX,  texture_height(t)*scaleY));
+    pen_texture(c, t, src, rectanglef(x, y, src.w*scaleX,  src.h*scaleY));
 }
 
 void pen_texture_at_center(context* c, texture* t, rect src, float x, float y, float scaleX, float scaleY, float coef_centerX, float coef_centerY)
 {
-    float frame_width_scaled =  texture_width (t) *scaleX;
-    float frame_height_scaled = texture_height(t) *scaleY;
+    float frame_width_scaled =  src.w *scaleX;
+    float frame_height_scaled = src.h *scaleY;
     pen_texture(c, t, src, rectanglef(x-frame_width_scaled*coef_centerX, y-frame_height_scaled*coef_centerY, frame_width_scaled,  frame_height_scaled));
 }
 
@@ -196,20 +196,65 @@ void pen_animation(context* c, animation* a, rectf dest, time t)
 
 
 #define NUM_COL_LETTER 16
-#define LETTER_WIDTH 40
-#define LETTER_HEIGHT 40
+#define LETTER_WIDTH 20
+#define LETTER_HEIGHT 20
+#define INTERLIGNE 0.2
+#define LETTER_SPACING -0.55
 
-void pen_text(context* c, const char* text, rectf dest)
-{
-    
-}
+
 void pen_text_at(context* c, const char* text, float x, float y, float pixel_ligne_height)
 {
-
+    int offset_x = 0; int offset_y = 0;
+    float step = pixel_ligne_height/LETTER_HEIGHT* LETTER_WIDTH;
+    for (int i = 0; i < strlen(text); i++)
+    {
+        char letter = text[i];
+        if (letter == '\n')
+        {
+            offset_x = 0;
+            offset_y += (1+INTERLIGNE) * LETTER_HEIGHT;
+        }
+        else{
+            pen_char(c, letter, rectanglef(x+offset_x, y+offset_y, 
+                                        pixel_ligne_height,
+                                        step));
+            offset_x += step + step * LETTER_SPACING;
+        }
+    }
 }
 
 void pen_text_at_center(context* c, const char* text, float x, float y, float pixel_ligne_height, float centerX, float centerY)
 {
+
+    int w = 0, h = 0; 
+    int step = pixel_ligne_height/LETTER_HEIGHT* LETTER_WIDTH;
+    //Trouve les dimensions du texte à afficher
+    for (int i = 0; i < strlen(text); i++)
+    {
+        int cur_w = 0;
+        char letter = text[i];
+        if (letter == '\n')
+        {
+            w = cur_w > w ? cur_w : w;
+            h += (1+INTERLIGNE) * LETTER_HEIGHT;
+        }
+        else{
+
+            cur_w += step + step * LETTER_SPACING;
+        }
+    }
+
+    // color tmp = pen_get_color(c);
+    // pen_color(c, rgb(0,0,0));
+    // pen_rect(c, rectanglef(x, y, w, h));
+    // pen_color(c, tmp);
+
+    w *= centerX;
+    h *= centerY;
+
+    pen_text_at(c, text, x-w, y-h, pixel_ligne_height);
+
+    
 
 }
 
@@ -217,12 +262,12 @@ void pen_char_at(context* c, char letter, float x, float y, float pixel_ligne_he
 {
     if (letter > ' ' && letter != '\\')
     {
-        rect mask = rectangle((letter % 16) * NUM_COL_LETTER,
-                              (letter / 16) * NUM_COL_LETTER,
-                              NUM_COL_LETTER, NUM_COL_LETTER);
-        pen_texture_at(c, c->font, mask, x, y,
+        rect mask = rectangle((letter % NUM_COL_LETTER) * LETTER_WIDTH,
+                              ((letter / NUM_COL_LETTER)) * LETTER_HEIGHT,
+                              LETTER_WIDTH, LETTER_HEIGHT);
+        pen_texture_at(c, c->_pen_font, mask, x, y,
                         pixel_ligne_height/LETTER_WIDTH,
-                        pixel_ligne_height/LETTER_HEIGHT);*/
+                        pixel_ligne_height/LETTER_HEIGHT);
     }
 }
 
@@ -230,9 +275,9 @@ void pen_char(context* c, char letter, rectf dest)
 {
     if (letter > ' ' && letter != '\\')
     {
-        rect mask = rectangle((letter % 16) * NUM_COL_LETTER,
-                              (letter / 16) * NUM_COL_LETTER,
-                              NUM_COL_LETTER, NUM_COL_LETTER);
+        rect mask = rectangle((letter % NUM_COL_LETTER) * LETTER_WIDTH,
+                              ((letter / NUM_COL_LETTER)) * LETTER_HEIGHT,
+                              LETTER_WIDTH, LETTER_HEIGHT);
         pen_texture(c, c->_pen_font, mask, dest);
     }
 }
