@@ -102,6 +102,7 @@ void contexte_free(context* c)
     // TTF_CloseFont(c->font_big);
     // TTF_CloseFont(c->font_fullscreen);
     
+    
     scene_unload(c, (scene*)(c->scene));
     SDL_DestroyRenderer(c->renderer);
     SDL_DestroyWindow(c->window);

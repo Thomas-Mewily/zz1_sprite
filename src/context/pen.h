@@ -5,6 +5,13 @@
 #define PEN_MODE_HOLLOW 0x1
 #define PEN_MODE_FILLED 0x2
 
+#define FONT_SIZE_SMALL (c->screen_height)/30
+#define FONT_SIZE_NORMAL (c->screen_height)/16
+#define FONT_SIZE_BIG (c->screen_height)/10
+#define FONT_SIZE_FULLSCREEN (c->screen_height)*0.8
+
+
+
 void pen_color(context* c, color co);
 color pen_get_color(context* c);
 
@@ -50,6 +57,13 @@ void pen_triangle(context* c,
                             float x3, float y3
                 ); 
 
-void pen_text(context* c, const char* text, rectf dest);
 
+void pen_text_at(context* c, const char* text, float x, float y, float pixel_ligne_height);
+void pen_text_at_center(context* c, const char* text, float x, float y, float pixel_ligne_height, float centerX, float centerY);
+
+void pen_char_at(context* c, char letter, float x, float y, float pixel_ligne_height);
+void pen_char(context* c, char letter, rectf dest);
+
+void pen_init(context* c);
+void pen_unload(context* c);
 #endif

@@ -50,7 +50,8 @@ void scene_titre_update(context* c, scene* sce)
 void scene_titre_draw(context* c, scene* sce)
 {
     obtenir_state;
-    pen_circle(c, c->window_width/2, c->window_height/2, c->window_height/32.0 * (s->nbFoisPresser+2));
+    //pen_circle(c, c->window_width/2, c->window_height/2, c->window_height/32.0 * (s->nbFoisPresser+2));
+    pen_text_at(c, "UwU", 0,0, FONT_SIZE_FULLSCREEN);
 }
 
 void scene_titre_printf(context* c, scene* sce)

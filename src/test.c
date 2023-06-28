@@ -2,18 +2,27 @@
 
 void testVec(){
 
-    vec* v = vec_empty(int);
+    //vec* v = vec_empty(int);
     //vec_push(v, color, rgb(1,2,3));
+    /*
     vec_push(v, int, 1);
     vec_push(v, int, 2);
     vec_printf_int(v);
-    int val = vec_get(v, int, 0);
+    int val = vec_get(v, int, 0);*/
     //v->
-    vec_free_lazy(v);
+    //vec_free_lazy(v);
+}
+
+void test_graph()
+{
+    graph* g = graph_test();
+    graph_printf(g);
+    graph_free(g);
 }
 
 void test_debug()
 {
+    test_graph();
         //SDL_Rect r = rectangle(0,10,2)
     //angle a = from_degree(180);
     //float degree = as_degree(a);
