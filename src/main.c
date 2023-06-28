@@ -46,8 +46,8 @@ int main(int argc, char *argv[])
     context* c = context_create("Houzayfa M, Martin J, Thomas T. Version de " current_time, 960, 540, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
     window_center_coef(c, 0.5, 0.5);
 
-    //scene_set(c, titre);
-    scene_set(c, houza);
+    scene_set(c, titre);
+    //scene_set(c, houza);
     //scene_set(c, thomas_parallax);
 
     while (!c->should_exit)

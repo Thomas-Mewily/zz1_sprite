@@ -8,7 +8,7 @@ void testVec(){
     vec_push(v, int, 2);
     vec_printf_int(v);
     int val = vec_get(v, int, 0);
-    v->
+    //v->
     vec_free_lazy(v);
 }
 

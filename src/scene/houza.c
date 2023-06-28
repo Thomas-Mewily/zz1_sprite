@@ -10,6 +10,7 @@ typedef struct
 
 void scene_houza_load(context* c, scene* sce)
 {
+    /*
     sce->state = (void*)create(state);
 
     obtenir_state;
@@ -18,7 +19,7 @@ void scene_houza_load(context* c, scene* sce)
 
     s->steve = texture_create(c, "asset/Steve.png");
     s->ss = sprite_sheet_create(c,)
-
+    */
 
     
 }
