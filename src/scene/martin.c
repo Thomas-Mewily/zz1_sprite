@@ -27,7 +27,7 @@ void scene_martin_load(context* c, scene* sce)
     set_bg_color(sce);
     s->steve = texture_create(c, "asset/steve.png");
     s->froggyS = sprite_sheet_create(c, "asset/froggyChair.png", 54, 54);
-    s->froggyAnim = animation_create(s->froggyS, frequence_s(10));
+    s->froggyAnim = animation_create(s->froggyS, frequence_s(20));
 
 
 }

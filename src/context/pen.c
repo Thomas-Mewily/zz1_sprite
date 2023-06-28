@@ -160,6 +160,7 @@ void pen_up(context* c)
 
 void pen_texture(context* c, texture* t, rect src, rectf dest)
 {
+    dest = apply_offset(c, dest);
     SDL_RenderCopyF(c->renderer, t, &src, &dest);
 }
 
