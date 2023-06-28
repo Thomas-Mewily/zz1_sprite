@@ -1,7 +1,6 @@
 #include "base.h"
 #include "test.h"
 
-#define NBSPRITES 3
 
 /*
 no opti, fast compile : -O0
