@@ -47,7 +47,7 @@ typedef struct
     //TTF_Font* font_medium;
     //TTF_Font* font_big;
     //TTF_Font* font_fullscreen;
-    texture* font;
+    texture* _pen_font;
 } context;
 
 context* context_create(char* window_name, int width, int height, Uint32 flags);

@@ -221,11 +221,12 @@ void pen_char_at(context* c, char letter, float x, float y, float pixel_ligne_he
                               (letter / 16) * NUM_COL_LETTER,
                               NUM_COL_LETTER, NUM_COL_LETTER);
         pen_rect(c, rectanglef(200, 200, 20,20));
-        pen_texture(c, c->font, texture_rect(c->font), rectanglef(0,0, 200,200));
+        pen_texture(c, c->_pen_font, texture_rect(c->_pen_font), rectanglef(0,0, 200,200));
         // pen_texture(c, c->font, rectangle(0,0,40*16,40*16), rectanglef(0,0, 200,200));
+        /*
         pen_texture_at(c, c->font, mask, x, y,
                         pixel_ligne_height/LETTER_WIDTH,
-                        pixel_ligne_height/LETTER_HEIGHT);
+                        pixel_ligne_height/LETTER_HEIGHT);*/
     }
 }
 
@@ -236,11 +237,16 @@ void pen_char(context* c, char letter, rectf dest)
         rect mask = rectangle((letter % 16) * NUM_COL_LETTER,
                               (letter / 16) * NUM_COL_LETTER,
                               NUM_COL_LETTER, NUM_COL_LETTER);
-        pen_texture(c, c->font, mask, dest);
+        pen_texture(c, c->_pen_font, mask, dest);
     }
 }
 
 void pen_init(context* c)
 {
-    c->font = texture_create(c, "asset/font.png");
+    c->_pen_font = texture_create(c, "asset/font.png");
+}
+
+void pen_unload(context* c)
+{
+    texture_free(c->_pen_font);
 }
