@@ -246,10 +246,11 @@ graph* graph_complet(int nb_node, float radius)
         repeat(j, nb_node)
         {
             graph_add_join(g, i, j );
-            /*
-            if( ((5*i+7*j)%100) < 80)
+            
+            if( ((5*i+7*j)%100) < 50)
             { // maybe add a join
-            }*/
+              // graph_add_join(g, i, j );
+            }
         }
     }
     return g;

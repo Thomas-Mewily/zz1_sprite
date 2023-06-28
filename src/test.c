@@ -15,9 +15,9 @@ void testVec(){
 
 void test_graph()
 {
-    graph* g = graph_complet(6,1);
-    graph_printf(g);
-    graph_free(g);
+    //graph* g = graph_complet(6,1);
+    //graph_printf(g);
+    //graph_free(g);
 }
 
 void test_debug()

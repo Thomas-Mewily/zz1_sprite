@@ -86,7 +86,41 @@ void context_update(context* c)
 
     c->timer = from_ms(SDL_GetTicks());
 
+
+
+    SDL_Event event;
+    while(SDL_PollEvent(&event))
+    {
+        bool event_consumed = false;
+        switch (event.type)
+        {
+            case SDL_QUIT: c->should_exit = true; break;
+            
+            case SDL_KEYDOWN:
+            case SDL_KEYUP:
+            {
+                switch (event.key.keysym.sym)
+                {
+                    case SDLK_ESCAPE: c->should_exit = true; break;
+                    // Debug
+                    case SDLK_d: scene_printf(c, (scene*)(c->scene)); break;
+                    // menu Principal
+                    case SDLK_p: scene_set(c, titre); break;
+                    default: break;
+                }
+            } break;
+            default: break;
+        }
+        if(event_consumed == false)
+        {
+            scene_event(c, (scene*)(c->scene), &event);
+        }
+    }
+
     scene_update(c, (scene*)(c->scene));
+
+
+
 }
 
 void context_draw(context* c)

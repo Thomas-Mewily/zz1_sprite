@@ -1,7 +1,5 @@
 #include "base.h"
 
-#define obtenir_state scene_martin_state* s = (scene_martin_state*)(sce->state);
-
 typedef struct 
 {
    float hue;
@@ -9,48 +7,44 @@ typedef struct
    texture* steve;
    sprite_sheet* froggyS;
    anim* froggyAnim;
-} scene_martin_state;
+} state;
 
-void set_bg_color(scene* sce)
+void set_bg_color(argument arg)
 {
     obtenir_state;
     sce->info.background_color = hsv(s->hue, 0.4, 0.95);
 }
 
-void scene_martin_load(context* c, scene* sce)
-{
-    sce->state = (void*)create(scene_martin_state);
+void scene_martin_load(argument arg)
+{   
     obtenir_state;
 
     s->hue = 0;
     s->color_change_speed = 0.7;
-    set_bg_color(sce);
+    set_bg_color(arg);
     s->steve = texture_create(c, "asset/steve.png");
     s->froggyS = sprite_sheet_create(c, "asset/froggyChair.png", 54, 54);
     s->froggyAnim = animation_create(s->froggyS, frequence_s(20));
-
-
-}
-void scene_martin_unload(context* c, scene* sce)
-{
-    obtenir_state;
-    SDL_DestroyTexture(s->steve);
-    free(sce->state);
 }
 
-void scene_martin_update(context* c, scene* sce)
+void scene_martin_unload(argument arg)
 {
     obtenir_state;
-    set_bg_color(sce);
+    texture_free(s->steve);
+}
+
+void scene_martin_update(argument arg)
+{
+    obtenir_state;
+    set_bg_color(arg);
     s->hue += s->color_change_speed;
     if (s->hue >= 360) {s->hue = 0;}
 
     c->pen_x = (c->window_width/2) -  c->mouse_x;
     c->pen_y = (c->window_height/2) -  c->mouse_y;
 
-
 }
-void scene_martin_draw(context* c, scene* sce)
+void scene_martin_draw(argument arg)
 {
     obtenir_state;
     //pen_circle(c, 100, 100, 50 );
@@ -63,7 +57,5 @@ void scene_martin_draw(context* c, scene* sce)
     pen_animation_at(c, s->froggyAnim, 10, 400, 3, 3, c->timer);
 }
 
-void scene_martin_printf(context* c, scene* sce)
-{
-    return;
-}
+void scene_martin_event (argument arg) { obtenir_state; }
+void scene_martin_printf(argument arg) { obtenir_state; }

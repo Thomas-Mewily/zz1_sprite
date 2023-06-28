@@ -1,15 +1,12 @@
 #include "base.h"
 
-#define obtenir_state scene_titre_state* s = (scene_titre_state*)(sce->state);
-
 typedef struct 
 {
    int nbFoisPresser;
-}scene_titre_state;
+}state;
 
-void scene_titre_load(context* c, scene* sce)
+void scene_titre_load(argument arg)
 {
-    sce->state = (void*)create(scene_titre_state);
     obtenir_state;
     sce->state = s;
 
@@ -18,47 +15,40 @@ void scene_titre_load(context* c, scene* sce)
     s->nbFoisPresser = 0;
 }
 
-void scene_titre_unload(context* c, scene* sce)
-{
-    free(sce->state);
-}
+void scene_titre_unload(argument arg) { obtenir_state; }
+void scene_titre_update(argument arg) { obtenir_state; }
 
-
-void scene_titre_update(context* c, scene* sce)
-{
-    obtenir_state;
-
-    //if (pull_up_masked(c->mouse_flag, c->mouse_old_flag, SDL_BUTTON(1) & SDL_BUTTON(2)))
-    if (c->mouse_flag & (SDL_BUTTON(1) & SDL_BUTTON(2)))
-    {
-        s->nbFoisPresser++;
-        if(s->nbFoisPresser >= 20)
-        {
-            c->should_exit = true;
-        }
-    }
-    if (c->kb_state[SDL_SCANCODE_M])
-    {
-        scene_set(c, martin);
-    }
-    else if (c->kb_state[SDL_SCANCODE_T])
-    {
-        scene_set(c, thomas_parallax);
-    }
-    else if (c->kb_state[SDL_SCANCODE_H])
-    {
-        scene_set(c, houza);
-    }
-}
-
-void scene_titre_draw(context* c, scene* sce)
+void scene_titre_draw(argument arg)
 {
     obtenir_state;
     //pen_circle(c, c->window_width/2, c->window_height/2, c->window_height/32.0 * (s->nbFoisPresser+2));
     pen_text_at(c, "UwU", 0,0, FONT_SIZE_FULLSCREEN);
 }
 
-void scene_titre_printf(context* c, scene* sce)
+void scene_titre_event (argument arg) 
+{ 
+    obtenir_state;
+
+    switch (ev->type)
+    {
+        //mousePress(ev->button.);
+        case SDL_MOUSEBUTTONDOWN: s->nbFoisPresser++; break;
+        case SDL_KEYDOWN: case SDL_KEYUP:
+        {
+            switch (ev->key.keysym.sym)
+            {
+                case SDLK_ESCAPE: c->should_exit = true; break;
+                case SDLK_m: scene_set(c, martin); break;
+                case SDLK_t: scene_set(c, thomas_parallax); break;
+                case SDLK_h: scene_set(c, houza); break;
+                default: break;
+            }
+        } break;
+        default: break;
+    }
+}
+
+void scene_titre_printf(argument arg)
 {
     obtenir_state;
     printf("Nb presser = %i\n", s->nbFoisPresser);
