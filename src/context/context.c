@@ -1,5 +1,13 @@
 #include "base.h"
 
+// void check_font_charged(TTF_Font* f)
+// {
+//     if (!f)
+//     {
+//         SDL_Log("Impossible d'ouvrir la police : %s\n", TTF_GetError());
+//     }
+// }
+
 context* context_create(char* window_name, int width, int height, Uint32 flags)
 {
     context* c = create(context);
@@ -45,6 +53,13 @@ context* context_create(char* window_name, int width, int height, Uint32 flags)
 
     twice(context_update(c););
 
+
+    // //Charge la font sous différentes tailles 
+    // c->font_small           = TTF_OpenFont(FONT_PATH, 20); check_font_charged(c->font_small);
+    // c->font_medium          = TTF_OpenFont(FONT_PATH, 30); check_font_charged(c->font_medium);
+    // c->font_big             = TTF_OpenFont(FONT_PATH, 50); check_font_charged(c->font_big);
+    // c->font_fullscreen      = TTF_OpenFont(FONT_PATH, 70); check_font_charged(c->font_fullscreen);
+
     return c;
 }
 
@@ -82,6 +97,11 @@ void context_draw(context* c)
 
 void contexte_free(context* c)
 {
+    // TTF_CloseFont(c->font_small);
+    // TTF_CloseFont(c->font_medium);
+    // TTF_CloseFont(c->font_big);
+    // TTF_CloseFont(c->font_fullscreen);
+    
     scene_unload(c, (scene*)(c->scene));
     SDL_DestroyRenderer(c->renderer);
     SDL_DestroyWindow(c->window);

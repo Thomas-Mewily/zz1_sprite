@@ -193,3 +193,8 @@ void pen_animation(context* c, animation* a, rectf dest, time t)
 {
     pen_texture(c, a->sprite_sheet->t, *animation_get_frame(a, t), dest);
 }
+
+void pen_text(context* c, const char* text, rectf dest)
+{
+    
+}

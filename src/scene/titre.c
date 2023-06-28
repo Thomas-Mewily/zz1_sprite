@@ -43,7 +43,6 @@ void scene_titre_update(context* c, scene* sce)
     }
     else if (c->kb_state[SDL_SCANCODE_T])
     {
-        SDL_Log("here\n");
         scene_set(c, thomas_parallax);
     }
 }

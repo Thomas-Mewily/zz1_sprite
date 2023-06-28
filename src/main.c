@@ -23,6 +23,11 @@ void init()
         printf("Impossible d'initialiser la SDL\n");
         crash(SDL_GetError());
     }
+    
+    // if(TTF_Init()==-1) {
+    //     printf("Impossible d'initialiser la SDL TTF\n");
+    //     crash(TTF_GetError());
+    // }
 }
 
 void unload()
