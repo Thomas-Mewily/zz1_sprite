@@ -10,7 +10,7 @@ typedef struct
    texture* parallax[4];
    sprite_sheet* ss;
    anim* knight;
-   float time_s_offset;
+   float time_offset;
 } state;
 
 void scene_thomas_parallax_load(context* c, scene* sce)
@@ -28,13 +28,14 @@ void scene_thomas_parallax_load(context* c, scene* sce)
 
     s->ss = sprite_sheet_create(c, "asset/knight_ko.png", 24, 32);
     s->knight = animation_create(s->ss, frequence_s(10));
-    s->time_s_offset = 0;
+    s->time_offset = 0;
 }
 
 void scene_thomas_parallax_unload(context* c, scene* sce)
 {
     obtenir_state;
 
+    
     repeat(i, nb_parallax)
     {
         texture_free(s->parallax[i]);
@@ -48,12 +49,21 @@ void scene_thomas_parallax_unload(context* c, scene* sce)
 void scene_thomas_parallax_update(context* c, scene* sce)
 {
     obtenir_state;
+
+    // todo utiliser & faire les macro inputs : pull 
+    if(c->kb_state[SDL_SCANCODE_SPACE])
+    {
+        s->time_offset = sce->info.time;
+    }
+    if(c->kb_state[SDL_SCANCODE_N])
+    {
+        scene_set(c,titre);
+    }
 }
 
 void scene_thomas_parallax_draw(context* c, scene* sce)
 {
     obtenir_state;
-
 
     float mX = -(c->mouse_x - (float)c->window_width /2)/(c->window_width /2);
     float mY = -(c->mouse_y - (float)c->window_height/2)/(c->window_height/2);
@@ -80,7 +90,7 @@ void scene_thomas_parallax_draw(context* c, scene* sce)
 
     int knight_anim_height = animation_height(s->knight);
     float scaleY = (int)(1.0/knight_anim_height*c->window_height/8);
-    float timer = second(sce->info.time)-s->time_s_offset;
+    float timer = second(sce->info.time)-s->time_offset;
     float fall_scale = scaleY+scaleY*abs(sin(timer*2*pi/4))*8/(timer*timer);
     pen_animation_at_center(c, s->knight, hole_x, hole_y, fall_scale, fall_scale, 0.5, 0.5, sce->info.time);
 }

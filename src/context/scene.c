@@ -7,7 +7,7 @@ scene* scene_create_arg(char name[256], scene_fn load, scene_fn unload, scene_fn
 
     i->active = true;
 
-    i->argument = null;
+    i->argument = argument;
 
     i->background_color = color_black;
     repeat(k, scene_name_max_length)

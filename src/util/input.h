@@ -10,5 +10,17 @@
 #define pull_down(newState, oldState)    ((!(newState)) &&   (oldState) )
 #define pull_changed(newState, oldState) (( (newState)) !=   (oldState) )
 
-#define pressed(newState)
+#define is_key_pull_up(context, sdl_scan_code) todo
+#define is_key_pull_down(context, sdl_scan_code) todo
+#define is_key_pull_changed(context, sdl_scan_code) todo
+
+// en partant du principe que la variable c contient le context
+#define is_key_pull_up_with_context(sdl_scan_code) is_key_pull_up(c, sdl_scan_code)
+#define is_key_pull_down_with_context(sdl_scan_code) is_key_pull_down(c, sdl_scan_code)
+#define is_key_pull_changed_with_context(sdl_scan_code) is_key_pull_changed(c, sdl_scan_code)
+
+
+
+#define is_key_pressed(newState)
+
 #endif
