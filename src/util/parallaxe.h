@@ -9,7 +9,7 @@ struct parallaxe;
 typedef struct parallaxe parallaxe;
 
 struct parallaxe{
-    SDL_Texture* layers;
+    SDL_Texture** layers;
     int max_depth;
 };
 

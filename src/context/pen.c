@@ -178,6 +178,7 @@ void pen_texture_at_center(context* c, texture* t, rect src, float x, float y, f
 
 void pen_animation_at(context* c, animation* a, float x, float y, float scaleX, float scaleY, time t)
 {
+    if( !a->nb_frame ) return;
     pen_animation(c, a, rectanglef(x, y, texture_width(a->sprite_sheet->t)/a->nb_frame*scaleX, texture_height(a->sprite_sheet->t)*scaleY), t);
 }
 
@@ -191,4 +192,9 @@ void pen_animation_at_center(context* c, animation* a, float x, float y, float s
 void pen_animation(context* c, animation* a, rectf dest, time t)
 {
     pen_texture(c, a->sprite_sheet->t, *animation_get_frame(a, t), dest);
+}
+
+void pen_text(context* c, const char* text, rectf dest)
+{
+    
 }

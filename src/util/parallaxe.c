@@ -2,7 +2,10 @@
 /*
 parallaxe* create_parallaxe(int max_depth);
 
-void get_parallaxe_at(context* c, int time);
+void get_parallaxe_at(context* c, int time)
+{
+    return;
+}
 
 void free_parallaxe(parallaxe* p)
 {
