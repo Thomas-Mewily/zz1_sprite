@@ -21,7 +21,7 @@ void scene_titre_update(argument arg) { obtenir_state; }
 void scene_titre_draw(argument arg)
 {
     obtenir_state;
-    //pen_circle(c, c->window_width/2, c->window_height/2, c->window_height/32.0 * (s->nbFoisPresser+2));
+    pen_circle(c, c->window_width/2, c->window_height/2, c->window_height/32.0 * (s->nbFoisPresser+2));
     pen_text_at(c, "UwU", 0,0, FONT_SIZE_FULLSCREEN);
 }
 
