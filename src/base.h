@@ -25,6 +25,9 @@
 #include "context/window.h"
 #include "context/pen.h"
 
+#include "graph/graph.h"
+
+
 #include "scene/all_scene.h"
 
 #endif

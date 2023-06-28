@@ -6,7 +6,7 @@
 typedef int time;
 
 #define from_ms(ms) (ms)
-#define from_s(s)   (s*1000)
+#define from_s(s)   (s/1000)
 
 #define frequence_s(fps)   (1000/(fps))
 

@@ -13,6 +13,7 @@ void pen_mode(context* c, uint32 mode);
 
 
 void pen_texture(context* c, texture* t, rect src, rectf dest);
+void pen_texture_at(context* c, texture* t, rect src, float x, float y, float scaleX, float scaleY);
 void pen_texture_at_center(context* c, texture* t, rect src, float x, float y, float scaleX, float scaleY, float coef_centerX, float coef_centerY);
 
 void pen_animation_at(context* c, animation* a, float x, float y, float scaleX, float scaleY, time t);
