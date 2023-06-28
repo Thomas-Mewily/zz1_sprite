@@ -196,21 +196,26 @@ void pen_animation(context* c, animation* a, rectf dest, time t)
 
 void pen_text(context* c, const char* text, rectf dest)
 {
-
+    
 }
-void pen_text_at(context* c, const char* text, rectf dest, float x, float y, float pixel_ligne_height)
+void pen_text_at(context* c, const char* text, float x, float y, float pixel_ligne_height)
 {
 
 }
 
-void pen_char_at(context* c, char letter, rectf dest, float x, float y, float pixel_ligne_height)
+void pen_text_at_center(context* c, const char* text, float x, float y, float pixel_ligne_height, float centerX, float centerY)
 {
 
+}
+
+void pen_char_at(context* c, char letter, float x, float y, float pixel_ligne_height)
+{
+    
 }
 
 void pen_char(context* c, char letter, rectf dest)
 {
-    
+
 }
 
 void pen_init(context* c)

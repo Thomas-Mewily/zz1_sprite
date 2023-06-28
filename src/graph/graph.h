@@ -26,7 +26,6 @@ typedef struct
     int a;
     int b;
     float distance;
-
 } join;
 
 struct graph {
@@ -80,11 +79,13 @@ void graph_add_join(graph*g , int a , int b){
    
 }
 
-float graph_node_x(graph * g , int a){
-   return g->_nodes[a].x;
-}
-float graph_node_y(graph * g , int a){
-   return g->_nodes[a].y;
+float graph_node_x(graph * g , int a) { return g->_nodes[a].x; }
+float graph_node_y(graph * g , int a) { return g->_nodes[a].y; }
+
+float graph_set_node_x_y(graph * g , int idx, float x, float y) 
+{ 
+   g->_nodes[idx].x = x;
 }
 */
+
 #endif
