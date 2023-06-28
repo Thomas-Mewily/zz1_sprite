@@ -1,37 +1,30 @@
 #include "base.h"
 #include <stdlib.h>
 
-#define obtenir_state state* s = (state*)(sce->state);
-
 typedef struct 
 {
    //texture* steve;
    graph* g;
 } state;
 
-void scene_houza_load(context* c, scene* sce)
+void scene_houza_load(argument arg)
 {
-    sce->state = (void*)create(state);
     obtenir_state;
 
-
     s->g = graph_complet(20,1);
-    
     sce->info.background_color = rgb(200,0,0);
-
     //s->steve = texture_create(c, "asset/Steve.png");
 }
 
 
-void scene_houza_unload(context* c, scene* sce)
+void scene_houza_unload(argument arg)
 {
     obtenir_state;
     graph_free(s->g);
    // texture_free(s->steve);
-    free(s);
 }
 
-void scene_houza_update(context* c, scene* sce)
+void scene_houza_update(argument arg)
 {
     obtenir_state;
 
@@ -41,7 +34,7 @@ void scene_houza_update(context* c, scene* sce)
     }
 } 
 
-void scene_houza_draw(context* c, scene* sce)
+void scene_houza_draw(argument arg)
 {
     obtenir_state;
 
@@ -59,7 +52,7 @@ void scene_houza_draw(context* c, scene* sce)
         pen_color(c,hsv(i%180,1,1));
 
         float x = graph_node_x(g,i);
-        float y =graph_node_y(g,i);
+        float y = graph_node_y(g,i);
         pen_circle(c,scale*x +offset_x,scale*y+offset_y ,radius);
         
         for(int k = 0; k < graph_node_get_nb_neighbors(g,i); k++)
@@ -124,8 +117,8 @@ void scene_houza_draw(context* c, scene* sce)
    #endif
 }
 
-
-void scene_houza_printf(context* c, scene* sce)
+bool scene_houza_event (argument arg) { obtenir_state; return false; }
+void scene_houza_printf(argument arg)
 {
     obtenir_state;
     printf("Parallax de houza\n");

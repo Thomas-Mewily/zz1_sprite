@@ -8,3 +8,5 @@ typedef SDL_Vertex vertex;
 
 typedef SDL_FRect rectf;
 typedef SDL_Rect rect;
+
+typedef SDL_Event event;

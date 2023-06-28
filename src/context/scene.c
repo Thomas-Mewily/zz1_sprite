@@ -1,13 +1,12 @@
 #include "base.h"
-
-scene* scene_create_arg(char name[256], scene_fn load, scene_fn unload, scene_fn update, scene_fn draw, scene_fn printf, void* argument)
+scene* scene_create_arg(char name[256], scene_fn load, scene_fn unload, scene_fn update, scene_fn draw, scene_fn_event event, scene_fn printf, void* message)
 {
     scene* sce = create(scene);
     scene_info* i = &sce->info;
 
     i->active = true;
 
-    i->argument = argument;
+    i->message = message;
 
     i->background_color = color_black;
     repeat(k, scene_name_max_length)
@@ -20,6 +19,7 @@ scene* scene_create_arg(char name[256], scene_fn load, scene_fn unload, scene_fn
     i->unload = unload;
     i->update = update;
     i->draw = draw;
+    i->event = event;
     i->printf = printf;
 
     i->is_loaded = false;
@@ -29,14 +29,27 @@ scene* scene_create_arg(char name[256], scene_fn load, scene_fn unload, scene_fn
     return sce;
 }
 
+#define get_argument argument_create(c, sce, null)
+#define get_argument_with_event argument_create(c, sce, ev)
+
+argument argument_create(context* arg_context, scene* arg_scene, event* arg_event)
+{
+    argument arg;
+    arg.arg_context = arg_context;
+    arg.arg_scene = arg_scene;
+    arg.arg_event = arg_event;
+    return arg;
+}
+
 void scene_unload(context* c, scene* sce)
 {
     if(sce == null) return;
 
     if(sce->info.active) { scene_set_inactive(c, sce); }
 
-    sce->info.unload(c, sce);
-    free(sce->info.argument);
+    sce->info.unload(get_argument);
+    free(sce->info.message);
+    free(sce->state);
     free(sce);
 }
 
@@ -44,7 +57,7 @@ void scene_update(context* c, scene* sce)
 {
     if(sce == null) return;
     sce->info.time = c->timer - sce->info.time_when_active;
-    sce->info.update(c, sce);
+    sce->info.update(get_argument);
 }
 
 void scene_draw(context* c, scene* sce)
@@ -53,16 +66,23 @@ void scene_draw(context* c, scene* sce)
     color co = pen_get_color(c);
     pen_color(c, sce->info.background_color);
     pen_clear(c);
+
     pen_color(c, co);
-    sce->info.draw(c, sce);
+    sce->info.draw(get_argument);
 }
 
 void scene_printf(context* c, scene* sce)
 {
     if(sce == null) return;
     printf("scene %s:\n", sce->info.name);
-    sce->info.printf(c, sce);
+    sce->info.printf(get_argument);
     printf("\n");
+}
+
+bool scene_event(context* c, scene* sce, event* ev)
+{
+    if(sce == null) return false;
+    return sce->info.event(get_argument_with_event);
 }
 
 void scene_set_active(context* c, scene* sce)
@@ -71,13 +91,15 @@ void scene_set_active(context* c, scene* sce)
     if(sce->info.is_loaded == false)
     {
         sce->info.is_loaded = true;
-        sce->info.load(c, sce);
+        sce->info.load(get_argument);
     }
     printf("scene %s active\n", sce->info.name);
     sce->info.active = true;
 }
+
 void scene_set_inactive(context* c, scene* sce)
 {
+    UNUSED(c);
     if(sce == null) { return;}
     sce->info.active = false;
 }

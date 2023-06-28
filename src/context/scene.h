@@ -7,12 +7,21 @@
 struct scene_struct;
 typedef struct scene_struct scene;
 
-typedef void (*scene_fn)(context* c, scene* sce);
+typedef struct 
+{
+   context* arg_context;
+   scene*   arg_scene;
+   event*   arg_event;
+}argument;
 
+typedef void (*scene_fn)(argument);
+typedef bool (*scene_fn_event)(argument);
+
+argument argument_create(context* arg_context, scene* arg_scene, event* arg_event);
 typedef struct
 {
    color background_color;
-   void* argument;
+   void* message;
 
    time time;              // since the beginning of the scene
    time time_when_active;  // based on context.time
@@ -21,13 +30,14 @@ typedef struct
    bool is_loaded;
    char name[scene_name_max_length];
 
-   #define scene_fn(name) void (*name)(context* c, scene* sce)
-
    scene_fn load;
    scene_fn unload;
 
    scene_fn update;
    scene_fn draw;
+
+   // return a bool consumed
+   scene_fn_event event;
 
    scene_fn printf;
 
@@ -39,18 +49,20 @@ struct scene_struct
    void* state;
 };
 
-scene* scene_create_arg(char name[256], scene_fn load, scene_fn unload, scene_fn update, scene_fn draw, scene_fn printf, void* argument);
+scene* scene_create_arg(char name[256], scene_fn load, scene_fn unload, scene_fn update, scene_fn draw, scene_fn_event event, scene_fn printf, void* message);
 
 void scene_unload(context* c, scene* sce);
 void scene_update(context* c, scene* sce);
 void scene_draw  (context* c, scene* sce);
+bool scene_event (context* c, scene* sce, event* ev); // return a bool consumed
 void scene_printf(context* c, scene* sce);
 
 #define scene_create(name) scene_create_arg(#name "\0",  \
-   scene_ ## name ## _load,\
+   scene_ ## name ## _load,  \
    scene_ ## name ## _unload,\
    scene_ ## name ## _update,\
    scene_ ## name ## _draw,  \
+   scene_ ## name ## _event, \
    scene_ ## name ## _printf,\
    null\
 )

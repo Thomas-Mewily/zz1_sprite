@@ -1,7 +1,5 @@
 #include "base.h"
 
-#define obtenir_state state* s = (state*)(sce->state);
-
 #define nb_parallax 4
 #define load_parallax(idx) texture_create(c, "asset/parallax" #idx ".png")
 
@@ -13,11 +11,9 @@ typedef struct
    float time_offset;
 } state;
 
-void scene_thomas_parallax_load(context* c, scene* sce)
+void scene_thomas_parallax_load(argument arg)
 {
-    sce->state = (void*)create(state);
     obtenir_state;
-    sce->state = s;
 
     sce->info.background_color = color_black;
 
@@ -31,10 +27,9 @@ void scene_thomas_parallax_load(context* c, scene* sce)
     s->time_offset = 0;
 }
 
-void scene_thomas_parallax_unload(context* c, scene* sce)
+void scene_thomas_parallax_unload(argument arg)
 {
     obtenir_state;
-
     
     repeat(i, nb_parallax)
     {
@@ -43,10 +38,9 @@ void scene_thomas_parallax_unload(context* c, scene* sce)
 
     sprite_sheet_free(s->ss);
     animation_free(s->knight);
-    free(sce->state);
 }
 
-void scene_thomas_parallax_update(context* c, scene* sce)
+void scene_thomas_parallax_update(argument arg)
 {
     obtenir_state;
 
@@ -61,7 +55,7 @@ void scene_thomas_parallax_update(context* c, scene* sce)
     }
 } 
 
-void scene_thomas_parallax_draw(context* c, scene* sce)
+void scene_thomas_parallax_draw(argument arg)
 {
     obtenir_state;
 
@@ -96,10 +90,7 @@ void scene_thomas_parallax_draw(context* c, scene* sce)
     pen_animation_at_center(c, s->knight, hole_x, hole_y, fall_scale, fall_scale, 0.5, 0.5, sce->info.time);
 }
 
-void scene_thomas_parallax_printf(context* c, scene* sce)
-{
-    obtenir_state;
-    printf("Parallax de Thomas\n");
-}
+bool scene_thomas_parallax_event (argument arg) { obtenir_state; return false; }
+void scene_thomas_parallax_printf(argument arg) { obtenir_state; printf("Parallax de Thomas\n"); }
 
 #undef obtenir_state

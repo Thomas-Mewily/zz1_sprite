@@ -10,6 +10,9 @@ typedef int node_type;
 
 struct graph;
 
+#define NODE_SELECTED_FALSE 0
+#define NODE_SELECTED_TRUE  1
+
 typedef struct
 {
     bool exist;
@@ -18,7 +21,9 @@ typedef struct
     float x;
     float y;
     vec* /*int*/ neightbors;
+
     bool colorer_en_noir; // Cache pour savoir si on est déjà passer sur le noeud 
+    int selected_flag;
 } node;
 typedef struct
 {
@@ -51,6 +56,7 @@ int graph_get_nb_node(graph* g);
 node* graph_get_node(graph* g , int idx);
 join* graph_get_join(graph*g, int a, int b);
 
+// ne pas free le vec de retour
 vec* graph_node_get_neighbors_vec(graph*g , int _joins);
 int graph_get_node_neighbors(graph* g, int idx, int neighbors_idx);
 
@@ -61,6 +67,8 @@ void graph_add_join(graph*g , int a, int b);
 
 float graph_node_x(graph * g , int idx);
 float graph_node_y(graph * g , int idx);
+
+//float graph_set_node_x_y(graph * g , int idx, float x, float y);todo
 
 int graph_nb_node_exist(graph * g);
 int graph_nb_join_exist(graph * g);

@@ -1,7 +1,5 @@
 #include "base.h"
 
-#define obtenir_state scene_martin_state* s = (scene_martin_state*)(sce->state);
-
 typedef struct 
 {
    float hue;
@@ -9,63 +7,82 @@ typedef struct
    texture* steve;
    sprite_sheet* froggyS;
    anim* froggyAnim;
-} scene_martin_state;
+   graph* graph_test;
+} state;
 
-void set_bg_color(scene* sce)
+void set_bg_color(argument arg)
 {
     obtenir_state;
     sce->info.background_color = hsv(s->hue, 0.4, 0.95);
 }
 
-void scene_martin_load(context* c, scene* sce)
-{
-    sce->state = (void*)create(scene_martin_state);
+void scene_martin_load(argument arg)
+{   
     obtenir_state;
 
     s->hue = 0;
     s->color_change_speed = 0.7;
-    set_bg_color(sce);
+    set_bg_color(arg);
     s->steve = texture_create(c, "asset/steve.png");
     s->froggyS = sprite_sheet_create(c, "asset/froggyChair.png", 54, 54);
     s->froggyAnim = animation_create(s->froggyS, frequence_s(20));
 
-    graph_gen_nul_equi(100, 1920, 1080);
-
+    s->graph_test = graph_gen_nul_equi(100, rectanglef(0, 0, 1920, 1080));
 
 }
-void scene_martin_unload(context* c, scene* sce)
+
+void scene_martin_unload(argument arg)
 {
     obtenir_state;
-    SDL_DestroyTexture(s->steve);
-    free(sce->state);
+    texture_free(s->steve);
+    // rip la mémoire occuper par froggyS et froggyAnim
 }
 
-void scene_martin_update(context* c, scene* sce)
+void scene_martin_update(argument arg)
 {
     obtenir_state;
-    set_bg_color(sce);
+    set_bg_color(arg);
     s->hue += s->color_change_speed;
     if (s->hue >= 360) {s->hue = 0;}
 
     c->pen_x = (c->window_width/2) -  c->mouse_x;
     c->pen_y = (c->window_height/2) -  c->mouse_y;
 
-
 }
-void scene_martin_draw(context* c, scene* sce)
+void scene_martin_draw(argument arg)
 {
     obtenir_state;
     //pen_circle(c, 100, 100, 50 );
-    pen_text_at(c, "QUOI? azertyuiopqsdfgjhklwxcvbnvc", 0, 0, FONT_SIZE_FULLSCREEN);
-    pen_text_at(c, "QUOI? azertyuiopqsdfgjhklwxcvbnvc", 0, 50, FONT_SIZE_BIG);
-    pen_text_at(c, "QUOI? azertyuiopqsdfgjhklwxcvbnvc", 0, 100, FONT_SIZE_NORMAL);
-    pen_text_at(c, "QUOI? azertyuiopqsdfgjhklwxcvbnvc", 0, 200, FONT_SIZE_SMALL);
-    pen_rect(c, rectanglef(400, 20, 100,20));
-    pen_texture_at(c, s->steve, texture_rect(s->steve), 400, 300, 1, 1);
-    pen_animation_at(c, s->froggyAnim, 10, 400, 3, 3, c->timer);
+    // pen_text_at(c, "QUOI? azertyuiopqsdfgjhklwxcvbnvc", 0, 0, FONT_SIZE_FULLSCREEN);
+    // pen_text_at(c, "QUOI? azertyuiopqsdfgjhklwxcvbnvc", 0, 50, FONT_SIZE_BIG);
+    // pen_text_at(c, "QUOI? azertyuiopqsdfgjhklwxcvbnvc", 0, 100, FONT_SIZE_NORMAL);
+    // pen_text_at(c, "QUOI? azertyuiopqsdfgjhklwxcvbnvc", 0, 200, FONT_SIZE_SMALL);
+    // pen_rect(c, rectanglef(400, 20, 100,20));
+    // pen_texture_at(c, s->steve, texture_rect(s->steve), 400, 300, 1, 1);
+    // pen_animation_at(c, s->froggyAnim, 10, 400, 3, 3, c->timer);
+
+    graph* g = s->graph_test;
+    int offset_x = 0;
+    int offset_y = 0;
+    float radius = 20;
+    float scale = 1;
+    repeat(i, graph_get_nb_node(g))
+    {
+        pen_color(c,hsv(i%180,1,1));
+
+        float x = graph_node_x(g,i);
+        float y =graph_node_y(g,i);
+        pen_circle(c,scale*x +offset_x,scale*y+offset_y, radius);
+        
+        for(int k = 0; k < graph_node_get_nb_neighbors(g,i); k++)
+        {
+            int j = graph_get_node_neighbors(g,i,k);
+            float xj = graph_node_x(g,j);
+            float yj =graph_node_y(g,j);
+            pen_line(c,scale*x +offset_x,scale*y+offset_y,scale*xj +offset_x,scale*yj+offset_y);
+        }
+    }
 }
 
-void scene_martin_printf(context* c, scene* sce)
-{
-    return;
-}
+bool scene_martin_event (argument arg) { obtenir_state; return false; }
+void scene_martin_printf(argument arg) { obtenir_state; }

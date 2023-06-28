@@ -2,12 +2,13 @@
 #define SCENE_TITRE_H
 #include "base.h"
 
-void scene_titre_load(context* c, scene* sce);
-void scene_titre_unload(context* c, scene* sce);
+void scene_titre_load  (argument arg);
+void scene_titre_unload(argument arg);
 
-void scene_titre_update(context* c, scene* sce);
-void scene_titre_draw(context* c, scene* sce);
+void scene_titre_update(argument arg);
+void scene_titre_draw  (argument arg);
 
-void scene_titre_printf(context* c, scene* sce);
+bool scene_titre_event (argument arg);
+void scene_titre_printf(argument arg);
 
 #endif
