@@ -5,6 +5,7 @@
 
 #include "titre.h"
 #include "thomas_parallax.h"
+#include "houza.h"
 #include "martin.h"
 
 #pragma GCC diagnostic warning "-Wunused-parameter"

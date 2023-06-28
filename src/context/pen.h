@@ -15,6 +15,7 @@ void pen_mode(context* c, uint32 mode);
 
 
 void pen_texture(context* c, texture* t, rect src, rectf dest);
+void pen_texture_at(context* c, texture* t, rect src, float x, float y, float scaleX, float scaleY);
 void pen_texture_at_center(context* c, texture* t, rect src, float x, float y, float scaleX, float scaleY, float coef_centerX, float coef_centerY);
 
 void pen_animation_at(context* c, animation* a, float x, float y, float scaleX, float scaleY, time t);
@@ -51,6 +52,12 @@ void pen_triangle(context* c,
                             float x3, float y3
                 ); 
 
-void pen_text(context* c, const char* text, rectf dest);
 
+void pen_text(context* c, const char* text, rectf dest);
+void pen_text_at(context* c, const char* text, rectf dest, float x, float y, float pixel_ligne_height);
+
+void pen_char(context* c, char letter, rectf dest);
+void pen_char_at(context* c, char letter, rectf dest, float x, float y, float pixel_ligne_height);
+
+void pen_init(context* c);
 #endif

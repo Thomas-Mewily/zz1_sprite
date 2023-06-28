@@ -196,18 +196,24 @@ void pen_animation(context* c, animation* a, rectf dest, time t)
 
 void pen_text(context* c, const char* text, rectf dest)
 {
+
+}
+void pen_text_at(context* c, const char* text, rectf dest, float x, float y, float pixel_ligne_height)
+{
+
+}
+
+void pen_char_at(context* c, char letter, rectf dest, float x, float y, float pixel_ligne_height)
+{
+
+}
+
+void pen_char(context* c, char letter, rectf dest)
+{
     
 }
 
-void font_write_char(context* c, char letter, int posX, int posY)
+void pen_init(context* c)
 {
-    if (letter > ' ' && letter != '\\')
-    {
-        SDL_Rect mask = rectangle((letter % 16) * font_rectangle_size, (letter / 16) * font_rectangle_size, font_rectangle_size, font_rectangle_size);
-        SDL_Rect pos = rectangle(posX, posY, font_rectangle_size, font_rectangle_size);
-
-        //texture* t = texture_create(c, "asset/font.png");
-        //texture_rect(t)
-        // SDL_BlitSurface(font, &mask, screen, &pos);
-    }
+    c->font = texture_create(c, "asset/font.png");
 }

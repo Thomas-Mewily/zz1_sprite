@@ -59,7 +59,7 @@ void scene_thomas_parallax_update(context* c, scene* sce)
     {
         scene_set(c,titre);
     }
-}
+} 
 
 void scene_thomas_parallax_draw(context* c, scene* sce)
 {
@@ -92,6 +92,7 @@ void scene_thomas_parallax_draw(context* c, scene* sce)
     float scaleY = (int)(1.0/knight_anim_height*c->window_height/8);
     float timer = second(sce->info.time)-s->time_offset;
     float fall_scale = scaleY+scaleY*abs(sin(timer*2*pi/4))*8/(timer*timer);
+    
     pen_animation_at_center(c, s->knight, hole_x, hole_y, fall_scale, fall_scale, 0.5, 0.5, sce->info.time);
 }
 
