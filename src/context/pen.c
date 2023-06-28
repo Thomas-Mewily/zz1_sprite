@@ -210,7 +210,13 @@ void pen_char_at(context* c, char letter, rectf dest, float x, float y, float pi
 
 void pen_char(context* c, char letter, rectf dest)
 {
-    
+    if (letter > ' ' && letter != '\\')
+    {
+        rect mask = rectangle((letter % 16) * font_rectangle_size,
+                              (letter / 16) * font_rectangle_size,
+                              font_rectangle_size, font_rectangle_size);
+        pen_texture(c, c->font, mask, dest);
+    }
 }
 
 void pen_init(context* c)
