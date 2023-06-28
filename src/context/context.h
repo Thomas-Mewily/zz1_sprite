@@ -2,10 +2,14 @@
 #define THE_CONTEXT_H
 #include "base.h"
 
+//extern struct scene_struct;
 typedef struct
 {
     int screen_width;
     int screen_height;
+
+    float window_ratio_width_div_height;
+    float window_ratio_height_div_width;
 
     SDL_Window* window;
     int window_width;
@@ -20,9 +24,14 @@ typedef struct
     int mouse_y;
     int32 mouse_flag;
 
+    int mouse_old_x;
+    int mouse_old_y;
+    int32 mouse_old_flag;
     const Uint8* kb_state;
 
-    timer tick;
+    time timer; // since the beginning of the program
+
+    void* scene;
 
     float  pen_x;
     float  pen_y;
@@ -33,6 +42,7 @@ typedef struct
     vertex _pen_vertex[3];
     int    _pen_idx;
 
+    bool should_exit;
 } context;
 
 context* context_create(char* window_name, int width, int height, Uint32 flags);

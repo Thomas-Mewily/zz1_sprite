@@ -1,9 +1,6 @@
 #include "base.h"
-
-parallaxe* create_parallaxe(int max_depth)
-{
-    return null;
-}
+/*
+parallaxe* create_parallaxe(int max_depth);
 
 void get_parallaxe_at(context* c, int time)
 {
@@ -16,6 +13,6 @@ void free_parallaxe(parallaxe* p)
     {
         SDL_DestroyTexture(p->layers[i]);
     }
-    free(p->layers);
-    free(p);
-}
+    
+    p->layers
+}*/

@@ -51,6 +51,13 @@ void pen_color(context* c, color co)
         (c->_pen_vertex[c->_pen_idx]).color = to_sdl_color(co);
     }
 }
+color pen_get_color(context* c)
+{
+    color co;
+    SDL_GetRenderDrawColor(c->renderer, &co.r, &co.g, &co.b, &co.a);
+    return co;
+}
+
 void pen_clear(context* c) { SDL_RenderClear(c->renderer); }
 
 // todo : affected by pen size
@@ -158,17 +165,31 @@ void pen_texture(context* c, texture* t, rect src, rectf dest)
 
 void pen_texture_at(context* c, texture* t, rect src, float x, float y, float scaleX, float scaleY)
 {
-    pen_texture(c, t, src, rectanglef(x, y, texture_width(t)*scaleX,  texture_width(t)*scaleY));
+    pen_texture(c, t, src, rectanglef(x, y, texture_width(t)*scaleX,  texture_height(t)*scaleY));
+}
+
+void pen_texture_at_center(context* c, texture* t, rect src, float x, float y, float scaleX, float scaleY, float coef_centerX, float coef_centerY)
+{
+    float frame_width_scaled =  texture_width (t) *scaleX;
+    float frame_height_scaled = texture_height(t) *scaleY;
+    pen_texture(c, t, src, rectanglef(x-frame_width_scaled*coef_centerX, y-frame_height_scaled*coef_centerY, frame_width_scaled,  frame_height_scaled));
 }
 
 
-void pen_animation_at(context* c, animation* a, float x, float y, float scaleX, float scaleY, timer t)
+void pen_animation_at(context* c, animation* a, float x, float y, float scaleX, float scaleY, time t)
 {
     if( !a->nb_frame ) return;
     pen_animation(c, a, rectanglef(x, y, texture_width(a->sprite_sheet->t)/a->nb_frame*scaleX, texture_height(a->sprite_sheet->t)*scaleY), t);
 }
 
-void pen_animation(context* c, animation* a, rectf dest, timer t)
+void pen_animation_at_center(context* c, animation* a, float x, float y, float scaleX, float scaleY, float coef_centerX, float coef_centerY, time t)
+{
+    float frame_width_scaled =  animation_width (a) *scaleX;
+    float frame_height_scaled = animation_height(a) *scaleY;
+    pen_animation(c, a, rectanglef(x-frame_width_scaled*coef_centerX, y-frame_height_scaled*coef_centerY, frame_width_scaled, frame_height_scaled), t);
+}
+
+void pen_animation(context* c, animation* a, rectf dest, time t)
 {
     pen_texture(c, a->sprite_sheet->t, *animation_get_frame(a, t), dest);
 }

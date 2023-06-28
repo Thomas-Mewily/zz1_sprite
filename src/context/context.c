@@ -40,8 +40,11 @@ context* context_create(char* window_name, int width, int height, Uint32 flags)
         c->_pen_vertex[i].tex_coord.y = 0;
     }
     
-    context_update(c);
-    
+    c->should_exit = false;
+    c->scene = null;
+
+    twice(context_update(c););
+
     return c;
 }
 
@@ -53,28 +56,33 @@ void context_update(context* c)
     c->screen_height = screen.h;
 
     SDL_GetWindowPosition(c->window, &c->window_x, &c->window_y);
-    
-    int window_width;
-    int window_height;
-    SDL_GetWindowSize(c->window, &window_width, &window_height);
-    if(c->window_width != window_width || c->window_height != window_height)
-    {
-        SDL_SetWindowSize(c->window, c->window_width, c->window_height);
-    }
+    SDL_GetWindowSize(c->window, &c->window_width, &c->window_height);
 
+    c->window_ratio_width_div_height = c->screen_width/(float)c->screen_height;
+    c->window_ratio_height_div_width = c->screen_height/(float)c->screen_width;
+
+    //printf("window %i %i, mouse %i %i\n", c->window_width, c->window_height, c->mouse_x, c->mouse_y);
+
+    c->mouse_old_flag = c->mouse_flag;
+    c->mouse_old_x = c->mouse_x;
+    c->mouse_old_y = c->mouse_y;
     c->mouse_flag = SDL_GetMouseState(&(c->mouse_x), &(c->mouse_y));
     c->kb_state = SDL_GetKeyboardState(NULL);
 
-    c->tick = SDL_GetTicks();
+    c->timer = from_ms(SDL_GetTicks());
+
+    scene_update(c, (scene*)(c->scene));
 }
 
 void context_draw(context* c)
 {
+    scene_draw(c, (scene*)(c->scene));
     SDL_RenderPresent(c->renderer);
 }
 
 void contexte_free(context* c)
 {
+    scene_unload(c, (scene*)(c->scene));
     SDL_DestroyRenderer(c->renderer);
     SDL_DestroyWindow(c->window);
 }

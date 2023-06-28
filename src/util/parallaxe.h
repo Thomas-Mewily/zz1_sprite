@@ -1,3 +1,4 @@
+/*
 #ifndef PARALLAXE
 #define PARALLAXE
 #include "base.h"
@@ -18,4 +19,4 @@ void get_parallaxe_at(context* c, int time);
 
 void free_parallaxe(parallaxe* p);
 
-#endif
+#endif*/
