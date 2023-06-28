@@ -254,3 +254,48 @@ graph* graph_complet(int nb_node, float radius)
     }
     return g;
 }
+
+graph* graph_gen_nul_equi(int nb_node, rectf area_contained)
+{
+    graph* g = graph_empty();
+    int area = nb_node* 9;
+    int tableW = sqrt(area * area_contained.w / area_contained.h);
+    int tableH = area / tableW;
+    //printf("aire voulue : %d, aire réelle : %d, dim : %d x %d", area, w * h, w, h);
+
+    float cellW = area_contained.w / tableW;
+    float cellH = area_contained.h / tableH;
+
+    bool** occuped = create_array(bool*, tableH);
+    for (int i = 0; i < tableH; i++)
+    {
+        occuped[i] = (bool*)calloc(sizeof(bool) * tableW);
+    }
+
+    bool crise_du_logement = false;
+    while (nb_node > 0 && !crise_du_logement)
+    {
+        int i, j;
+        int it = 0;
+        do
+        {
+            i = rand()%tableH; j = rand()%tableW;
+            i++;
+        } while (occuped[i][j] && it <= area);
+        if (it > area) {crise_du_logement = true;}
+        node* new_node = graph_add_node_x_y(g, j * cellW + rand()%(int)cellW,
+                                            i * cellH + rand()%(int)cellH); 
+
+        for (int k = -1; k < 2; k++)
+        {
+            for (int l = -1; l < 2; l++)
+            {
+                if (!(i+k<0 || i+k >= tableW || j+l < 0 || j+l >= tableH))
+                    occuped[i+k][j+l] = true;
+            }
+        }
+    }
+    
+
+    return g;
+}

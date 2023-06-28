@@ -76,4 +76,6 @@ void graph_printf(graph* g);
 
 graph* graph_complet(int nb_noeud, float radius);
 
+graph* graph_gen_nul_equi(int nb_node, rectf area_contained);
+
 #endif

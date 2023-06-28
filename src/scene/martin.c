@@ -29,6 +29,8 @@ void scene_martin_load(context* c, scene* sce)
     s->froggyS = sprite_sheet_create(c, "asset/froggyChair.png", 54, 54);
     s->froggyAnim = animation_create(s->froggyS, frequence_s(20));
 
+    graph_gen_nul_equi(100, 1920, 1080);
+
 
 }
 void scene_martin_unload(context* c, scene* sce)
