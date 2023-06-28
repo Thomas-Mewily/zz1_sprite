@@ -15,6 +15,7 @@ typedef struct
 }argument;
 
 typedef void (*scene_fn)(argument);
+typedef bool (*scene_fn_event)(argument);
 
 argument argument_create(context* arg_context, scene* arg_scene, event* arg_event);
 typedef struct
@@ -35,7 +36,8 @@ typedef struct
    scene_fn update;
    scene_fn draw;
 
-   scene_fn event;
+   // return a bool consumed
+   scene_fn_event event;
 
    scene_fn printf;
 
@@ -47,12 +49,12 @@ struct scene_struct
    void* state;
 };
 
-scene* scene_create_arg(char name[256], scene_fn load, scene_fn unload, scene_fn update, scene_fn draw, scene_fn event, scene_fn printf, void* message);
+scene* scene_create_arg(char name[256], scene_fn load, scene_fn unload, scene_fn update, scene_fn draw, scene_fn_event event, scene_fn printf, void* message);
 
 void scene_unload(context* c, scene* sce);
 void scene_update(context* c, scene* sce);
 void scene_draw  (context* c, scene* sce);
-void scene_event (context* c, scene* sce, event* ev);
+bool scene_event (context* c, scene* sce, event* ev); // return a bool consumed
 void scene_printf(context* c, scene* sce);
 
 #define scene_create(name) scene_create_arg(#name "\0",  \

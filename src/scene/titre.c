@@ -25,7 +25,7 @@ void scene_titre_draw(argument arg)
     pen_text_at(c, "UwU", 0,0, FONT_SIZE_FULLSCREEN);
 }
 
-void scene_titre_event (argument arg) 
+bool scene_titre_event (argument arg) 
 { 
     obtenir_state;
 
@@ -38,14 +38,15 @@ void scene_titre_event (argument arg)
             switch (ev->key.keysym.sym)
             {
                 case SDLK_ESCAPE: c->should_exit = true; break;
-                case SDLK_m: scene_set(c, martin); break;
-                case SDLK_t: scene_set(c, thomas_parallax); break;
-                case SDLK_h: scene_set(c, houza); break;
+                case SDLK_m: scene_set(c, martin); return true;
+                case SDLK_t: scene_set(c, thomas_parallax); return true;
+                case SDLK_h: scene_set(c, houza); return true;
                 default: break;
             }
         } break;
         default: break;
     }
+    return false;
 }
 
 void scene_titre_printf(argument arg)

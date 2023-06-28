@@ -1,6 +1,5 @@
 #include "base.h"
-
-scene* scene_create_arg(char name[256], scene_fn load, scene_fn unload, scene_fn update, scene_fn draw, scene_fn event, scene_fn printf, void* message)
+scene* scene_create_arg(char name[256], scene_fn load, scene_fn unload, scene_fn update, scene_fn draw, scene_fn_event event, scene_fn printf, void* message)
 {
     scene* sce = create(scene);
     scene_info* i = &sce->info;
@@ -80,10 +79,10 @@ void scene_printf(context* c, scene* sce)
     printf("\n");
 }
 
-void scene_event(context* c, scene* sce, event* ev)
+bool scene_event(context* c, scene* sce, event* ev)
 {
-    if(sce == null) return;
-    sce->info.event(get_argument_with_event);
+    if(sce == null) return false;
+    return sce->info.event(get_argument_with_event);
 }
 
 void scene_set_active(context* c, scene* sce)

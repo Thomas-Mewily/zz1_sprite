@@ -117,7 +117,7 @@ void scene_houza_draw(argument arg)
    #endif
 }
 
-void scene_houza_event (argument arg) { obtenir_state; }
+bool scene_houza_event (argument arg) { obtenir_state; return false; }
 void scene_houza_printf(argument arg)
 {
     obtenir_state;

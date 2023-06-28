@@ -90,7 +90,7 @@ void scene_thomas_parallax_draw(argument arg)
     pen_animation_at_center(c, s->knight, hole_x, hole_y, fall_scale, fall_scale, 0.5, 0.5, sce->info.time);
 }
 
-void scene_thomas_parallax_event (argument arg) { obtenir_state; }
+bool scene_thomas_parallax_event (argument arg) { obtenir_state; return false; }
 void scene_thomas_parallax_printf(argument arg) { obtenir_state; printf("Parallax de Thomas\n"); }
 
 #undef obtenir_state

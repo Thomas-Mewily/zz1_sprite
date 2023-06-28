@@ -58,5 +58,5 @@ void scene_martin_draw(argument arg)
     pen_animation_at(c, s->froggyAnim, 10, 400, 3, 3, c->timer);
 }
 
-void scene_martin_event (argument arg) { obtenir_state; }
+bool scene_martin_event (argument arg) { obtenir_state; return false; }
 void scene_martin_printf(argument arg) { obtenir_state; }
