@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     window_center_coef(c, 0.5, 0.5);
 
     //scene_set(c, titre);
-    scene_set(c, thomas_parallax);
+    scene_set(c, titre);
 
     while (!c->should_exit)
     {
