@@ -45,6 +45,10 @@ void scene_titre_update(context* c, scene* sce)
     {
         scene_set(c, thomas_parallax);
     }
+    else if (c->kb_state[SDL_SCANCODE_H])
+    {
+        scene_set(c, houza);
+    }
 }
 
 void scene_titre_draw(context* c, scene* sce)
