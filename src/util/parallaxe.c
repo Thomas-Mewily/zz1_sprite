@@ -1,5 +1,5 @@
 #include "base.h"
-
+/*
 parallaxe* create_parallaxe(int max_depth);
 
 void get_parallaxe_at(context* c, int time);
@@ -12,4 +12,4 @@ void free_parallaxe(parallaxe* p)
     }
     
     p->layers
-}
+}*/
