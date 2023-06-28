@@ -10,7 +10,7 @@ void testVec(){
     vec_printf_int(v);
     int val = vec_get(v, int, 0);*/
     //v->
-    vec_free_lazy(v);
+    //vec_free_lazy(v);
 }
 
 void test_debug()
