@@ -5,10 +5,10 @@
 #define PEN_MODE_HOLLOW 0x1
 #define PEN_MODE_FILLED 0x2
 
-#define FONT_SIZE_SMALL (c->screen_height)/30
-#define FONT_SIZE_NORMAL (c->screen_height)/16
-#define FONT_SIZE_BIG (c->screen_height)/10
-#define FONT_SIZE_FULLSCREEN (c->screen_height)*0.8
+#define FONT_SIZE_SMALL (c->window_height)/30
+#define FONT_SIZE_NORMAL (c->window_height)/16
+#define FONT_SIZE_BIG (c->window_height)/10
+#define FONT_SIZE_FULLSCREEN (c->window_height)*0.8
 
 
 
