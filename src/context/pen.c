@@ -213,7 +213,7 @@ void pen_animation(context* c, animation* a, rectf dest, time t)
 #define LETTER_SPACING -0.5
 
 
-void pen_text_at(context* c, const char* text, float x, float y, float pixel_ligne_height)
+void pen_text_at(context* c, char* text, float x, float y, float pixel_ligne_height)
 {
     int offset_x = 0; int offset_y = 0;
     float step = pixel_ligne_height/LETTER_HEIGHT* LETTER_WIDTH;
@@ -235,7 +235,7 @@ void pen_text_at(context* c, const char* text, float x, float y, float pixel_lig
     }
 }
 
-void pen_text_at_center(context* c, const char* text, float x, float y, float pixel_ligne_height, float centerX, float centerY)
+void pen_text_at_center(context* c, char* text, float x, float y, float pixel_ligne_height, float centerX, float centerY)
 {
     int w = 0, h = 0; 
     int step = pixel_ligne_height/LETTER_HEIGHT* LETTER_WIDTH;

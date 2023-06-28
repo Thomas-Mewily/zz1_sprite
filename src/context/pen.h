@@ -61,12 +61,12 @@ void pen_triangle(context* c,
                 ); 
 
 
-void pen_text_at(context* c, const char* text, float x, float y, float pixel_ligne_height);
-void pen_text_at_center(context* c, const char* text, float x, float y, float pixel_ligne_height, float centerX, float centerY);
+void pen_text_at(context* c, char* text, float x, float y, float pixel_ligne_height);
+void pen_text_at_center(context* c, char* text, float x, float y, float pixel_ligne_height, float centerX, float centerY);
 
 #define pen_formatted_text_at_center(context, x, y, pixel_ligne_height, centerX, centerY, format, ...)\
 {\
-   char* s[2048]; \
+   char s[2048]; \
    sprintf(s, format, __VA_ARGS__);\
    pen_text_at_center(c, s, x, y, pixel_ligne_height, centerX, centerY);\
 }
