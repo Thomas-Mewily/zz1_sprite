@@ -2,9 +2,9 @@
 #define MATH_H
 #include <math.h>
 
-#define sqrt(val_float)  (sqrtf)(val_float)
-#define pow(x_float, y_float) (powf)(x_float,y_float)
-#define abs(val_float) (fabsf)(val_float)
+#define sqrt(val_float)  (sqrtf)((float)val_float)
+#define pow(x_float, y_float) (powf)((float)x_float,(float)y_float)
+#define abs(val_float) (fabsf)((float)val_float)
 
 float squared(float x);
 

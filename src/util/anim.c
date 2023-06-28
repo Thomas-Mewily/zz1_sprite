@@ -1,7 +1,7 @@
 #include "base.h"
 
 
-anim* animation_create(sprite_sheet* sprite_sheet, timer frame_duration)
+anim* animation_create(sprite_sheet* sprite_sheet, time frame_duration)
 {
     animation* newAS = create(animation);
     newAS->first_frame = 0;
@@ -18,7 +18,17 @@ void animation_free(animation* a)
     free(a);
 }
 
-rect* animation_get_frame(animation* a, timer t)
+int animation_width(animation* a)
+{
+    return texture_width(a->sprite_sheet->t)/a->nb_frame;
+}
+
+int animation_height(animation* a)
+{
+    return texture_height(a->sprite_sheet->t);
+}
+
+rect* animation_get_frame(animation* a, time t)
 {
     int frame_number = t / a->frame_duration - a->first_frame;
     int frame_id;

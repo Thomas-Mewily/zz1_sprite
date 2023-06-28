@@ -4,7 +4,7 @@
 
 typedef struct{
     sprite_sheet* sprite_sheet;
-    timer frame_duration; //temps d'une image en millisecondes
+    time frame_duration; //temps d'une image en millisecondes
     int first_frame;
     int last_frame;
     int nb_frame;
@@ -13,12 +13,15 @@ typedef struct{
 typedef anim animation;
 
 #define create_animation animation_create 
-anim* animation_create(sprite_sheet* sprite_sheet, timer frame_duration);
+anim* animation_create(sprite_sheet* sprite_sheet, time frame_duration);
 
 #define free_animation animation_free 
 void animation_free(animation* a);
 
-rect* animation_get_frame(animation* a, timer t);
+int animation_width(animation* a);
+int animation_height(animation* a);
+
+rect* animation_get_frame(animation* a, time t);
 
 
 #endif

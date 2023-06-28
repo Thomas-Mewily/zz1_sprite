@@ -2,12 +2,13 @@
 #include "test.h"
 
 /*
-gcc -fdiagnostics-color=always -g ./src/*.c -Iinclude -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -o ./bin/main.exe
-gcc -fdiagnostics-color=always -g ./src/*.c ./src/context/*.c ./src/util/*.c -Iinclude -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -o ./bin/main.exe
-gcc -fdiagnostics-color=always -g ./src/*.c ./src/context/*.c ./src/util/*.c ./src/collection/*.c -Iinclude -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -o ./bin/main.exe
-./bin/main
-*/
+no opti, fast compile : -O0
+lot of opti, slow compile : -O4
 
+gcc -O0 -fdiagnostics-color=always -g ./src/*.c ./src/context/*.c ./src/util/*.c ./src/collection/*.c ./src/scene/*.c -Iinclude -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -o ./bin/main.exe
+./bin/main.exe
+
+*/
 
 void init()
 {
@@ -29,41 +30,6 @@ void unload()
     SDL_Quit();
 }
 
-
-void draw_triangle(context* c)
-{
-    //pen_triangle_colored(c, 10, 10, color_red, 10, 90, color_blue, 40, 60, color_green);
-    int delta = 200;
-    //pen_triangle_colored(c, 10, 10, color_red, 10, 10+delta, color_blue, 10+delta/2, delta*2/3, color_black);
-
-
-    float x = c->screen_width/4;
-    float y = c->screen_height/2;
-    float step = c->screen_height/8;
-
-    
-    pen_goto(c, x-step, y+step);
-    pen_color(c, color_white);
-
-    pen_down(c);
-        pen_goto(c, x+step, y+step);
-        pen_color(c, color_red);
-
-        pen_goto(c, x+step, y-step);
-        pen_color(c, color_black);
-
-        pen_goto(c, x-step, y-step);
-        pen_color(c, color_blue);
-
-        pen_goto(c, x-step, y+step);
-        pen_color(c, color_white);
-    pen_up(c);
-
-    pen_goto(c, 0, 0);
-}
-
-
-
 int main(int argc, char *argv[])
 {
     (void)argc;
@@ -71,15 +37,65 @@ int main(int argc, char *argv[])
     init();
     test_debug();
 
-    context* c = context_create("Mini Engine. Thomas T", 960, 540, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+    context* c = context_create("Houzayfa M, Martin J, Thomas T. Version de " current_time, 960, 540, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+    window_center_coef(c, 0.5, 0.5);
+
+    //scene_set(c, titre);
+    scene_set(c, thomas_parallax);
+
+    while (!c->should_exit)
+    {
+        context_update(c);
+
+        SDL_Event event;
+
+        while(SDL_PollEvent(&event))
+        {
+            switch (event.type)
+            {
+                case SDL_QUIT: c->should_exit = true; break;
+                
+                case SDL_KEYDOWN:
+                case SDL_KEYUP:
+                {
+                    switch (event.key.keysym.sym)
+                    {
+                        case SDLK_ESCAPE: c->should_exit = true; break;
+                        default: break;
+                    }
+                } break;
+                default: break;
+            }
+        }
+
+        context_draw(c);
+    }
+
+    contexte_free(c);
+    unload();
+
+    /*
+    context* c = context_create("Espace pour tomber. Thomas T", 960, 540, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
     window_center_coef(c, 0.5, 0.5);
 
     bool stop = false;
 
     //texture* t = texture_create(c, "asset/knight_ko.png");
 
+    #define nb_parallax 4
+    #define load_parallax(idx) texture_create(c, "asset/parallax" #idx ".png")
+
+    texture* parallax[4] =
+    {
+        load_parallax(1),
+        load_parallax(2),
+        load_parallax(3),
+        load_parallax(4),
+    };
+
     sprite_sheet* ss = sprite_sheet_create(c, "asset/knight_ko.png", 24, 32);
     anim* knight = animation_create(ss, frequence_s(10));
+    float time_s_offset = 0;
 
     while (!stop)
     {
@@ -91,84 +107,56 @@ int main(int argc, char *argv[])
             switch (event.type)
             {
                 case SDL_QUIT: stop = true; break;
-                /*
                 
-
                 case SDL_KEYDOWN:
                 case SDL_KEYUP:
                 {
-                    #define speed 10
-                    bool isPress = event.type == SDL_KEYDOWN;
                     switch (event.key.keysym.sym)
                     {
-                        #define target(x, y) { target_x = x*(screen.w-window_width); target_y = (1-y)*(screen.h-window_height); need_target = true; } break;
-
-                        case SDLK_7: case SDLK_KP_7: target(   0,   1); break;
-                        case SDLK_8: case SDLK_KP_8: target( 0.5,   1); break;
-                        case SDLK_9: case SDLK_KP_9: target(   1,   1); break;
-                        case SDLK_4: case SDLK_KP_4: target(   0, 0.5); break;
-                        case SDLK_5: case SDLK_KP_5: target( 0.5, 0.5); break;
-                        case SDLK_6: case SDLK_KP_6: target(   1, 0.5); break;
-                        case SDLK_1: case SDLK_KP_1: target(   0,   0); break;
-                        case SDLK_2: case SDLK_KP_2: target( 0.5,   0); break;
-                        case SDLK_3: case SDLK_KP_3: target(   1,   0); break;
-                        
                         case SDLK_ESCAPE: stop = true; break;
                         case SDLK_SPACE: 
                         {
-                            SDL_SetWindowPosition(window2, window_get_x(window), window_get_y(window));
+                            time_s_offset = c->timer_s;
                         }break;
-  
-                        case SDLK_RIGHT:  case SDLK_f:  window_move(window, +speed, 0     ); break;
-                        case SDLK_LEFT :  case SDLK_s:  window_move(window, -speed, 0     ); break;
-                        case SDLK_UP   :  case SDLK_e:  window_move(window,      0, +speed); break;
-                        case SDLK_DOWN :  case SDLK_d:  window_move(window,      0, -speed); break;
-
-                        case SDLK_F5: case SDLK_p: window_animation = !window_animation; break;
-                        case SDLK_DELETE:
-                        case SDLK_CLEAR:
-                        case SDLK_CARET:
-                            break;
-                            
-                        case SDLK_F11:
-                            if(event.type == SDL_KEYDOWN)
-                            { 
-                                window_change_fullscreen(window);
-                            }
-                        break;
-                            
                         default: break;
                     }
-                } break;*/
+                } break;
                 default: break;
             }
         }
 
-        pen_mode(c, PEN_MODE_FILLED);
-        //pen_color(c, color_white);
-        pen_color(c, rgb(100, 30, 150));
+        pen_color(c, color_black);
         pen_clear(c);
+        
+        float mX = -(c->mouse_x - (float)c->window_width /2)/(c->window_width /2);
+        float mY = -(c->mouse_y - (float)c->window_height/2)/(c->window_height/2);
 
+        float hole_x;
+        float hole_y;
+        for(int i = nb_parallax-1; i >= 0; i--)
+        {
+            float j = (i-((nb_parallax-1)/2.0))/((nb_parallax-1)/2.0);
+            float dest_x = c->window_width /2 + mX*(j)*c->window_height/8;
+            float dest_y = c->window_height/2 + mY*(j)*c->window_height/8;
+            texture* t = parallax[i];
+            float scale = (1-j*0.5-length(0,0, mX, mY*c->window_ratio_width_div_height)/16)*(1+abs(j*0.5));
+            float scaleX = scale/texture_width(t);
+            float scaleY = scale/texture_height(t);
+            pen_texture_at_center(c, t, texture_rect(t), dest_x, dest_y, scaleX*c->window_width, scaleY*c->window_height, 0.5, 0.5);
+        
+            if(i == nb_parallax-1)
+            {
+                hole_x = dest_x;
+                hole_y = dest_y;
+            }
+        }
 
-        //float len = length(c->mouse_x, c->mouse_y, c->window_width/2, c->window_height/2);
-        float lenX = abs(c->mouse_x-(float)c->window_width/2);
-        float lenY = abs(c->mouse_y-(float)c->window_height/2);
+        int knight_anim_height = animation_height(knight);
+        float scaleY = (int)(1.0/knight_anim_height*c->window_height/8);
+        float timer = c->timer_s-time_s_offset;
+        float fall_scale = scaleY+scaleY*abs(sin(timer*2*pi/4))*8/(timer*timer);
+        pen_animation_at_center(c, knight, hole_x, hole_y, fall_scale, fall_scale, 0.5, 0.5, c->tick);
 
-        pen_color(c, rgb(255*c->mouse_x/(float)c->window_width, 255*c->mouse_y/(float)c->window_height, 127));
-        pen_oval(c, c->window_width/4, c->window_height/2, lenX, lenY);
-
-        pen_mode(c, PEN_MODE_HOLLOW);
-        pen_color(c, hsv(360*lenX/(c->window_width/2), 1 , 1));
-        pen_oval(c, c->window_width*3/4, c->window_height/2, lenY, lenX);
-
-
-
-        pen_color(c, color_white);
-        pen_line(c, c->window_width/2, c->window_height/2, c->mouse_x, c->mouse_y);
-
-        draw_triangle(c);
-
-        pen_animation_at(c, knight, 200, 200, 2, 2, c->tick);
         //pen_animation()
         //pen_texture(c, t, texture_rect(t), window_rectf(c));
         
@@ -179,12 +167,28 @@ int main(int argc, char *argv[])
         context_draw(c);
     }
 
+    repeat(i, nb_parallax)
+    {
+        texture_free(parallax[i]);
+    }
+
     sprite_sheet_free(ss);
     animation_free(knight);
 
     //texture_free(t);
 
-    unload(c);
+    unload(c);*/
 
     return 0;
 }
+
+/*
+
+gcc -fdiagnostics-color=always -g ./src/*.c ./src/context/*.c ./src/util/*.c ./src/collection/*.c ./src/scene/*.c -Iinclude -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -o ./bin/main.exe
+gcc -O0 -fdiagnostics-color=always -g ./src/*.c ./src/context/*.c ./src/util/*.c ./src/collection/*.c ./src/scene/*.c -Iinclude -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -o ./bin/main.exe
+gcc -fdiagnostics-color=always -g ./src/*.c ./src/context/*.c ./src/util/*.c ./src/collection/*.c ./src/scene/*.c -Iinclude -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -o ./bin/main.exe
+./bin/main
+
+gcc -x c-header -H -o ./src/base.h.gch ./src/base.h
+gcc -x c-header -H -o base.h.gch ./src/base.h
+*/
