@@ -51,6 +51,8 @@ texture* texture_create(context* c, char *path)
         return null;
     }
 
+    printf("texture %s chargée\n", path);
+
     return my_texture;
 }
 

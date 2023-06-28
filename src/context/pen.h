@@ -61,4 +61,5 @@ void pen_char_at(context* c, char letter, float x, float y, float pixel_ligne_he
 void pen_char(context* c, char letter, rectf dest);
 
 void pen_init(context* c);
+void pen_unload(context* c);
 #endif

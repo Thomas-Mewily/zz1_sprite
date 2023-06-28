@@ -222,7 +222,7 @@ void pen_char_at(context* c, char letter, float x, float y, float pixel_ligne_he
                               NUM_COL_LETTER, NUM_COL_LETTER);
         pen_texture_at(c, c->font, mask, x, y,
                         pixel_ligne_height/LETTER_WIDTH,
-                        pixel_ligne_height/LETTER_HEIGHT);
+                        pixel_ligne_height/LETTER_HEIGHT);*/
     }
 }
 
@@ -233,11 +233,16 @@ void pen_char(context* c, char letter, rectf dest)
         rect mask = rectangle((letter % 16) * NUM_COL_LETTER,
                               (letter / 16) * NUM_COL_LETTER,
                               NUM_COL_LETTER, NUM_COL_LETTER);
-        pen_texture(c, c->font, mask, dest);
+        pen_texture(c, c->_pen_font, mask, dest);
     }
 }
 
 void pen_init(context* c)
 {
-    c->font = texture_create(c, "asset/font.png");
+    c->_pen_font = texture_create(c, "asset/font.png");
+}
+
+void pen_unload(context* c)
+{
+    texture_free(c->_pen_font);
 }

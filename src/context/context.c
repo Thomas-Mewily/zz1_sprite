@@ -85,7 +85,6 @@ void context_update(context* c)
     c->kb_state = SDL_GetKeyboardState(NULL);
 
     c->timer = from_ms(SDL_GetTicks());
-    c->font = null;
 
     scene_update(c, (scene*)(c->scene));
 }
@@ -102,6 +101,7 @@ void contexte_free(context* c)
     // TTF_CloseFont(c->font_medium);
     // TTF_CloseFont(c->font_big);
     // TTF_CloseFont(c->font_fullscreen);
+    
     
     scene_unload(c, (scene*)(c->scene));
     SDL_DestroyRenderer(c->renderer);
