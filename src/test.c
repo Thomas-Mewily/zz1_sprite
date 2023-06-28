@@ -13,8 +13,16 @@ void testVec(){
     //vec_free_lazy(v);
 }
 
+void test_graph()
+{
+    graph* g = graph_test();
+    graph_printf(g);
+    graph_free(g);
+}
+
 void test_debug()
 {
+    test_graph();
         //SDL_Rect r = rectangle(0,10,2)
     //angle a = from_degree(180);
     //float degree = as_degree(a);
