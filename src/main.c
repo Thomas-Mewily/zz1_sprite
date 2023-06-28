@@ -44,6 +44,8 @@ int main(int argc, char *argv[])
     test_debug();
 
     context* c = context_create("Houzayfa M, Martin J, Thomas T. Version de " current_time, 960, 540, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+    pen_init(c);
+    
     window_center_coef(c, 0.5, 0.5);
 
     scene_set(c, titre);

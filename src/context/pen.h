@@ -50,6 +50,12 @@ void pen_triangle(context* c,
                             float x3, float y3
                 ); 
 
-void pen_text(context* c, const char* text, rectf dest);
 
+void pen_text(context* c, const char* text, rectf dest);
+void pen_text_at(context* c, const char* text, rectf dest, float x, float y, float pixel_ligne_height);
+
+void pen_char(context* c, char letter, rectf dest);
+void pen_char_at(context* c, char letter, rectf dest, float x, float y, float pixel_ligne_height);
+
+void pen_init(context* c);
 #endif

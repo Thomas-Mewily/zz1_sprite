@@ -2,7 +2,6 @@
 #define TEXTURE_H
 #include "base.h"
 
-typedef SDL_Texture texture;
 int texture_width(texture* t);
 int texture_height(texture* t);
 

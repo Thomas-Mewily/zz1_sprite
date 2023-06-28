@@ -85,6 +85,7 @@ void context_update(context* c)
     c->kb_state = SDL_GetKeyboardState(NULL);
 
     c->timer = from_ms(SDL_GetTicks());
+    c->font = null;
 
     scene_update(c, (scene*)(c->scene));
 }

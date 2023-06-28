@@ -196,5 +196,24 @@ void pen_animation(context* c, animation* a, rectf dest, time t)
 
 void pen_text(context* c, const char* text, rectf dest)
 {
+
+}
+void pen_text_at(context* c, const char* text, rectf dest, float x, float y, float pixel_ligne_height)
+{
+
+}
+
+void pen_char_at(context* c, char letter, rectf dest, float x, float y, float pixel_ligne_height)
+{
+
+}
+
+void pen_char(context* c, char letter, rectf dest)
+{
     
+}
+
+void pen_init(context* c)
+{
+    c->font = texture_create(c, "asset/font.png");
 }
