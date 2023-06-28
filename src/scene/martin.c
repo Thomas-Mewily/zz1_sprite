@@ -37,10 +37,12 @@ void scene_martin_update(context* c, scene* sce)
     s->hue += s->color_change_speed;
     if (s->hue >= 360) {s->hue = 0;}
 
+
 }
 void scene_martin_draw(context* c, scene* sce)
 {
-    return;
+    //pen_circle(c, 100, 100, 50 );
+    pen_char_at(c, 'A', 40, 40, 40);
 }
 
 void scene_martin_printf(context* c, scene* sce)

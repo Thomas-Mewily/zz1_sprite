@@ -194,6 +194,11 @@ void pen_animation(context* c, animation* a, rectf dest, time t)
     pen_texture(c, a->sprite_sheet->t, *animation_get_frame(a, t), dest);
 }
 
+
+#define NUM_COL_LETTER 16
+#define LETTER_WIDTH 40
+#define LETTER_HEIGHT 40
+
 void pen_text(context* c, const char* text, rectf dest)
 {
     
@@ -212,16 +217,27 @@ void pen_char_at(context* c, char letter, float x, float y, float pixel_ligne_he
 {
     if (letter > ' ' && letter != '\\')
     {
-        rect mask = rectangle((letter % 16) * font_rectangle_size,
-                              (letter / 16) * font_rectangle_size,
-                              font_rectangle_size, font_rectangle_size);
-        pen_texture(c, c->font, mask, dest);
+        rect mask = rectangle((letter % 16) * NUM_COL_LETTER,
+                              (letter / 16) * NUM_COL_LETTER,
+                              NUM_COL_LETTER, NUM_COL_LETTER);
+        pen_rect(c, rectanglef(200, 200, 20,20));
+        pen_texture(c, c->font, texture_rect(c->font), rectanglef(0,0, 200,200));
+        // pen_texture(c, c->font, rectangle(0,0,40*16,40*16), rectanglef(0,0, 200,200));
+        pen_texture_at(c, c->font, mask, x, y,
+                        pixel_ligne_height/LETTER_WIDTH,
+                        pixel_ligne_height/LETTER_HEIGHT);
     }
 }
 
 void pen_char(context* c, char letter, rectf dest)
 {
-
+    if (letter > ' ' && letter != '\\')
+    {
+        rect mask = rectangle((letter % 16) * NUM_COL_LETTER,
+                              (letter / 16) * NUM_COL_LETTER,
+                              NUM_COL_LETTER, NUM_COL_LETTER);
+        pen_texture(c, c->font, mask, dest);
+    }
 }
 
 void pen_init(context* c)

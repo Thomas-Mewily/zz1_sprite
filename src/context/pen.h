@@ -5,7 +5,7 @@
 #define PEN_MODE_HOLLOW 0x1
 #define PEN_MODE_FILLED 0x2
 
-#define font_rectangle_size 16
+
 
 void pen_color(context* c, color co);
 color pen_get_color(context* c);
