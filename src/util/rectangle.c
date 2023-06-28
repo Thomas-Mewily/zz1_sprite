@@ -1,5 +1,6 @@
 #include "base.h"
 
+
 rect square(int x, int y, int wh) { return rectangle(x, y, wh, wh); }
 rect rectangle(int x, int y, int w, int h)
 {

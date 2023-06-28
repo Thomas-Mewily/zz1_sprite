@@ -198,3 +198,16 @@ void pen_text(context* c, const char* text, rectf dest)
 {
     
 }
+
+void font_write_char(context* c, char letter, int posX, int posY)
+{
+    if (letter > ' ' && letter != '\\')
+    {
+        SDL_Rect mask = rectangle((letter % 16) * font_rectangle_size, (letter / 16) * font_rectangle_size, font_rectangle_size, font_rectangle_size);
+        SDL_Rect pos = rectangle(posX, posY, font_rectangle_size, font_rectangle_size);
+
+        //texture* t = texture_create(c, "asset/font.png");
+        //texture_rect(t)
+        // SDL_BlitSurface(font, &mask, screen, &pos);
+    }
+}
