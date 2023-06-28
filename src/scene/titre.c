@@ -37,6 +37,15 @@ void scene_titre_update(context* c, scene* sce)
             c->should_exit = true;
         }
     }
+    if (c->kb_state[SDL_SCANCODE_M])
+    {
+        scene_set(c, martin);
+    }
+    else if (c->kb_state[SDL_SCANCODE_T])
+    {
+        SDL_Log("here\n");
+        scene_set(c, thomas_parallax);
+    }
 }
 
 void scene_titre_draw(context* c, scene* sce)
