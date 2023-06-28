@@ -27,6 +27,7 @@ typedef struct
     int mouse_old_x;
     int mouse_old_y;
     int32 mouse_old_flag;
+    const Uint8* kb_state;
 
     time timer; // since the beginning of the program
 

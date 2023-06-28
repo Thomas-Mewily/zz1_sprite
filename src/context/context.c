@@ -67,6 +67,7 @@ void context_update(context* c)
     c->mouse_old_x = c->mouse_x;
     c->mouse_old_y = c->mouse_y;
     c->mouse_flag = SDL_GetMouseState(&(c->mouse_x), &(c->mouse_y));
+    c->kb_state = SDL_GetKeyboardState(NULL);
 
     c->timer = from_ms(SDL_GetTicks());
 
@@ -82,6 +83,7 @@ void context_draw(context* c)
 void contexte_free(context* c)
 {
     scene_unload(c, (scene*)(c->scene));
+    free(c->kb_state);
     SDL_DestroyRenderer(c->renderer);
     SDL_DestroyWindow(c->window);
 }

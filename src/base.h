@@ -18,6 +18,7 @@
 #include "context/scene.h"
 
 #include "util/texture.h"
+#include "util/parallaxe.h"
 #include "util/sprite_sheet.h"
 #include "util/anim.h"
 
