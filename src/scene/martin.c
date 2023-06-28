@@ -31,6 +31,7 @@ void scene_martin_unload(argument arg)
 {
     obtenir_state;
     texture_free(s->steve);
+    // rip la mémoire occuper par froggyS et froggyAnim
 }
 
 void scene_martin_update(argument arg)

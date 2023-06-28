@@ -100,6 +100,7 @@ void scene_set_active(context* c, scene* sce)
 
 void scene_set_inactive(context* c, scene* sce)
 {
+    UNUSED(c);
     if(sce == null) { return;}
     sce->info.active = false;
 }
