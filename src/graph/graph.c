@@ -231,16 +231,14 @@ void graph_printf(graph* g)
     }
 }
 
-graph* graph_test()
+graph* graph_complet(int nb_node, float radius)
 {
     graph* g = graph_empty();
     
-    int nb_node = 10;
-    float d = 2;
     repeat(i, nb_node)
     {
         angle a = from_degree(360.0*i/nb_node);
-        graph_add_node_x_y(g, cos(a)*d, sin(a)*d);
+        graph_add_node_x_y(g, cos(a)*radius, sin(a)*radius);
     }
 
     repeat(i, nb_node)

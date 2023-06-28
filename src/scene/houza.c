@@ -6,15 +6,16 @@
 typedef struct 
 {
    //texture* steve;
-   
+   graph* g;
 } state;
 
 void scene_houza_load(context* c, scene* sce)
 {
-    
     sce->state = (void*)create(state);
-
     obtenir_state;
+
+
+    s->g = graph_complet(20,1);
     
     sce->info.background_color = rgb(200,0,0);
 
@@ -25,7 +26,7 @@ void scene_houza_load(context* c, scene* sce)
 void scene_houza_unload(context* c, scene* sce)
 {
     obtenir_state;
-
+    graph_free(s->g);
    // texture_free(s->steve);
     free(s);
 }
@@ -43,6 +44,32 @@ void scene_houza_update(context* c, scene* sce)
 void scene_houza_draw(context* c, scene* sce)
 {
     obtenir_state;
+
+    float radius = c->screen_height/32.0f;
+
+    float scale = c->window_height/2-radius;
+    float offset_x = c->window_width/2;
+    float offset_y = c->window_height/2;
+
+    pen_color(c,color_white);
+    graph* g = s->g;
+    //graph_get_join(g,0,1).distance
+    repeat(i, graph_get_nb_node(g))
+    {
+        pen_color(c,hsv(i%180,1,1));
+
+        float x = graph_node_x(g,i);
+        float y =graph_node_y(g,i);
+        pen_circle(c,scale*x +offset_x,scale*y+offset_y ,radius);
+        
+        for(int k = 0; k < graph_node_get_nb_neighbors(g,i); k++)
+        {
+            int j = graph_get_node_neighbors(g,i,k);
+            float xj = graph_node_x(g,j);
+            float yj =graph_node_y(g,j);
+            pen_line(c,scale*x +offset_x,scale*y+offset_y,scale*xj +offset_x,scale*yj+offset_y);
+        }
+    }
 
    #if 0
     //texture* t =  s->steve;

@@ -72,10 +72,8 @@ void graph_colorier_nodes_blanc(graph * g);
 bool graph_node_en_blanc(graph* g, int idx);
 bool graph_node_en_noir (graph* g, int idx);
 
-
-
 void graph_printf(graph* g);
 
-graph* graph_test();
+graph* graph_complet(int nb_noeud, float radius);
 
 #endif
