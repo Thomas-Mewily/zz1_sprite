@@ -210,7 +210,13 @@ void pen_text_at_center(context* c, const char* text, float x, float y, float pi
 
 void pen_char_at(context* c, char letter, float x, float y, float pixel_ligne_height)
 {
-    
+    if (letter > ' ' && letter != '\\')
+    {
+        rect mask = rectangle((letter % 16) * font_rectangle_size,
+                              (letter / 16) * font_rectangle_size,
+                              font_rectangle_size, font_rectangle_size);
+        pen_texture(c, c->font, mask, dest);
+    }
 }
 
 void pen_char(context* c, char letter, rectf dest)
