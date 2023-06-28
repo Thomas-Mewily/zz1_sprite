@@ -1,7 +1,5 @@
 #include "../base.h"
 
-#define UNUSED(x) (void)(x)
-
 #define get_state \
 scene* sce = (arg.arg_scene); \
 context* c = (arg.arg_context); \

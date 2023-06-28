@@ -114,3 +114,13 @@ void scene_switch(context* c, scene* sce)
         sce->info.time_when_active = c->timer;
     }
 }
+
+bool scene_context_load(context* c)
+{
+    c->scene = null;
+    return true;
+}
+void scene_context_unload(context* c)
+{
+    scene_unload(c, (scene*)(c->scene));
+}

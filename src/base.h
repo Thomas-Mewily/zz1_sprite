@@ -14,7 +14,7 @@
 #include "util/vertex.h"
 #include "util/input.h"
 
-#include "context/context.h"
+#include "context/context_struct.h"
 #include "context/scene.h"
 
 #include "util/texture.h"
@@ -23,11 +23,15 @@
 #include "util/anim.h"
 
 #include "context/window.h"
+#include "context/camera.h"
 #include "context/pen.h"
 
 #include "graph/graph.h"
 
 
 #include "scene/all_scene.h"
+
+#include "context/context.h"
+
 
 #endif

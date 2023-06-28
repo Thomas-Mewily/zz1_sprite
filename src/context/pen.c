@@ -1,55 +1,21 @@
 #include "base.h"
 
-void pen_goto(context* c, float x, float y) 
-{ 
-    c->pen_x = x; c->pen_y = y;
-    if(pen_is_down(c))
-    {
-        c->_pen_idx++;
-        //(c->_pen_vertex[c->_pen_idx]).position.x = x;
-        //(c->_pen_vertex[c->_pen_idx]).position.y = y;
 
-        //(c->_pen_vertex[c->_pen_idx]).color = to_sdl_color(p);
-    }
-}
-void pen_goto_with_color(context* c, float x, float y, color co)
-{
-    pen_goto(c, x, y);
-    pen_color(c, co);
-}
 
-void pen_move(context* c, float step) 
-{ 
-    pen_goto(c, c->pen_x + cos(c->pen_move_rotation)*step, c->pen_y + sin(c->pen_move_rotation)*step);
-}
 void pen_mode(context* c, uint32 mode)
 {
     c->pen_mode = mode;
 }
 
-
-void pen_move_2D(context* c, float stepX, float stepY) 
-{
-    float cosinus = cos(c->pen_move_rotation);
-    float sinus   = sin(c->pen_move_rotation);
-
-    // not sure about that
-    c->pen_x += cosinus*stepX + sinus  *stepY;
-    c->pen_y += sinus  *stepX + cosinus*stepY;
-}
-
-void pen_rotate(context* c, angle a)
-{
-    c->pen_move_rotation += a;
-}
-
 void pen_color(context* c, color co) 
 { 
     SDL_SetRenderDrawColor(c->renderer, co.r, co.g, co.b, co.a);
+    /*
     if(pen_is_down(c))
     {
         (c->_pen_vertex[c->_pen_idx]).color = to_sdl_color(co);
     }
+    */
 }
 color pen_get_color(context* c)
 {
@@ -68,12 +34,12 @@ void pen_rect(context* c, rectf r) { pen_pixel_rect(c, r); }
 #define X(x) apply_x_offset(c, x)
 #define Y(y) apply_y_offset(c, y)
 
-float apply_x_offset(context* c, float x) { return (x-c->pen_x)*c->pen_scale; }
-float apply_y_offset(context* c, float y) { return (y-c->pen_y)*c->pen_scale; }
+float apply_x_offset(context* c, float x) { return (x - c->_camera_x)*c->_camera_scale_x; }
+float apply_y_offset(context* c, float y) { return (y - c->_camera_y)*c->_camera_scale_y; }
 
 rectf apply_offset(context* c, rectf r)
 {
-    return rectanglef(X(r.x), Y(r.y), r.w*c->pen_scale, r.h*c->pen_scale);
+    return rectanglef(X(r.x), Y(r.y), r.w*c->_camera_scale_x, r.h*c->_camera_scale_y);
 }
 
 void pen_pixel(context* c, float x, float y) { SDL_RenderDrawPointF(c->renderer, X(x), Y(y)); }
@@ -85,7 +51,7 @@ void pen_oval(context* c, float x, float y, float radius_x, float radius_y)
     if((c->pen_mode) & PEN_MODE_FILLED)
     {
         int stepPrecision = 2;
-        for(int rx = 0; rx <= radius_x; rx+=stepPrecision)
+        for(int rx = 0; rx <= radius_x+1; rx+=stepPrecision)
         {
             int height = ((float)(radius_y))*sqrt(1-(1-rx/(float)radius_x)*(1-rx/(float)radius_x));
             pen_rect(c, rectanglef(x-radius_x+rx,y-height, stepPrecision, 2*height));
@@ -115,6 +81,7 @@ void pen_oval(context* c, float x, float y, float radius_x, float radius_y)
         }
     }
 }
+
 /*
 void pen_triangle(context* c, float x1, float y1,
                               float x2, float y2,
@@ -142,6 +109,19 @@ void pen_triangle_colored(context* c, float x1, float y1, color c1,
     if( SDL_RenderGeometry(c->renderer, NULL, triangleVertex, 3, NULL, 0) < 0 ) {SDL_Log("%s\n", SDL_GetError());}
 }*/
 
+#if 0
+/*
+void pen_move_2D(context* c, float stepX, float stepY) 
+{
+    
+    //float cosinus = cos(c->pen_move_rotation);
+    //float sinus   = sin(c->pen_move_rotation);
+
+    // not sure about that
+    //c->pen_x += cosinus*stepX + sinus  *stepY;
+    //c->pen_y += sinus  *stepX + cosinus*stepY;
+}*/
+
 bool pen_is_down(context*  c)
 {
     return c->_pen_is_down;
@@ -157,6 +137,36 @@ void pen_up(context* c)
     check(c->_pen_is_down == true);
     c->_pen_is_down = false;
 }
+
+
+void pen_goto(context* c, float x, float y) 
+{ 
+    c->pen_x = x; c->pen_y = y;
+    if(pen_is_down(c))
+    {
+        c->_pen_idx++;
+        //(c->_pen_vertex[c->_pen_idx]).position.x = x;
+        //(c->_pen_vertex[c->_pen_idx]).position.y = y;
+
+        //(c->_pen_vertex[c->_pen_idx]).color = to_sdl_color(p);
+    }
+}
+void pen_goto_with_color(context* c, float x, float y, color co)
+{
+    pen_goto(c, x, y);
+    pen_color(c, co);
+}
+
+void pen_move(context* c, float step) 
+{ 
+    pen_goto(c, c->pen_x + cos(c->pen_move_rotation)*step, c->pen_y + sin(c->pen_move_rotation)*step);
+}
+
+void pen_rotate(context* c, angle a)
+{
+    c->pen_move_rotation += a;
+}
+#endif
 
 void pen_texture(context* c, texture* t, rect src, rectf dest)
 {
@@ -197,10 +207,10 @@ void pen_animation(context* c, animation* a, rectf dest, time t)
 
 
 #define NUM_COL_LETTER 16
-#define LETTER_WIDTH 20
-#define LETTER_HEIGHT 20
+#define LETTER_WIDTH  18
+#define LETTER_HEIGHT 18
 #define INTERLIGNE 0.2
-#define LETTER_SPACING -0.55
+#define LETTER_SPACING -0.5
 
 
 void pen_text_at(context* c, const char* text, float x, float y, float pixel_ligne_height)
@@ -227,7 +237,6 @@ void pen_text_at(context* c, const char* text, float x, float y, float pixel_lig
 
 void pen_text_at_center(context* c, const char* text, float x, float y, float pixel_ligne_height, float centerX, float centerY)
 {
-
     int w = 0, h = 0; 
     int step = pixel_ligne_height/LETTER_HEIGHT* LETTER_WIDTH;
     int text_length = (int)strlen(text);
@@ -285,9 +294,25 @@ void pen_char(context* c, char letter, rectf dest)
     }
 }
 
-void pen_init(context* c)
+bool pen_load(context* c)
 {
-    c->_pen_font = texture_create(c, "asset/font.png");
+    c->_pen_font = texture_create(c, "asset/font_amstrad_cpc_18.png");
+    pen_mode(c, PEN_MODE_FILL);
+    /*
+    c->pen_x = 0;
+    c->pen_y = 0;
+    c->pen_scale = 1;
+    c->pen_mode  = 2;
+    c->pen_move_rotation = from_degree(0);
+    c->_pen_is_down = false;
+
+    repeat(i, 3)
+    {
+        c->_pen_vertex[i].tex_coord.x = 0;
+        c->_pen_vertex[i].tex_coord.y = 0;
+    }*/
+
+    return true;
 }
 
 void pen_unload(context* c)

@@ -22,7 +22,10 @@ void scene_titre_draw(argument arg)
 {
     obtenir_state;
     pen_circle(c, c->window_width/2, c->window_height/2, c->window_height/32.0 * (s->nbFoisPresser+2));
-    pen_text_at(c, "UwU", 0,0, FONT_SIZE_FULLSCREEN);
+    //pen_text_at(c, "UwU", 0,0, FONT_SIZE_FULLSCREEN);
+    //pen_text_at_center(c, "UwU", c->window_width/2,c->window_height/2, FONT_SIZE_NORMAL, 0.5, 0.5);
+
+    pen_formatted_text_at_center(c, c->window_width/2,c->window_height/2, FONT_SIZE_NORMAL, 0.5, 0.5, "UwU tick: %i", c->timer);
 }
 
 bool scene_titre_event (argument arg) 

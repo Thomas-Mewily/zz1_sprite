@@ -30,12 +30,13 @@ void test_debug()
     //float cosinus = cos(a);
 }
 
+#if 0
 void draw_triangle(context* c)
 {
     //pen_triangle_colored(c, 10, 10, color_red, 10, 90, color_blue, 40, 60, color_green);
     //int delta = 200;
     //pen_triangle_colored(c, 10, 10, color_red, 10, 10+delta, color_blue, 10+delta/2, delta*2/3, color_black);
-
+    
 
     float x = c->screen_width/4;
     float y = c->screen_height/2;
@@ -61,6 +62,7 @@ void draw_triangle(context* c)
 
     pen_goto(c, 0, 0);
 }
+#endif
 
 void draw_test(context*c )
 {
@@ -87,5 +89,5 @@ void draw_test(context*c )
         pen_color(c, color_white);
         pen_line(c, c->window_width/2, c->window_height/2, c->mouse_x, c->mouse_y);
 
-        draw_triangle(c);
+        //draw_triangle(c);
 }

@@ -12,7 +12,7 @@ gcc -O0 -fdiagnostics-color=always -g ./src/*.c ./src/context/*.c ./src/util/*.c
 ./bin/main.exe
 */
 
-void init()
+void sdl_load()
 {
     printf("Compilation de %s\n", current_time);
     SDL_version nb;
@@ -31,7 +31,7 @@ void init()
     // }
 }
 
-void unload()
+void sdl_unload()
 {
     IMG_Quit();
     SDL_Quit();
@@ -39,13 +39,11 @@ void unload()
 
 int main(int argc, char *argv[])
 {
-    (void)argc;
-    (void)argv;
-    init();
+    UNUSED(argc); UNUSED(argv);
+    sdl_load();
     test_debug();
 
     context* c = context_create("Houzayfa M, Martin J, Thomas T. Version de " current_time, 960, 540, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
-    pen_init(c);
     
     window_center_coef(c, 0.5, 0.5);
 
@@ -57,9 +55,8 @@ int main(int argc, char *argv[])
         context_draw(c);
     }
 
-    pen_unload(c);
     contexte_free(c);
-    unload();
+    sdl_unload();
 
     return 0;
 }
