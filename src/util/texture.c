@@ -47,7 +47,7 @@ texture* texture_create(context* c, char *path)
                                          // la SDL_Surface ne sert que comme élément transitoire 
     if (my_texture == NULL) 
     { 
-        printf("Echec de la transformation de la surface %s en texture\n", path);
+        printf("Echec de la transformation de la surface %s en texture : %s\n", path, SDL_GetError());
         return null;
     }
 

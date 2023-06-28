@@ -20,7 +20,7 @@ typedef struct
     int mouse_y;
     int32 mouse_flag;
 
-    Uint8* kb_state;
+    const Uint8* kb_state;
 
     timer tick;
 

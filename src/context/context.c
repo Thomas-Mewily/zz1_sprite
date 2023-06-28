@@ -75,7 +75,6 @@ void context_draw(context* c)
 
 void contexte_free(context* c)
 {
-    free(c->kb_state);
     SDL_DestroyRenderer(c->renderer);
     SDL_DestroyWindow(c->window);
 }

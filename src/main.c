@@ -1,6 +1,8 @@
 #include "base.h"
 #include "test.h"
 
+#define NBSPRITES 3
+
 /*
 gcc -fdiagnostics-color=always -g ./src/*.c -Iinclude -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -o ./bin/main.exe
 gcc -fdiagnostics-color=always -g ./src/*.c ./src/context/*.c ./src/util/*.c -Iinclude -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -o ./bin/main.exe
@@ -75,11 +77,25 @@ int main(int argc, char *argv[])
     window_center_coef(c, 0.5, 0.5);
 
     bool stop = false;
+    vec* positions;
+    positions = vec_empty(int);
+    int animID = 0;
 
     //texture* t = texture_create(c, "asset/knight_ko.png");
 
-    sprite_sheet* ss = sprite_sheet_create(c, "asset/knight_ko.png", 24, 32);
-    anim* knight = animation_create(ss, frequence_s(10));
+    sprite_sheet* doggoS = sprite_sheet_create(c, "asset/doggo.png", 372, 415);
+    anim* doggoAnim = animation_create(doggoS, frequence_s(25));
+
+    sprite_sheet* froggyS = sprite_sheet_create(c, "asset/froggyChair.png", 54, 54);
+    anim* froggyAnim = animation_create(froggyS, frequence_s(28));
+
+    sprite_sheet* sbS = sprite_sheet_create(c, "asset/stickBug.png", 428, 174);
+    anim* sbAnim = animation_create(sbS, frequence_s(10));
+
+
+
+    // sprite_sheet* doggo
+    // animation* 
 
     while (!stop)
     {
@@ -91,7 +107,22 @@ int main(int argc, char *argv[])
             switch (event.type)
             {
                 case SDL_QUIT: stop = true; break;
-                default: break;
+
+                case SDL_MOUSEBUTTONDOWN:
+                    if(c->kb_state[SDL_SCANCODE_SPACE])
+                    {
+                        vec_add(positions, int, c->mouse_x);
+                        vec_add(positions, int, c->mouse_y);
+                        vec_add(positions, int, animID);
+                    }
+                    if(c->kb_state[SDL_SCANCODE_S])
+                    {
+                        animID = (animID + 1) % NBSPRITES;
+                    }
+
+
+                
+
             }
         }
 
@@ -119,7 +150,25 @@ int main(int argc, char *argv[])
 
         draw_triangle(c);
 
-        pen_animation_at(c, knight, 200, 200, 2, 2, c->tick);
+        for (int i = 0; i < positions->length; i+=3)
+        {
+            
+            switch (vec_get(positions, int, i+2))
+            {
+            case 0:
+                pen_animation_at(c, doggoAnim, vec_get(positions, int, i),
+                                 vec_get(positions, int, i+1), 0.5, 0.5, c->tick);
+                break;
+            case 1:
+                pen_animation_at(c, froggyAnim, vec_get(positions, int, i),
+                                    vec_get(positions, int, i+1), 5, 5, c->tick);
+                break;
+            case 2:
+                pen_animation_at(c, sbAnim, vec_get(positions, int, i),
+                                    vec_get(positions, int, i+1), 0.5, 0.5, c->tick);
+                break;
+            }
+        }
         //pen_animation()
         //pen_texture(c, t, texture_rect(t), window_rectf(c));
         
@@ -130,8 +179,8 @@ int main(int argc, char *argv[])
         context_draw(c);
     }
 
-    sprite_sheet_free(ss);
-    animation_free(knight);
+    sprite_sheet_free(doggoS);
+    animation_free(doggoAnim);
 
     //texture_free(t);
 

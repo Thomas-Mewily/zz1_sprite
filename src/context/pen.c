@@ -164,6 +164,7 @@ void pen_texture_at(context* c, texture* t, rect src, float x, float y, float sc
 
 void pen_animation_at(context* c, animation* a, float x, float y, float scaleX, float scaleY, timer t)
 {
+    if( !a->nb_frame ) return;
     pen_animation(c, a, rectanglef(x, y, texture_width(a->sprite_sheet->t)/a->nb_frame*scaleX, texture_height(a->sprite_sheet->t)*scaleY), t);
 }
 
