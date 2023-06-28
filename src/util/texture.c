@@ -45,7 +45,7 @@ texture* texture_create(context* c, char *path)
     my_texture = SDL_CreateTextureFromSurface(c->renderer, my_image); // Chargement de l'image de la surface vers la texture
     SDL_FreeSurface(my_image);   
                                          // la SDL_Surface ne sert que comme élément transitoire 
-    if (my_texture == NULL) 
+    if (my_texture == NULL)
     { 
         printf("Echec de la transformation de la surface %s en texture : %s\n", path, SDL_GetError());
         return null;

@@ -220,9 +220,6 @@ void pen_char_at(context* c, char letter, float x, float y, float pixel_ligne_he
         rect mask = rectangle((letter % 16) * NUM_COL_LETTER,
                               (letter / 16) * NUM_COL_LETTER,
                               NUM_COL_LETTER, NUM_COL_LETTER);
-        pen_rect(c, rectanglef(200, 200, 20,20));
-        pen_texture(c, c->font, texture_rect(c->font), rectanglef(0,0, 200,200));
-        // pen_texture(c, c->font, rectangle(0,0,40*16,40*16), rectanglef(0,0, 200,200));
         pen_texture_at(c, c->font, mask, x, y,
                         pixel_ligne_height/LETTER_WIDTH,
                         pixel_ligne_height/LETTER_HEIGHT);
