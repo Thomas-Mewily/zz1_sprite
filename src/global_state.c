@@ -9,9 +9,9 @@ void get_graph(context* c)
         graph_free(gs->g);
     }
 
-    gs->g = graph_generate(200, rectanglef(0, 0, 160, 90), 0.25f);
+    //gs->g = graph_generate(200, rectanglef(0, 0, 160, 90), 0.25f);
     //gs->g = graph_generate(100, rectanglef(0, 0, 160, 90), 0.25f);
-    //gs->g = graph_generate(6, rectanglef(0, 0, 16, 9), 0.25f);
+    gs->g = graph_generate(6, rectanglef(0, 0, 16, 9), 0.25f);
     //gs->g = graph_complet(8);
     graph* g = gs->g;
 
