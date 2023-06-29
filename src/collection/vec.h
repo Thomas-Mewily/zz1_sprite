@@ -14,7 +14,8 @@ typedef struct
 #define vec_set(v, type, idx, value) vec_get(v, type, idx) = value
 
 #define vec_peek(v, type) (vec_get(v, type, v->length-1))
-#define vec_pop(v, type)  (vec_get(v, type, --(v->length)))
+// pas sur que ça marche
+//#define vec_pop(v, type)  (vec_get(v, type, --(v->length)))
 
 #define reinterpret_cast(ptr_exp, type) (&ptr_exp)
 

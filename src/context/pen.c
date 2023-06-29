@@ -44,16 +44,29 @@ rectf apply_offset(context* c, rectf r)
 
 void pen_pixel(context* c, float x, float y) { SDL_RenderDrawPointF(renderer, X(x), Y(y)); }
 void pen_pixel_line(context* c, float x1, float y1, float x2, float y2) { SDL_RenderDrawLineF(renderer, X(x1), Y(y1), X(x2), Y(y2)); }
-void pen_pixel_rect(context* c, rectf r) { r = apply_offset(c, r); SDL_RenderFillRectF(renderer, &r); }
+void pen_pixel_rect(context* c, rectf r) 
+{ 
+    r = apply_offset(c, r);
+    SDL_RenderFillRectF(renderer, &r);
+}
 void pen_circle(context* c, float x, float y, float radius) { pen_oval(c, x, y, radius, radius); }
 void pen_oval(context* c, float x, float y, float radius_x, float radius_y)
 {
+    rectf dest_pixel = apply_offset(c, rectanglef(x-radius_x,y-radius_y,2*radius_x,2*radius_y));
+    if(dest_pixel.x > window_width(c) || dest_pixel.y > window_height(c) ||
+        dest_pixel.x +dest_pixel.w < 0 || dest_pixel.y +dest_pixel.h < 0
+      )
+      {
+        return; // ovale off screen
+      }
+
     if((c->pen_mode) & PEN_MODE_FILLED)
     {
-        int stepPrecision = 2;
-        for(int rx = 0; rx <= radius_x+1; rx+=stepPrecision)
+        float stepPrecision = 2/c->camera_scale_y;
+        float rx_max = radius_x+1/c->camera_scale_y;
+        for(float rx = 0; rx < rx_max; rx+=stepPrecision)
         {
-            int height = ((float)(radius_y))*sqrt(1-(1-rx/(float)radius_x)*(1-rx/(float)radius_x));
+            float height = radius_y*sqrt(1-(1-rx/radius_x)*(1-rx/radius_x));
             pen_rect(c, rectanglef(x-radius_x+rx,y-height, stepPrecision, 2*height));
             pen_rect(c, rectanglef(x+radius_x-rx,y-height, stepPrecision, 2*height));
         }
@@ -215,7 +228,7 @@ void pen_animation(context* c, animation* a, rectf dest, time t)
 
 void pen_text_at(context* c, char* text, float x, float y, float pixel_ligne_height)
 {
-    int offset_x = 0; int offset_y = 0;
+    float offset_x = 0; int offset_y = 0;
     float step = pixel_ligne_height/LETTER_HEIGHT* LETTER_WIDTH;
     int text_length = (int)strlen(text);
     for (int i = 0; i < text_length; i++)
@@ -298,13 +311,12 @@ void pen_unload(context* c)
 }
 
 // graph -> windows pixel
-float pen_get_graph_pos_x(float pos, graph* g)
+float pen_get_graph_pos_2_pixelx(float pos, graph* g)
 {
     return (pos-g->x_min)/g->x_etendu * g->draw_dest.w + g->draw_dest.x;
 }
-
 // graph -> windows pixel
-float pen_get_graph_pos_y(float pos, graph* g)
+float pen_get_graph_pos_2_pixel_y(float pos, graph* g)
 {
     return (pos-g->y_min)/g->y_etendu * g->draw_dest.h + g->draw_dest.y;
 }
@@ -319,19 +331,31 @@ void pen_graph(context* c, graph* g)
     c->camera_scale_x *= height_pixel;
     c->camera_scale_y *= height_pixel;*/
 
-    repeat(i, graph_get_nb_node(g))
+    if(g->draw_text_info)
     {
-        pen_node(c, g, i);
-
-        for(int k = 0; k < graph_node_get_nb_neighbors(g,i); k++)
+        repeat(i, graph_get_nb_node(g))
         {
-            int j = graph_get_node_neighbors(g,i,k);
-            if(j < i)
+            pen_node(c, g, i);
+
+            repeat(j, i)
+            {   
+                pen_join(c, g, i, j);
+            }
+        }
+    }else
+    {
+        repeat(i, graph_get_nb_node(g))
+        {
+            pen_node(c, g, i);
+
+            for(int k = 0; k < graph_node_get_nb_neighbors(g, i); k++)
             {
+                int j = graph_get_node_neighbors(g,i,k);
                 pen_join(c, g, i, j);
             }
         }
     }
+
 
     //camera_set_state(c, cs);
 }
@@ -341,8 +365,8 @@ void pen_node (context* c, graph* g, int i)
     pen_color(c, color_black);
     float radius = c->screen_height/64.0;
     node* n = graph_get_node(g, i);
-    float x = pen_get_graph_pos_x(graph_node_x(g,i), g);
-    float y = pen_get_graph_pos_y(graph_node_y(g,i), g);
+    float x = pen_get_graph_pos_2_pixelx(graph_node_x(g,i), g);
+    float y = pen_get_graph_pos_2_pixel_y(graph_node_y(g,i), g);
     pen_oval(c, x, y, radius/c->camera_scale_x, radius/c->camera_scale_y);
 
     if(g->draw_text_info)
@@ -355,15 +379,19 @@ void pen_node (context* c, graph* g, int i)
 
 void pen_join (context* c, graph* g, int a, int b)
 {
-    if(graph_join_exist(g, a, b) == false) { return; }
+    if(a == b) { return; }
+    bool exist = graph_join_exist(g, a, b);
+
+    //printf("exist %i node %i %i\n",exist, a, b);
+
+    if(exist == false && g->draw_text_info == false) {  return; }
+
+    pen_color(c, exist ? color_black : color_red);
     
-
-    pen_color(c, color_black);
-    float x1 = pen_get_graph_pos_x(graph_node_x(g,a), g);
-    float y1 = pen_get_graph_pos_y(graph_node_y(g,a), g);
-    float x2 = pen_get_graph_pos_x(graph_node_x(g,b), g);
-    float y2 = pen_get_graph_pos_y(graph_node_y(g,b), g);
-
+    float x1 = pen_get_graph_pos_2_pixelx(graph_node_x(g,a), g);
+    float y1 = pen_get_graph_pos_2_pixel_y(graph_node_y(g,a), g);
+    float x2 = pen_get_graph_pos_2_pixelx(graph_node_x(g,b), g);
+    float y2 = pen_get_graph_pos_2_pixel_y(graph_node_y(g,b), g);
 
     pen_line(c,x1, y1, x2, y2);
 
@@ -373,7 +401,24 @@ void pen_join (context* c, graph* g, int a, int b)
         float txt_y = (y1 + y2)/2;
         float txt_y_offset = FONT_SIZE_SMALL/2;
 
-        pen_formatted_text_at_center(c, txt_x, txt_y+txt_y_offset, FONT_SIZE_SMALL, 0.5, 0.5, "%.3f",  graph_get_join(g, a, b)->distance);
-        pen_formatted_text_at_center(c, txt_x, txt_y-txt_y_offset, FONT_SIZE_SMALL, 0.5, 0.5, "%.3f",  graph_join_get_distance_opti(g, a, b));
+        /*
+        float xm = input_mouse_x(c);
+        float ym = input_mouse_y(c);
+
+        float t = ((xm-x1)*(x2-x1)+(ym-y1)*(y2-y1))/(squared((x2-x1))+squared(y2-y1));
+        float xs= x1+t*(x2-x1);
+        float ys= y1+t*(y2-y1);
+
+        txt_x = xs;
+        txt_x = ys;*/
+
+        if(exist)
+        {
+            pen_formatted_text_at_center(c, txt_x, txt_y-txt_y_offset, FONT_SIZE_SMALL, 0.5, 0.5, "%.2f", graph_get_join(g, a, b)->distance);
+        }
+        else
+        {
+            pen_formatted_text_at_center(c, txt_x, txt_y-txt_y_offset, FONT_SIZE_SMALL, 0.5, 0.5, "%.2f",  graph_join_get_distance_opti(g, a, b));
+        }
     }
 }
