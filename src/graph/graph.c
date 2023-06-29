@@ -314,6 +314,7 @@ graph* graph_gen_nul_equi(int nb_node, rectf area_contained)
     free(occuped);
     
     return g;
+}
 void graph_set_node_x_y(graph * g , int a, float x, float y)
 {
     graph_check_index(g, a);
