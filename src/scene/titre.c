@@ -11,7 +11,8 @@ void scene_titre_load(argument arg)
     sce->state = s;
 
     //sce->info.background_color = rgb(127, 255, 0);
-    sce->info.background_color = rgb(99,   0, 145);
+    //sce->info.background_color = rgb(99,   0, 145);
+    sce->info.background_color = rgb(107,   51, 135);
 
     s->nbFoisPresser = 0;
 }

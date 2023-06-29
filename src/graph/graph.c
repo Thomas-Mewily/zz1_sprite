@@ -574,7 +574,6 @@ void graph_calculer_distance_noeud(graph* g, int source)
 
     }
     end:
-    debug;
 
     repeat(i, prev->length)
     {
