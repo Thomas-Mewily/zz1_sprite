@@ -67,7 +67,7 @@ void scene_martin_draw(argument arg)
     graph* g = s->graph_test;
     int offset_x = 0;
     int offset_y = 0;
-    float radius = 3;
+    float radius = 10;
     float scale = 1;
     pen_color(c,rgb(0,0,0));
     repeat(i, graph_get_nb_node(g))
