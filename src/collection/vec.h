@@ -37,11 +37,12 @@ typedef struct
     vec_shrink_if_needed(_v);\
 }
 
+//todo check index
+
 #define vec_remove_at(v, idx)\
 {\
     vec* _v = (v);\
     int _idx = (idx);\
-    check(("vec_remove_at() : vec have no element", _v->length >= 0));\
     if(_idx+1 != _v->length)\
     {\
         vec_copy(_v, _v, (_idx+1)*_v->sizeof_value, (_v->length - _idx-1)*_v->sizeof_value, _idx*_v->sizeof_value);\
