@@ -26,6 +26,7 @@ struct node
 
     int annotation; // Cache pour savoir si on est déjà passer sur le noeud 
     int selected_flag;
+    int order;
 };
 struct join
 {
@@ -99,6 +100,8 @@ void graph_nodes_toute_annoter(graph * g, int val);
 
 bool graph_node_en_blanc(graph* g, int idx);
 bool graph_node_en_noir (graph* g, int idx);
+
+void graph_set_order_label(graph* g, vec* path);
 
 void graph_printf(graph* g);
 

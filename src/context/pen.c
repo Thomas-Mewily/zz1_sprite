@@ -349,7 +349,7 @@ void pen_node (context* c, graph* g, int i)
     {
         float txt_x = x;
         float txt_y = y;
-        pen_formatted_text_at_center(c, txt_x, txt_y, FONT_SIZE_NORMAL, 0.5, 1, "%i",  n->idx);
+        pen_formatted_text_at_center(c, txt_x, txt_y, FONT_SIZE_NORMAL, 0.5, 1, "%i",  n->order);
     }
 }
 

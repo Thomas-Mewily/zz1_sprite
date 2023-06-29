@@ -8,6 +8,7 @@ void node_init(graph* g, int idx)
    n->x = 0;
    n->y = 0;
    n->neightbors = vec_empty(int);
+   n->order = -1;
 }
 
 void join_init(join* j, int a, int b)
@@ -285,6 +286,27 @@ void graph_set_node_x_y(graph * g , int a, float x, float y)
         int b = graph_get_node_neighbors(g, a, n);
         update_join_length(g, a, b);
     }
+}
+
+void graph_set_order_label(graph* g, vec* path)
+{
+    int nb_node = graph_get_nb_node(g);
+    debug;
+    for (int i = 0; i < nb_node; i++)
+    {
+        graph_get_node(g, i)->order = -1;
+    }
+    debug;
+    for (int i = 0; i < path->length; i++)
+    {
+        node* n = graph_get_node(g, i);
+        if (n->order == -1)
+        {
+            n->order = vec_get(path, int, i);
+        }
+    }
+    debug;
+    
 }
 
 graph* graph_complet(int nb_node)
@@ -578,22 +600,17 @@ float path_calculate_length(graph* g, vec* path)
     int elt_count = path->length;
     if (elt_count <= 1) {return 0;}
     elt_count--;
-debug;
     float length = 0;
 
     for (int i = 0; i < elt_count; i++)
     {
-        debug;
         int a = vec_get(path, int, i);
-        debug;
         int b = vec_get(path, int, i+1);
-        debug;
         join* j = graph_get_join(g, a, b);
-        debug;
         //length += j->distance;
     }
     //return length;
-    return rand()%100;
+    return rand()%1000;
 }
 
 graph* graph_generate(int nb_node, rectf area_contained, float proba)
@@ -624,36 +641,27 @@ vec* graph_recuit_simule(graph* g, float motivation, float(*t_update)(float), fl
 
     int nb_no_progress_iter = 0;
     int min_iter = nb_node * motivation;
-    debug;
     while (nb_no_progress_iter < min_iter)
     {    
-        debug;
         perm_path = vec_clone(curr_path);
-        debug;
         int a, b;
         do
         {   a = rand()%(nb_node-1)+1;
             b = rand()%(nb_node-1)+1;
         } while (a == b);
-        debug;
         int tmp = vec_get(perm_path, int, a);
-        debug;
         vec_set(perm_path, int, a, vec_get(perm_path, int, b));
-        debug;
         vec_set(perm_path, int, b, tmp); 
-debug;
         float curr_length = path_calculate_length(g, curr_path);
-        debug;
         float perm_length = path_calculate_length(g, perm_path);
-        debug;
-        float delta = curr_length - perm_length;
-        debug;
+        float delta =  perm_length - curr_length;
+        SDL_Log("delta %f\n", delta);
         bool swap = false;
         if (delta > 0) {swap = true;}
         else
         {
             float p = expf(-(delta)/t);
-
+            SDL_Log("proba : %f\n", p);
             if ( rand()%1000 < (int)(p*1000)) {swap = true;}
             else { nb_no_progress_iter ++;}
         }
@@ -662,9 +670,8 @@ debug;
             vec_copy(perm_path, curr_path, 0, perm_path->length, 0);
             nb_no_progress_iter = 0;
         }
-        debug;
         t = t_update(t);
-        debug;
+        SDL_Log("nb it useless %d t %f\n", nb_no_progress_iter, t);
     }
     if (nb_no_progress_iter >= min_iter) {SDL_Log("Sorti de la boucle de manière officielle\n");}
 }
