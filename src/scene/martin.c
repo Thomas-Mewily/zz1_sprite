@@ -27,7 +27,9 @@ void scene_martin_load(argument arg)
     // s->froggyS = sprite_sheet_create(c, "asset/froggyChair.png", 54, 54);
     // s->froggyAnim = animation_create(s->froggyS, frequence_s(20));
 
-    s->graph_test = graph_gen_nul_equi(10, rectanglef(0, 0, 400, 400));
+    int nb_node = 30;
+    s->graph_test = graph_gen_nul_equi(nb_node, rectanglef(40, 40, window_width(c), window_height(c)));
+    graph_link_arbre_couvrant(s->graph_test);
 
 }
 
@@ -67,7 +69,7 @@ void scene_martin_draw(argument arg)
     graph* g = s->graph_test;
     int offset_x = 0;
     int offset_y = 0;
-    float radius = 20;
+    float radius = 5;
     float scale = 1;
     pen_color(c,rgb(0,0,0));
     repeat(i, graph_get_nb_node(g))
@@ -78,13 +80,13 @@ void scene_martin_draw(argument arg)
         pen_circle(c,scale*x +offset_x,scale*y+offset_y, radius);
         //SDL_Log("noeud n°%d, x = %F; y = %f", i, x, y);
         
-        // for(int k = 0; k < graph_node_get_nb_neighbors(g,i); k++)
-        // {
-        //     int j = graph_get_node_neighbors(g,i,k);
-        //     float xj = graph_node_x(g,j);
-        //     float yj =graph_node_y(g,j);
-        //     pen_line(c,scale*x +offset_x,scale*y+offset_y,scale*xj +offset_x,scale*yj+offset_y);
-        // }
+        for(int k = 0; k < graph_node_get_nb_neighbors(g,i); k++)
+        {
+            int j = graph_get_node_neighbors(g,i,k);
+            float xj = graph_node_x(g,j);
+            float yj =graph_node_y(g,j);
+            pen_line(c,scale*x +offset_x,scale*y+offset_y,scale*xj +offset_x,scale*yj+offset_y);
+        }
     }
 }
 
