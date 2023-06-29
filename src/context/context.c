@@ -104,3 +104,6 @@ void context_draw(context* c)
     scene_draw(c, (scene*)(c->scene));
     SDL_RenderPresent(c->renderer);
 }
+
+void context_should_exit_application(context* c, bool should_exit) { c->should_exit = should_exit; }
+scene* context_get_current_scene(context* c) { return (scene*)c->scene; }

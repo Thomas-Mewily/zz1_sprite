@@ -1,6 +1,6 @@
 #include "base.h"
 
-
+#define renderer window_renderer(c)
 
 void pen_mode(context* c, uint32 mode)
 {
@@ -9,7 +9,7 @@ void pen_mode(context* c, uint32 mode)
 
 void pen_color(context* c, color co) 
 { 
-    SDL_SetRenderDrawColor(c->renderer, co.r, co.g, co.b, co.a);
+    SDL_SetRenderDrawColor(renderer , co.r, co.g, co.b, co.a);
     /*
     if(pen_is_down(c))
     {
@@ -20,11 +20,11 @@ void pen_color(context* c, color co)
 color pen_get_color(context* c)
 {
     color co;
-    SDL_GetRenderDrawColor(c->renderer, &co.r, &co.g, &co.b, &co.a);
+    SDL_GetRenderDrawColor(renderer, &co.r, &co.g, &co.b, &co.a);
     return co;
 }
 
-void pen_clear(context* c) { SDL_RenderClear(c->renderer); }
+void pen_clear(context* c) { SDL_RenderClear(renderer); }
 
 // todo : affected by pen size
 void pen_line(context* c, float x1, float y1, float x2, float y2) { pen_pixel_line(c, x1, y1, x2, y2); }
@@ -34,17 +34,17 @@ void pen_rect(context* c, rectf r) { pen_pixel_rect(c, r); }
 #define X(x) apply_x_offset(c, x)
 #define Y(y) apply_y_offset(c, y)
 
-float apply_x_offset(context* c, float x) { return (x - c->_camera_x)*c->_camera_scale_x; }
-float apply_y_offset(context* c, float y) { return (y - c->_camera_y)*c->_camera_scale_y; }
+float apply_x_offset(context* c, float x) { return (x - camera_x(c))*camera_scale_x(c); }
+float apply_y_offset(context* c, float y) { return (y - camera_y(c))*camera_scale_y(c); }
 
 rectf apply_offset(context* c, rectf r)
 {
-    return rectanglef(X(r.x), Y(r.y), r.w*c->_camera_scale_x, r.h*c->_camera_scale_y);
+    return rectanglef(X(r.x), Y(r.y), r.w*camera_scale_x(c), r.h*camera_scale_y(c));
 }
 
-void pen_pixel(context* c, float x, float y) { SDL_RenderDrawPointF(c->renderer, X(x), Y(y)); }
-void pen_pixel_line(context* c, float x1, float y1, float x2, float y2) { SDL_RenderDrawLineF(c->renderer, X(x1), Y(y1), X(x2), Y(y2)); }
-void pen_pixel_rect(context* c, rectf r) { r = apply_offset(c, r); SDL_RenderFillRectF(c->renderer, &r); }
+void pen_pixel(context* c, float x, float y) { SDL_RenderDrawPointF(renderer, X(x), Y(y)); }
+void pen_pixel_line(context* c, float x1, float y1, float x2, float y2) { SDL_RenderDrawLineF(renderer, X(x1), Y(y1), X(x2), Y(y2)); }
+void pen_pixel_rect(context* c, rectf r) { r = apply_offset(c, r); SDL_RenderFillRectF(renderer, &r); }
 void pen_circle(context* c, float x, float y, float radius) { pen_oval(c, x, y, radius, radius); }
 void pen_oval(context* c, float x, float y, float radius_x, float radius_y)
 {
@@ -171,7 +171,7 @@ void pen_rotate(context* c, angle a)
 void pen_texture(context* c, texture* t, rect src, rectf dest)
 {
     dest = apply_offset(c, dest);
-    SDL_RenderCopyF(c->renderer, t, &src, &dest);
+    SDL_RenderCopyF(renderer, t, &src, &dest);
 }
 
 void pen_texture_at(context* c, texture* t, rect src, float x, float y, float scaleX, float scaleY)

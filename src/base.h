@@ -6,15 +6,15 @@
 
 #include "collection/vec.h"
 
-#include "util/timer.h"
 #include "util/math.h"
 #include "util/angle.h"
 #include "util/color.h"
 #include "util/rectangle.h"
 #include "util/vertex.h"
-#include "util/input.h"
 
 #include "context/context_struct.h"
+#include "context/timer.h"
+#include "context/input.h"
 #include "context/scene.h"
 
 #include "util/texture.h"
@@ -25,7 +25,6 @@
 #include "context/window.h"
 #include "context/camera.h"
 #include "context/pen.h"
-
 
 #include "graph/graph.h"
 #include "graph/ant.h"

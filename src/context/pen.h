@@ -17,6 +17,7 @@ void pen_color(context* c, color co);
 color pen_get_color(context* c);
 
 void pen_clear(context* c);
+
 void pen_mode(context* c, uint32 mode);
 
 

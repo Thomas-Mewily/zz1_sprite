@@ -67,3 +67,16 @@ void window_update(context* c)
     c->window_ratio_width_div_height = c->screen_width/(float)c->screen_height;
     c->window_ratio_height_div_width = c->screen_height/(float)c->screen_width;
 }
+
+int screen_width(context* c) { return c->screen_width; }
+int screen_height(context* c) { return c->screen_height; }
+
+SDL_Renderer* screen_renderer(context* c) { return c->renderer; }
+
+SDL_Window* window(context* c) { return c->window; }
+int window_width(context* c) { return c->window_width; }
+int window_height(context* c) { return c->window_height; }
+int window_x(context* c) { return c->window_x; }
+int window_y(context* c) { return c->window_y; }
+float window_ratio_width_div_height(context* c) { return c->window_ratio_width_div_height; }
+float window_ratio_height_div_width(context* c) { return c->window_ratio_width_div_height; }

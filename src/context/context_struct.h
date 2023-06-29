@@ -3,8 +3,12 @@
 #include "base.h"
 
 #define FONT_PATH "asset/Milky Mania.ttf"
+
+// Utiliser de préférence les fonction associé au contexte pour y acceder
 typedef struct
 {
+    // windows and screen related
+    SDL_Renderer* renderer;
     int screen_width;
     int screen_height;
 
@@ -18,8 +22,7 @@ typedef struct
     int window_x;
     int window_y;
 
-    SDL_Renderer* renderer;
-
+    // input related
     int mouse_x;
     int mouse_y;
     int32 mouse_flag;
@@ -33,12 +36,12 @@ typedef struct
 
     void* scene;
 
-    float  _camera_x;
-    float  _camera_y;
-    float  _camera_scale_x;
-    float  _camera_scale_y;
-    bool   _camera_can_zoom;
-    bool   _camera_can_scroll;
+    float  camera_x;
+    float  camera_y;
+    float  camera_scale_x;
+    float  camera_scale_y;
+    bool   camera_can_zoom;
+    bool   camera_can_scroll;
 
     uint32 pen_mode;
     //angle  pen_move_rotation;
