@@ -26,7 +26,9 @@
 #include "context/camera.h"
 #include "context/pen.h"
 
+
 #include "graph/graph.h"
+#include "graph/ant.h"
 
 
 #include "scene/all_scene.h"
