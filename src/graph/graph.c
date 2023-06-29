@@ -391,3 +391,8 @@ void graph_link_fill_joins(graph* g, float proba)
     }
     
 }
+
+vec* graph_recuit_simule(graph* g)
+{
+
+}
