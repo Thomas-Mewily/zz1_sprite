@@ -237,37 +237,14 @@ void pen_text_at(context* c, char* text, float x, float y, float pixel_ligne_hei
 
 void pen_text_at_center(context* c, char* text, float x, float y, float pixel_ligne_height, float centerX, float centerY)
 {
-    int w = 0, h = 0; 
+    int h = pixel_ligne_height; 
     int step = pixel_ligne_height/LETTER_HEIGHT* LETTER_WIDTH;
-    int text_length = (int)strlen(text);
-    //Trouve les dimensions du texte à afficher
-    for (int i = 0; i < text_length; i++)
-    {
-        int cur_w = 0;
-        char letter = text[i];
-        if (letter == '\n')
-        {
-            w = cur_w > w ? cur_w : w;
-            h += (1+INTERLIGNE) * LETTER_HEIGHT;
-        }
-        else{
-
-            cur_w += step + step * LETTER_SPACING;
-        }
-    }
-
-    // color tmp = pen_get_color(c);
-    // pen_color(c, rgb(0,0,0));
-    // pen_rect(c, rectanglef(x, y, w, h));
-    // pen_color(c, tmp);
+    int w = (int)strlen(text) * (step + step * LETTER_SPACING);
 
     w *= centerX;
     h *= centerY;
 
     pen_text_at(c, text, x-w, y-h, pixel_ligne_height);
-
-    
-
 }
 
 void pen_char_at(context* c, char letter, float x, float y, float pixel_ligne_height)
