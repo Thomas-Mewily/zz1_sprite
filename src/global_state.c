@@ -2,6 +2,16 @@
 #define FPS_IDLE 500
 #define FPS_WALK 200
 
+/*
+no opti, fast compile : -O0
+lot of opti, slow compile : -O4
+
+gcc -O4 -fdiagnostics-color=always -g ./src/*.c ./src/context/*.c ./src/util/*.c ./src/collection/*.c ./src/scene/*.c ./src/graph/*.c -Wall -Wextra -Iinclude -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -o ./bin/main.exe
+gcc -O0 -fdiagnostics-color=always -g ./src/*.c ./src/context/*.c ./src/util/*.c ./src/collection/*.c ./src/scene/*.c ./src/graph/*.c -Wall -Wextra -Iinclude -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -o ./bin/main.exe
+./bin/main.exe
+gource
+*/
+
 void get_graph(context* c)
 {
     if(gs->g != null)
@@ -11,7 +21,9 @@ void get_graph(context* c)
 
     //gs->g = graph_generate(200, rectanglef(0, 0, 160, 90), 0.25f);
     //gs->g = graph_generate(100, rectanglef(0, 0, 160, 90), 0.25f);
-    gs->g = graph_generate(6, rectanglef(0, 0, 16, 9), 0.25f);
+    //gs->g = graph_generate( 8, rectanglef(0, 0, 16, 9), 0.25f);
+    gs->g = graph_generate( 3+(rand()%10), rectanglef(0, 0, 16*4, 9*4), 0.25f);
+    
     //gs->g = graph_complet(8);
     graph* g = gs->g;
 

@@ -317,7 +317,7 @@ void pen_graph(context* c, graph* g)
     c->camera_scale_x *= height_pixel;
     c->camera_scale_y *= height_pixel;*/
 
-    if(g->draw_text_info)
+    if(g->draw_text_info == GRAPH_DISPLAY_MODE_LOT_OF_TEXT)
     {
         repeat(i, graph_get_nb_node(g))
         {
@@ -348,17 +348,26 @@ void pen_graph(context* c, graph* g)
 
 void pen_node (context* c, graph* g, int i)
 {
-    color co = color_black;
+
+
+    float radius = NODE_RADIUS_PIXEL;
+    node* n = graph_get_node(g, i);
+    float x = camera_graph_pos_2_cam_pos_x(c, g, graph_node_x(g,i));
+    float y = camera_graph_pos_2_cam_pos_y(c, g, graph_node_y(g,i));
+
+    pen_color(c, color_black);
+    pen_oval(c, x, y, radius/c->camera_scale_x, radius/c->camera_scale_y);
+
+    color co = rgb(192,192,192);
     if(graph_get_nb_node(g) <= 32 && graph_node_touched_by_mouse(c,g,i))
     {
         co = color_white;
     }
     pen_color(c, co);
-    float radius = NODE_RADIUS_PIXEL;
-    node* n = graph_get_node(g, i);
-    float x = camera_graph_pos_2_cam_pos_x(c, g, graph_node_x(g,i));
-    float y = camera_graph_pos_2_cam_pos_y(c, g, graph_node_y(g,i));
+
+    radius *= 0.8;
     pen_oval(c, x, y, radius/c->camera_scale_x, radius/c->camera_scale_y);
+    //pen_rect(c, rectanglef(x-radius/c->camera_scale_x/2, y-radius/c->camera_scale_y/2, radius/c->camera_scale_x, radius/c->camera_scale_y));
 
     if(g->draw_text_info)
     {
