@@ -1,4 +1,6 @@
 #include "base.h"
+#define FPS_IDLE 500
+#define FPS_WALK 200
 
 void global_state_load(context* c)
 {
@@ -19,10 +21,50 @@ void global_state_load(context* c)
     graph_add_join(g, x, y);
     graph_add_join(g, y, z);
     graph_add_join(g, z, x);
+
+    gs->goblinS = sprite_sheet_create(c, "asset/goblin.png", 24, 32);
+
+    gs->goblin_anim_down_walk = animation_create(gs->goblinS, FPS_WALK);
+    gs->goblin_anim_down_walk->first_frame = 8; 
+    gs->goblin_anim_down_walk->last_frame = 11; 
+    gs->goblin_anim_right_walk = animation_create(gs->goblinS, FPS_WALK);
+    gs->goblin_anim_right_walk->first_frame = 12; 
+    gs->goblin_anim_right_walk->last_frame = 15; 
+    gs->goblin_anim_up_walk = animation_create(gs->goblinS, FPS_WALK);
+    gs->goblin_anim_up_walk->first_frame = 16; 
+    gs->goblin_anim_up_walk->last_frame = 19; 
+    gs->goblin_anim_left_walk = animation_create(gs->goblinS, FPS_WALK);
+    gs->goblin_anim_left_walk->first_frame = 20; 
+    gs->goblin_anim_left_walk->last_frame = 23; 
+
+    gs->goblin_anim_down_idle = animation_create(gs->goblinS, FPS_IDLE);
+    gs->goblin_anim_down_idle->first_frame = 0; 
+    gs->goblin_anim_down_idle->last_frame = 1; 
+    gs->goblin_anim_right_idle = animation_create(gs->goblinS, FPS_IDLE);
+    gs->goblin_anim_right_idle->first_frame = 2; 
+    gs->goblin_anim_right_idle->last_frame = 3; 
+    gs->goblin_anim_up_idle = animation_create(gs->goblinS, FPS_IDLE);
+    gs->goblin_anim_up_idle->first_frame = 4; 
+    gs->goblin_anim_up_idle->last_frame = 5; 
+    gs->goblin_anim_left_idle = animation_create(gs->goblinS, FPS_IDLE);
+    gs->goblin_anim_left_idle->first_frame = 6; 
+    gs->goblin_anim_left_idle->last_frame = 7; 
+    
 }
 
 void global_state_unload(context* c)
 {
+    free_animation(gs->goblin_anim_down_walk);
+    free_animation(gs->goblin_anim_right_walk);
+    free_animation(gs->goblin_anim_up_walk);
+    free_animation(gs->goblin_anim_left_walk);
+
+    free_animation(gs->goblin_anim_down_idle);
+    free_animation(gs->goblin_anim_right_idle);
+    free_animation(gs->goblin_anim_up_idle);
+    free_animation(gs->goblin_anim_left_idle);
+    sprite_sheet_free(gs->goblinS);
+
     graph_free(gs->g);
     free(gs);
 }
