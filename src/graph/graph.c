@@ -371,3 +371,23 @@ void graph_link_arbre_couvrant(graph* g)
     SDL_Log("Arbre couvrant généré\n");
 
 }
+
+void graph_link_fill_joins(graph* g, float proba)
+{   
+    if (proba > 1) {proba = 1;}
+    if (proba > 0.001)
+    {
+        int p = proba * 1000;
+        int nb_node = graph_get_nb_node(g);
+        for (int i = 0; i < nb_node; i++)
+        {
+            for (int j = 0; j < nb_node; j++)
+            {
+                if (rand()%1000 <= p)
+                    graph_add_join(g, i, j);
+            }
+            
+        }
+    }
+    
+}

@@ -30,6 +30,7 @@ void scene_martin_load(argument arg)
     int nb_node = 30;
     s->graph_test = graph_gen_nul_equi(nb_node, rectanglef(40, 40, window_width(c), window_height(c)));
     graph_link_arbre_couvrant(s->graph_test);
+    graph_link_fill_joins(s->graph_test, 0.1);
 
 }
 
@@ -69,7 +70,7 @@ void scene_martin_draw(argument arg)
     graph* g = s->graph_test;
     int offset_x = 0;
     int offset_y = 0;
-    float radius = 5;
+    float radius = 3;
     float scale = 1;
     pen_color(c,rgb(0,0,0));
     repeat(i, graph_get_nb_node(g))
