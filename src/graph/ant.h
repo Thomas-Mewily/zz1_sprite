@@ -8,7 +8,6 @@
 #define ANT_STOP 2
 typedef int ant_state;*/
 
-
 typedef struct 
 {
     // display position on screen
@@ -20,8 +19,12 @@ typedef struct
     graph* g;
     int node_source_idx;
     int node_destination_idx;
+    int node_source_idy;
+    int node_destination_idy;
     //ant_state state;
 } ant;
+
+ant*  ant_create(ant*a);
 
 float ant_source_x(ant* a);
 float ant_source_y(ant* a);

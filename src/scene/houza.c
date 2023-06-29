@@ -5,6 +5,7 @@ typedef struct
 {
    //texture* steve;
    graph* g;
+   ant* a;
 } state;
 
 void scene_houza_load(argument arg)
@@ -12,6 +13,8 @@ void scene_houza_load(argument arg)
     obtenir_state;
 
     s->g = graph_complet(20,1);
+    //s->a = ant_create(s->a);
+
     sce->info.background_color = rgb(200,0,0);
     //s->steve = texture_create(c, "asset/Steve.png");
 }
@@ -21,12 +24,15 @@ void scene_houza_unload(argument arg)
 {
     obtenir_state;
     graph_free(s->g);
+
+    
    // texture_free(s->steve);
 }
 
 void scene_houza_update(argument arg)
 {
     obtenir_state;
+    ant_update(10,s->a);
 
     if(c->kb_state[SDL_SCANCODE_N])
     {
@@ -37,6 +43,7 @@ void scene_houza_update(argument arg)
 void scene_houza_draw(argument arg)
 {
     obtenir_state;
+    
 
     float radius = c->screen_height/32.0f;
 
@@ -44,16 +51,21 @@ void scene_houza_draw(argument arg)
     float offset_x = c->window_width/2;
     float offset_y = c->window_height/2;
 
+
+
     pen_color(c,color_white);
     graph* g = s->g;
+    ant* a = s->a;
+
     //graph_get_join(g,0,1).distance
     repeat(i, graph_get_nb_node(g))
     {
-        pen_color(c,hsv(i%180,1,1));
+        pen_color(c,color_white);
 
         float x = graph_node_x(g,i);
         float y = graph_node_y(g,i);
         pen_circle(c,scale*x +offset_x,scale*y+offset_y ,radius);
+        
         
         for(int k = 0; k < graph_node_get_nb_neighbors(g,i); k++)
         {
@@ -63,6 +75,11 @@ void scene_houza_draw(argument arg)
             pen_line(c,scale*x +offset_x,scale*y+offset_y,scale*xj +offset_x,scale*yj+offset_y);
         }
     }
+
+
+   rectf fourmis = rectanglef(10,10  ,20,20);
+    pen_rect(c,fourmis);
+   
 
    #if 0
     //texture* t =  s->steve;
