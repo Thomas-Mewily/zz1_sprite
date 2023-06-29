@@ -21,6 +21,8 @@ context* context_create(char* window_name, int width, int height, Uint32 flags)
     c->should_exit = false;
     twice(context_update(c););
 
+    global_state_load(c);
+
     // //Charge la font sous différentes tailles 
     // c->font_small           = TTF_OpenFont(FONT_PATH, 20); check_font_charged(c->font_small);
     // c->font_medium          = TTF_OpenFont(FONT_PATH, 30); check_font_charged(c->font_medium);
@@ -37,7 +39,7 @@ void contexte_free(context* c)
     // TTF_CloseFont(c->font_medium);
     // TTF_CloseFont(c->font_big);
     // TTF_CloseFont(c->font_fullscreen);
-    
+    global_state_unload(c);
     scene_context_unload(c);
     pen_unload(c);
     camera_unload(c);

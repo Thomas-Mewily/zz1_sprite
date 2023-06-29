@@ -1,6 +1,8 @@
 #ifndef BASE_H
 #define BASE_H
 
+typedef struct the_global_state the_global_state;
+
 #include "betterC.h"
 #include "SDL.h"
 
@@ -29,10 +31,10 @@
 #include "graph/graph.h"
 #include "graph/ant.h"
 
-
 #include "scene/all_scene.h"
 
 #include "context/context.h"
 
+#include "global_state.h"
 
 #endif

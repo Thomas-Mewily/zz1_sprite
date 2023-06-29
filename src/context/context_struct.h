@@ -56,5 +56,7 @@ typedef struct
     //TTF_Font* font_big;
     //TTF_Font* font_fullscreen;
     texture* _pen_font;
+
+    the_global_state* _global_state;
 } context;
 #endif
