@@ -433,6 +433,14 @@ float path_calculate_length(graph* g, vec* path)
     return length;
 }
 
+graph* graph_generate(int nb_node, rectf area_contained, float proba)
+{
+    graph* newG = graph_gen_nul_equi(nb_node, area_contained);
+    graph_link_arbre_couvrant(newG);
+    graph_link_fill_joins(newG, proba);
+    return newG;
+}
+
 vec* graph_recuit_simule(graph* g, float motivation, float(*t_update)(float), float t_start)
 {
     int nb_node = graph_get_nb_node(g);

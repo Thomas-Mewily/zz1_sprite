@@ -28,10 +28,7 @@ void scene_martin_load(argument arg)
     // s->froggyAnim = animation_create(s->froggyS, frequence_s(20));
 
     int nb_node = 30;
-    s->graph_test = graph_gen_nul_equi(nb_node, rectanglef(40, 40, window_width(c), window_height(c)));
-    graph_link_arbre_couvrant(s->graph_test);
-    graph_link_fill_joins(s->graph_test, 0.1);
-
+    s->graph_test = graph_generate(nb_node, rectanglef(40, 40, window_width(c), window_height(c)), 0.2);
 }
 
 void scene_martin_unload(argument arg)
