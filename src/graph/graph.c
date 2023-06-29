@@ -31,7 +31,6 @@ void join_free(join* n)
     // rien à faire
 }
 
-
 void graph_check_index(graph* g, int idx)
 {
    check(idx >= 0 && idx < graph_get_nb_node(g));
@@ -234,6 +233,41 @@ void graph_printf(graph* g)
     }
 }
 
+void recalculer_etendu(graph * g)
+{
+    g->x_etendu = 0;
+    g->y_etendu = 0;
+    if(graph_get_nb_node(g) == 0) return;
+
+    g->x_min = graph_node_x(g,0);
+    g->x_max = graph_node_x(g,0);
+    g->y_min = graph_node_y(g,0);
+    g->y_max = graph_node_y(g,0);
+
+    repeat(i, graph_get_nb_node(g))
+    {
+        g->x_min = minif(graph_node_x(g,i), g->x_min);
+        g->y_min = minif(graph_node_y(g,i), g->y_min);
+        g->x_max = maxif(graph_node_x(g,i), g->x_max);
+        g->y_max = maxif(graph_node_y(g,i), g->y_max);
+    }
+
+    g->x_etendu = g->x_max - g->x_min;
+    g->y_etendu = g->y_max - g->y_min;
+}
+
+void graph_set_node_x_y(graph * g , int a, float x, float y)
+{
+    graph_check_index(g, a);
+    graph_get_node(g, a)->x = x;
+    graph_get_node(g, a)->y = y;
+    recalculer_etendu(g);
+    repeat(n, graph_node_get_nb_neighbors(g, a))
+    {
+        int b = graph_get_node_neighbors(g, a, n);
+        update_join_length(g, a, b);
+    }
+}
 graph* graph_complet(int nb_node, float radius)
 {
     graph* g = graph_empty();
@@ -258,6 +292,7 @@ graph* graph_complet(int nb_node, float radius)
     }
     return g;
 }
+
 
 graph* graph_gen_nul_equi(int nb_node, rectf area_contained)
 {
@@ -289,17 +324,19 @@ graph* graph_gen_nul_equi(int nb_node, rectf area_contained)
             i = rand()%(tableH); j = rand()%(tableW);
             it++;
         } while (occuped[i][j] && it <= area);
-        if (it > area) {crise_du_logement = true;}
 
-        graph_add_node_x_y(g, j * cellW + rand()%(int)cellW,
-                                            i * cellH + rand()%(int)cellH); 
+        if (it > area) {crise_du_logement = true; SDL_Log("Crise du logement\n");}
+
+        int x = j * cellW + rand()%(int)cellW;
+        int y = i * cellH + rand()%(int)cellH;
+        graph_add_node_x_y(g, x, y); 
         nb_node--;
 
         for (int k = -1; k < 2; k++)
         {
             for (int l = -1; l < 2; l++)
             {
-                if (!(i+k<0 || i+k >= tableW || j+l < 0 || j+l >= tableH))
+                if (!(i+k<0 || i+k >= tableH || j+l < 0 || j+l >= tableW))
                     occuped[i+k][j+l] = true;
             }
         }
@@ -310,46 +347,72 @@ graph* graph_gen_nul_equi(int nb_node, rectf area_contained)
         free(occuped[i]);
     }
     free(occuped);
+    SDL_Log("Graph nul généré\n");
     
     return g;
 }
 
-float maxi(float a, float b) { return a > b ? a : b; }
-float mini(float a, float b) { return a < b ? a : b; }
 
-void recalculer_etendu(graph * g)
+
+
+
+void graph_link_arbre_couvrant(graph* g)
 {
-    g->x_etendu = 0;
-    g->y_etendu = 0;
-    if(graph_get_nb_node(g) == 0) return;
+    node* root  = graph_get_node(g, 0);
+    root->etat = node_depart;
 
-    g->x_min = graph_node_x(g,0);
-    g->x_max = graph_node_x(g,0);
-    g->y_min = graph_node_y(g,0);
-    g->y_max = graph_node_y(g,0);
+    int nb_unlk_node = graph_get_nb_node(g) -1;
+    int nb_used_node = 1;
 
-    repeat(i, graph_get_nb_node(g))
+
+    vec* used_nodes = vec_empty(node*);//Nodes déjà liées
+    vec* unlk_nodes = vec_empty(node*);//Nodes pas encore liées (unlk -> unlinked)
+
+    vec_add(used_nodes, node*, root);
+
+    for (int i = 1; i < nb_unlk_node+1; i++)
     {
-        g->x_min = mini(graph_node_x(g,i), g->x_min);
-        g->y_min = mini(graph_node_y(g,i), g->y_min);
-        g->x_max = maxi(graph_node_x(g,i), g->x_max);
-        g->y_max = maxi(graph_node_y(g,i), g->y_max);
+        vec_add(unlk_nodes, node*, graph_get_node(g, i));
     }
 
-    g->x_etendu = g->x_max - g->x_min;
-    g->y_etendu = g->y_max - g->y_min;
+    while (nb_unlk_node)
+    {
+        int unlk_id = rand()%nb_unlk_node;//index dans le vecteur
+        int used_id = rand()%nb_used_node;
+
+        node* picked_unlk_node = vec_get(unlk_nodes, node*, unlk_id);
+        //node* picked_used_node = vec_get(used_nodes, node*, used_id);
+        
+        SDL_Log("node liées : %d et %d\n", unlk_id, used_id);
+        graph_add_join(g, picked_unlk_node->idx, used_id);
+        vec_remove_at(unlk_nodes, unlk_id);
+        vec_add(used_nodes, node*, picked_unlk_node);
+
+        nb_unlk_node --;
+        nb_used_node ++;
+    }
+    vec_free_lazy(unlk_nodes);
+    vec_free_lazy(used_nodes);
+    SDL_Log("Arbre couvrant généré\n");
+
 }
 
-void graph_set_node_x_y(graph * g , int a, float x, float y)
-{
-    graph_check_index(g, a);
-    graph_get_node(g, a)->x = x;
-    graph_get_node(g, a)->y = y;
-    recalculer_etendu(g);
-
-    repeat(n, graph_node_get_nb_neighbors(g, a))
+void graph_link_fill_joins(graph* g, float proba)
+{   
+    if (proba > 1) {proba = 1;}
+    if (proba > 0.001)
     {
-        int b = graph_get_node_neighbors(g, a, n);
-        update_join_length(g, a, b);
+        int p = proba * 1000;
+        int nb_node = graph_get_nb_node(g);
+        for (int i = 0; i < nb_node; i++)
+        {
+            for (int j = 0; j < nb_node; j++)
+            {
+                if (rand()%1000 <= p)
+                    graph_add_join(g, i, j);
+            }
+            
+        }
     }
+    
 }
