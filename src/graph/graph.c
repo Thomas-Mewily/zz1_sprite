@@ -370,7 +370,7 @@ void graph_link_arbre_couvrant(graph* g)
     vec_free_lazy(used_nodes);
     SDL_Log("Arbre couvrant généré\n");
 
-}
+}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
 
 void graph_link_fill_joins(graph* g, float proba)
 {   
