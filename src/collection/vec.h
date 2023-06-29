@@ -57,18 +57,17 @@ typedef struct
 {\
     vec* _v = (v);\
     type _value = (value);\
-    int idx = -1;\
+    int _idx = -1;\
 \
-    repeat(i, _v->length)\
+    repeat(_i, _v->length)\
     {\
-        if(vec_get(_v, type, i) == _value)\
+        if(vec_get(_v, type, _i) == _value)\
         {\
-            idx = i;\
+            _idx = _i;\
             break;\
         }\
     }\
-    idx;\
-    *int_ptr_result = idx\
+    *int_ptr_result = _idx;\
 }
 
 #define vec_insert(v, type, idx, value)\

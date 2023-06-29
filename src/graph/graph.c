@@ -288,25 +288,34 @@ void graph_set_node_x_y(graph * g , int a, float x, float y)
     }
 }
 
+
 void graph_set_order_label(graph* g, vec* path)
 {
+    return; //NE MARCHE PAS
     int nb_node = graph_get_nb_node(g);
-    debug;
     for (int i = 0; i < nb_node; i++)
     {
         graph_get_node(g, i)->order = -1;
     }
     debug;
-    for (int i = 0; i < path->length; i++)
+    for (int i = 0; i < nb_node; i++)
     {
-        node* n = graph_get_node(g, i);
-        if (n->order == -1)
+        int r=0;
+        bool run = true;
+        while (r<path->length && run)
         {
-            n->order = vec_get(path, int, i);
+            if (vec_get(path, int, r) == i)
+            {
+                run = false;
+            }
+            r++;
         }
+        if (run) {r = -1;}
+        SDL_Log("r = %d\n", r);
+        //vec_index_of(path, int, i, &r);//Réccupère la premiere apparition du noeud dans le chemin
+        graph_get_node(g, i)->order = r;
     }
     debug;
-    
 }
 
 graph* graph_complet(int nb_node)

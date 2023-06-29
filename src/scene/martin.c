@@ -32,7 +32,7 @@ void scene_martin_load(argument arg)
 
     vec* path = graph_recuit_simule(s->graph_test, 0.5, &t_ud_geometric, 1000);
     debug;
-    graph_set_order_label(s->graph_test, path);
+    //graph_set_order_label(s->graph_test, path);
 }
 
 void scene_martin_unload(argument arg)
