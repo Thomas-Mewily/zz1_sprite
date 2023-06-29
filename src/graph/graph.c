@@ -409,7 +409,7 @@ void graph_link_arbre_couvrant(graph* g)
     vec_free_lazy(used_nodes);
     SDL_Log("Arbre couvrant généré\n");
 
-}
+}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
 
 void graph_link_fill_joins(graph* g, float proba)
 {   
@@ -569,5 +569,82 @@ void graph_calculer_distance_opti(graph* g)
     repeat(i, graph_get_nb_node(g))
     {
         graph_calculer_distance_noeud(g, i);
+    }
+}
+
+float path_calculate_length(graph* g, vec* path)
+{
+    if (path->sizeof_value != sizeof(int)) {SDL_Log("Le chemin passé n'est pas un vecteur de int !!\n"); return -1;}
+    int elt_count = path->length;
+    if (elt_count <= 1) {return 0;}
+
+    float length = 0;
+    for (int i = 0; i < elt_count; i++)
+    {
+        length += graph_get_join(g, vec_get(path, int, i),
+                                    vec_get(path, int, i+1))->distance_opti;
+    }
+    return length;
+}
+
+graph* graph_generate(int nb_node, rectf area_contained, float proba)
+{
+    graph* newG = graph_gen_nul_equi(nb_node, area_contained);
+    graph_link_arbre_couvrant(newG);
+    graph_link_fill_joins(newG, proba);
+    return newG;
+}
+
+vec* graph_recuit_simule(graph* g, float motivation, float(*t_update)(float), float t_start)
+{
+    int nb_node = graph_get_nb_node(g);
+    float t = t_start;
+
+    vec* curr_path = vec_empty(int);
+    vec* perm_path;
+
+    vec_add(curr_path, int, node_depart);
+    for (int i = 1; i < nb_node; i++)
+    {
+        vec_add(curr_path, int, node_depart);
+    }
+    vec_add(curr_path, int, node_depart);
+    //curr_path est de la forme [0 1 2 3 4 ... N-1 N 0]
+
+    int nb_no_progress_iter = 0;
+    int min_iter = nb_node * motivation;
+    while (nb_no_progress_iter < min_iter)
+    {    
+        perm_path = vec_clone(curr_path);
+
+        int a, b;
+        do
+        {   a = rand()%(nb_node-1);
+            b = rand()%(nb_node-1);
+        } while (a == b);
+
+        int tmp = vec_get(perm_path, int, a);
+        vec_set(perm_path, int, a, vec_get(perm_path, int, b));
+        vec_set(perm_path, int, b, tmp); 
+
+        float curr_length = path_calculate_length(g, curr_path);
+        float perm_length = path_calculate_length(g, perm_path);
+        float delta = curr_length - perm_length;
+
+        bool swap = false;
+        if (delta > 0) {swap = true;}
+        else
+        {
+            float p = expf(-(delta)/t);
+
+            if ( rand()%1000 < (int)(p*1000)) {swap = true;}
+            else { nb_no_progress_iter ++;}
+        }
+        if (swap)
+        {
+            vec_copy(perm_path, curr_path, 0, perm_path->length, 0);
+            nb_no_progress_iter = 0;
+        }
+        t = t_update(t);
     }
 }

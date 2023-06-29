@@ -109,4 +109,12 @@ void graph_link_arbre_couvrant(graph* g);
 void graph_link_fill_joins(graph* g, float proba);
 
 void graph_calculer_distance_opti(graph* g);
+vec* graph_recuit_simule(graph* g, float motivation, float(*t_update)(float), float t_start);
+
+graph* graph_generate(int nb_node, rectf area_contained, float proba);
+
+
+float path_calculate_length(graph* g, vec* path);
+
+
 #endif
