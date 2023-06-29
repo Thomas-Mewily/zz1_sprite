@@ -21,6 +21,8 @@ context* context_create(char* window_name, int width, int height, Uint32 flags)
     
     global_state_load(c);
 
+    c->timer = 0;
+    c->nb_update = 0;
     c->should_exit = false;
     twice(context_update(c););
     
@@ -52,11 +54,11 @@ void context_update(context* c)
 {
     window_update(c); // Oh shit, it's gonna take a loooong time...
 
-
     //printf("window %i %i, mouse %i %i\n", c->window_width, c->window_height, c->mouse_x, c->mouse_y);
     // todo faire/dépalcer le fichier input dans context ?
 
     c->timer = from_ms(SDL_GetTicks());
+    c->nb_update++;
 
     SDL_Event ev;
     while(SDL_PollEvent(&ev))

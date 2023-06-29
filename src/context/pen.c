@@ -31,11 +31,8 @@ void pen_line(context* c, float x1, float y1, float x2, float y2) { pen_pixel_li
 void pen_dot(context* c, float x, float y) { pen_pixel(c, x, y); }
 void pen_rect(context* c, rectf r) { pen_pixel_rect(c, r); }
 
-#define X(x) apply_x_offset(c, x)
-#define Y(y) apply_y_offset(c, y)
-
-float apply_x_offset(context* c, float x) { return (x - camera_x(c))*camera_scale_x(c); }
-float apply_y_offset(context* c, float y) { return (y - camera_y(c))*camera_scale_y(c); }
+#define X(x) camera_cam_pos_2_pixel_pos_x(c, x)
+#define Y(y) camera_cam_pos_2_pixel_pos_y(c, y)
 
 rectf apply_offset(context* c, rectf r)
 {
@@ -310,17 +307,6 @@ void pen_unload(context* c)
     texture_free(c->_pen_font);
 }
 
-// graph -> windows pixel
-float pen_get_graph_pos_2_pixelx(float pos, graph* g)
-{
-    return (pos-g->x_min)/g->x_etendu * g->draw_dest.w + g->draw_dest.x;
-}
-// graph -> windows pixel
-float pen_get_graph_pos_2_pixel_y(float pos, graph* g)
-{
-    return (pos-g->y_min)/g->y_etendu * g->draw_dest.h + g->draw_dest.y;
-}
-
 void pen_graph(context* c, graph* g)
 {
     /*
@@ -362,36 +348,51 @@ void pen_graph(context* c, graph* g)
 
 void pen_node (context* c, graph* g, int i)
 {
-    pen_color(c, color_black);
-    float radius = c->screen_height/64.0;
+    color co = color_black;
+    if(graph_get_nb_node(g) <= 32 && graph_node_touched_by_mouse(c,g,i))
+    {
+        co = color_white;
+    }
+    pen_color(c, co);
+    float radius = NODE_RADIUS_PIXEL;
     node* n = graph_get_node(g, i);
-    float x = pen_get_graph_pos_2_pixelx(graph_node_x(g,i), g);
-    float y = pen_get_graph_pos_2_pixel_y(graph_node_y(g,i), g);
+    float x = camera_graph_pos_2_cam_pos_x(c, g, graph_node_x(g,i));
+    float y = camera_graph_pos_2_cam_pos_y(c, g, graph_node_y(g,i));
     pen_oval(c, x, y, radius/c->camera_scale_x, radius/c->camera_scale_y);
 
     if(g->draw_text_info)
     {
         float txt_x = x;
         float txt_y = y;
-        pen_formatted_text_at_center(c, txt_x, txt_y, FONT_SIZE_NORMAL, 0.5, 1, "#%i order%i",  n->idx, n->order);
+        //pen_formatted_text_at_center(c, txt_x, txt_y, FONT_SIZE_NORMAL, 0.5, 1, "#%i order%i",  n->idx, n->order);
+        pen_formatted_text_at_center(c, txt_x, txt_y, FONT_SIZE_NORMAL, 0.5, 1, "%i",  n->idx);
     }
 }
 
 void pen_join (context* c, graph* g, int a, int b)
 {
     if(a == b) { return; }
+    join* j = graph_get_join(g,a,b);
     bool exist = graph_join_exist(g, a, b);
 
-    //printf("exist %i node %i %i\n",exist, a, b);
+    // node existe pas
+    if(exist == false && g->draw_text_info != GRAPH_DISPLAY_MODE_LOT_OF_TEXT) {  return; }
 
-    if(exist == false && g->draw_text_info == false) {  return; }
-
-    pen_color(c, exist ? color_black : color_red);
+    color co = color_black;
+    if(g->draw_text_info == GRAPH_DISPLAY_MODE_LOT_OF_TEXT)
+    {
+        if(exist == false){ co = rgba(0,255,0,0); }
+        else if(j->distance_opti < j->distance)
+        {
+            co = color_red;
+        }
+    }
+    pen_color(c, co);
     
-    float x1 = pen_get_graph_pos_2_pixelx(graph_node_x(g,a), g);
-    float y1 = pen_get_graph_pos_2_pixel_y(graph_node_y(g,a), g);
-    float x2 = pen_get_graph_pos_2_pixelx(graph_node_x(g,b), g);
-    float y2 = pen_get_graph_pos_2_pixel_y(graph_node_y(g,b), g);
+    float x1 = camera_graph_pos_2_cam_pos_x(c, g, graph_node_x(g,a));
+    float y1 = camera_graph_pos_2_cam_pos_y(c, g, graph_node_y(g,a));
+    float x2 = camera_graph_pos_2_cam_pos_x(c, g, graph_node_x(g,b));
+    float y2 = camera_graph_pos_2_cam_pos_y(c, g, graph_node_y(g,b));
 
     pen_line(c,x1, y1, x2, y2);
 
@@ -411,14 +412,11 @@ void pen_join (context* c, graph* g, int a, int b)
 
         txt_x = xs;
         txt_x = ys;*/
+        pen_formatted_text_at_center(c, txt_x, txt_y-txt_y_offset, FONT_SIZE_SMALL, 0.5, 0.5, "%.2f",  graph_get_join(g, a, b)->distance);
 
-        if(exist)
+        if(g->draw_text_info == GRAPH_DISPLAY_MODE_LOT_OF_TEXT)
         {
-            pen_formatted_text_at_center(c, txt_x, txt_y-txt_y_offset, FONT_SIZE_SMALL, 0.5, 0.5, "%.2f", graph_get_join(g, a, b)->distance);
-        }
-        else
-        {
-            pen_formatted_text_at_center(c, txt_x, txt_y-txt_y_offset, FONT_SIZE_SMALL, 0.5, 0.5, "%.2f",  graph_join_get_distance_opti(g, a, b));
+            pen_formatted_text_at_center(c, txt_x, txt_y+txt_y_offset, FONT_SIZE_SMALL, 0.5, 0.5, "%.2f",  graph_join_get_distance_opti(g, a, b));
         }
     }
 }

@@ -17,5 +17,7 @@ void global_state_unload(context* c);
 
 void global_state_update(context* c);
 bool global_state_event(context* c, event* ev);
+
 void global_state_draw(context* c);
+void global_state_printf(context* c);
 #endif

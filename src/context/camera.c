@@ -123,3 +123,39 @@ void camera_set_state(context* c, camera_state s)
     c->camera_scale_x = s.scale_x;
     c->camera_scale_y = s.scale_y;
 }
+
+float camera_pixel_pos_2_graph_pos_x(context* c, graph* g, float pos)
+{
+    UNUSED(c);
+    //return (pos-g->draw_dest.x)/g->draw_dest.w*g->x_etendu+g->x_min;
+    return (pos-g->draw_dest.x* camera_scale_x(c) + camera_x(c) )/g->draw_dest.w*g->x_etendu+g->x_min;
+}
+float camera_pixel_pos_2_graph_pos_y(context* c, graph* g, float pos)
+{
+    UNUSED(c);
+    //return (pos-g->draw_dest.y)/g->draw_dest.h*g->y_etendu+g->y_min;
+    return (pos-g->draw_dest.y* camera_scale_y(c) + camera_y(c))/g->draw_dest.h*g->y_etendu+g->y_min;
+}
+
+float camera_graph_pos_2_pixel_pos_x(context* c, graph* g, float pos)
+{
+    return camera_cam_pos_2_pixel_pos_x(c, camera_graph_pos_2_cam_pos_x(c,g,pos));
+}
+float camera_graph_pos_2_pixel_pos_y(context* c, graph* g, float pos)
+{
+    return camera_cam_pos_2_pixel_pos_y(c, camera_graph_pos_2_cam_pos_y(c,g,pos));
+}
+
+float camera_graph_pos_2_cam_pos_x(context* c, graph* g, float pos)
+{
+    UNUSED(c);
+    return (pos-g->x_min)/g->x_etendu * g->draw_dest.w + g->draw_dest.x;
+}
+float camera_graph_pos_2_cam_pos_y(context* c, graph* g, float pos)
+{
+    UNUSED(c);
+    return (pos-g->y_min)/g->y_etendu * g->draw_dest.h + g->draw_dest.y;
+}
+
+float camera_cam_pos_2_pixel_pos_x(context* c, float x) { return (x - camera_x(c))*camera_scale_x(c); }
+float camera_cam_pos_2_pixel_pos_y(context* c, float y) { return (y - camera_y(c))*camera_scale_y(c); }

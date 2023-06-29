@@ -75,8 +75,12 @@ void scene_draw(context* c, scene* sce)
 void scene_printf(context* c, scene* sce)
 {
     if(sce == null) return;
-    printf("scene %s:\n", sce->info.name);
+
+    printf("global state printf :\n");
+    global_state_printf(c);
+    printf("scene %s printf:\n", sce->info.name);
     sce->info.printf(get_argument);
+
     printf("\n");
 }
 

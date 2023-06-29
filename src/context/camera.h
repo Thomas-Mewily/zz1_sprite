@@ -35,4 +35,16 @@ void camera_set_scale_y(context* c, float v);
 bool camera_can_zoom(context* c);
 bool camera_can_scroll(context* c);
 
+float camera_pixel_pos_2_graph_pos_x(context* c, graph* g, float pos);
+float camera_pixel_pos_2_graph_pos_y(context* c, graph* g, float pos);
+
+float camera_graph_pos_2_cam_pos_x(context* c, graph* g, float pos);
+float camera_graph_pos_2_cam_pos_y(context* c, graph* g, float pos);
+
+float camera_cam_pos_2_pixel_pos_x(context* c, float x);
+float camera_cam_pos_2_pixel_pos_y(context* c, float y);
+
+float camera_graph_pos_2_pixel_pos_x(context* c, graph* g, float pos);
+float camera_graph_pos_2_pixel_pos_y(context* c, graph* g, float pos);
+
 #endif

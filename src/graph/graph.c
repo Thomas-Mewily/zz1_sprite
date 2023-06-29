@@ -1,5 +1,19 @@
 #include "base.h"
 
+float graph_node_length_pixel_from_point(context* c, graph* g, int idx, float x, float y)
+{
+    return length(x, y, camera_graph_pos_2_pixel_pos_x(c, g, graph_node_x(g, idx)), camera_graph_pos_2_pixel_pos_y(c, g, graph_node_y(g, idx)));
+}
+bool graph_node_touched_by(context* c, graph* g, int idx, float x, float y)
+{
+    return graph_node_length_pixel_from_point(c, g, idx, x, y) < NODE_RADIUS_PIXEL*1.5;
+}
+bool graph_node_touched_by_mouse(context* c, graph* g, int idx) 
+{
+    return graph_node_touched_by(c, g, idx, input_mouse_x(c), input_mouse_y(c));
+}
+
+
 void node_init(graph* g, int idx)
 {
    node* n = graph_get_node(g, idx);
@@ -71,7 +85,7 @@ graph* graph_empty()
    g->_nodes = null;
    g->_joins = null;
    g->_nb = 0;
-   g->draw_text_info = true;
+   g->draw_text_info = GRAPH_DISPLAY_MODE_MINIMAL_TEXT;
    return g;
 }
 
@@ -80,6 +94,7 @@ void graph_was_edited(graph* g)
 {
     g->doit_calculer_distance_opti = true;
 }
+
 
 float graph_join_get_distance_opti(graph* g, int a, int b)
 {
@@ -126,8 +141,10 @@ bool graph_node_exist(graph*g, int idx)   { return graph_get_node(g, idx)->exist
 
 void update_join_length(graph*g , int a , int b)
 {
+    if(graph_join_exist(g, a, b) == false) return;
     join* j = graph_get_join(g ,a ,b);
     j->distance = length(graph_node_x(g,a), graph_node_y(g,a), graph_node_x(g,b), graph_node_y(g,b));
+    g->doit_calculer_distance_opti = true;
 }
 
 void graph_add_join(graph*g , int a , int b)
@@ -280,12 +297,20 @@ void graph_set_node_x_y(graph * g , int a, float x, float y)
     graph_get_node(g, a)->x = x;
     graph_get_node(g, a)->y = y;
     recalculer_etendu(g);
-    graph_was_edited(g);
     repeat(n, graph_node_get_nb_neighbors(g, a))
     {
         int b = graph_get_node_neighbors(g, a, n);
         update_join_length(g, a, b);
     }
+    graph_was_edited(g);
+    
+}
+
+void graph_join_set_distance(graph* g, int a, int b, float distance)
+{
+    if(graph_join_exist(g, a, b) == false) return;
+    graph_get_join(g, a, b)->distance = distance;
+    graph_was_edited(g);
 }
 
 
@@ -567,7 +592,7 @@ void graph_calculer_distance_opti(graph* g)
         {
             if(i != j)
             {
-                graph_get_join(g, i, j)->distance_opti = -1;
+                graph_get_join(g, i, j)->distance_opti = 10E10;
                 vec_clear(graph_get_join(g, i, j)->distance_opti_node_a_passer);
             }
         }
@@ -587,12 +612,14 @@ float path_calculate_length(graph* g, vec* path)
     if (elt_count <= 1) {return 0;}
     elt_count--;
     float length = 0;
-
+    UNUSED(length);
     for (int i = 0; i < elt_count; i++)
     {
         int a = vec_get(path, int, i);
         int b = vec_get(path, int, i+1);
         join* j = graph_get_join(g, a, b);
+        UNUSED(j);
+
         //length += j->distance;
     }
     //return length;

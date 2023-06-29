@@ -31,6 +31,8 @@ void scene_martin_load(argument arg)
     s->graph_test = graph_generate(nb_node, rectanglef(40, 40, window_width(c), window_height(c)), 0.2);
 
     vec* path = graph_recuit_simule(s->graph_test, 0.5, &t_ud_geometric, 1000);
+    UNUSED(path);
+
     debug;
     //graph_set_order_label(s->graph_test, path);
 }

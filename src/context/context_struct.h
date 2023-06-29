@@ -39,6 +39,7 @@ typedef struct
     const Uint8* kb_state;
 
     time timer; // since the beginning of the program
+    int  nb_update;
 
     void* scene;
 
