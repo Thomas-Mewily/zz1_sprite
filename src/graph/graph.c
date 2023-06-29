@@ -15,6 +15,9 @@ void join_init(join* j, int a, int b)
    j->a = a;
    j->b = b;
    j->exist = false;
+
+   j->distance_opti = -1;
+   j->distance_opti_node_a_passer = null;
 }
 
 void node_free(node* n)
@@ -140,8 +143,7 @@ int graph_add_node_x_y(graph* g, float x, float y)
     g->_nb++;
 
     node_init(g, i);
-    g->_nodes[i].x = x;
-    g->_nodes[i].y = y;
+    graph_set_node_x_y(g, i, x, y);
     g->_nodes[i].exist = true;
     return g->_nb-1;
 }
@@ -174,26 +176,22 @@ int graph_nb_join_exist(graph * g)
     return nb_join;
 }
 
-void graph_colorier_nodes_blanc(graph * g)
+void graph_nodes_toute_annoter(graph * g, int val)
 {
     repeat(i, graph_get_nb_node(g))
     {
-        graph_get_node(g, i)->colorer_en_noir = false;
+        graph_get_node(g, i)->annotation = val;
     }
 }
 
-void graph_node_colorier_blanc(graph * g, int idx)
+void graph_node_annoter(graph * g, int idx, int val)
 {
-    graph_get_node(g, idx)->colorer_en_noir = false;
-}
-void graph_node_colorier_noir(graph * g, int idx)
-{
-    graph_get_node(g, idx)->colorer_en_noir = true;
+    graph_get_node(g, idx)->annotation = val;
 }
 
 bool graph_node_en_noir(graph* g, int idx)
 {
-    return graph_get_node(g, idx)->colorer_en_noir;
+    return graph_get_node(g, idx)->annotation == annoter_noir;
 }
 
 bool graph_node_en_blanc(graph* g, int idx)
@@ -211,9 +209,9 @@ void graph_printf_node(graph* g, int idx)
     // déjà traité
     if(graph_node_en_noir(g, idx)) { return; }
 
-    graph_node_colorier_noir(g, idx);
+    graph_node_annoter(g, idx, annoter_noir);
     printf("node %i {%.2f, %.2f}. neighbors : [", idx, graph_node_x(g, idx), graph_node_y(g, idx));
-
+    
     repeat(n, graph_node_get_nb_neighbors(g, idx))
     {
         int n_idx = graph_get_node_neighbors(g, idx, n);
@@ -228,7 +226,7 @@ void graph_printf_node(graph* g, int idx)
 void graph_printf(graph* g)
 {
     printf("graph de %i node and %i joins : [(idx, length)]\n", graph_nb_node_exist(g), graph_nb_join_exist(g));
-    graph_colorier_nodes_blanc(g);
+    graph_nodes_toute_annoter(g, annoter_blanc);
 
     repeat(i, graph_get_nb_node(g))
     {
@@ -314,11 +312,41 @@ graph* graph_gen_nul_equi(int nb_node, rectf area_contained)
     free(occuped);
     
     return g;
+}
+
+float maxi(float a, float b) { return a > b ? a : b; }
+float mini(float a, float b) { return a < b ? a : b; }
+
+void recalculer_etendu(graph * g)
+{
+    g->x_etendu = 0;
+    g->y_etendu = 0;
+    if(graph_get_nb_node(g) == 0) return;
+
+    g->x_min = graph_node_x(g,0);
+    g->x_max = graph_node_x(g,0);
+    g->y_min = graph_node_y(g,0);
+    g->y_max = graph_node_y(g,0);
+
+    repeat(i, graph_get_nb_node(g))
+    {
+        g->x_min = mini(graph_node_x(g,i), g->x_min);
+        g->y_min = mini(graph_node_y(g,i), g->y_min);
+        g->x_max = maxi(graph_node_x(g,i), g->x_max);
+        g->y_max = maxi(graph_node_y(g,i), g->y_max);
+    }
+
+    g->x_etendu = g->x_max - g->x_min;
+    g->y_etendu = g->y_max - g->y_min;
+}
+
 void graph_set_node_x_y(graph * g , int a, float x, float y)
 {
     graph_check_index(g, a);
     graph_get_node(g, a)->x = x;
     graph_get_node(g, a)->y = y;
+    recalculer_etendu(g);
+
     repeat(n, graph_node_get_nb_neighbors(g, a))
     {
         int b = graph_get_node_neighbors(g, a, n);

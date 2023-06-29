@@ -21,6 +21,7 @@ void pen_clear(context* c);
 void pen_mode(context* c, uint32 mode);
 
 
+
 void pen_texture(context* c, texture* t, rect src, rectf dest);
 void pen_texture_at(context* c, texture* t, rect src, float x, float y, float scaleX, float scaleY);
 void pen_texture_at_center(context* c, texture* t, rect src, float x, float y, float scaleX, float scaleY, float coef_centerX, float coef_centerY);
@@ -74,6 +75,11 @@ void pen_text_at_center(context* c, char* text, float x, float y, float pixel_li
 
 void pen_char_at(context* c, char letter, float x, float y, float pixel_ligne_height);
 void pen_char(context* c, char letter, rectf dest);
+
+
+void pen_graph(context* c, graph* g);
+void pen_join (context* c, graph* g, int a, int b);
+void pen_node (context* c, graph* g, int idx);
 
 bool pen_load(context* c);
 void pen_unload(context* c);

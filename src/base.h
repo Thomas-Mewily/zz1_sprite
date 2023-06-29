@@ -5,6 +5,7 @@ typedef struct the_global_state the_global_state;
 
 #include "betterC.h"
 #include "SDL.h"
+#include "struct_foward_declaration.h"
 
 #include "collection/vec.h"
 

@@ -8,38 +8,53 @@
 
 typedef int node_type;
 
-struct graph;
+//struct graph;
 
 #define NODE_SELECTED_FALSE 0
 #define NODE_SELECTED_TRUE  1
 
-typedef struct
+#define annoter_noir 0
+#define annoter_blanc 1
+struct node
 {
     bool exist;
     int idx;
     node_type etat;
-    float x;
-    float y;
+    float x; // entre 0 et 1
+    float y; // entre 0 et 1
     vec* /*int*/ neightbors;
 
-    bool colorer_en_noir; // Cache pour savoir si on est déjà passer sur le noeud 
+    int annotation; // Cache pour savoir si on est déjà passer sur le noeud 
     int selected_flag;
-} node;
-typedef struct
+};
+struct join
 {
     bool exist;
     int a;
     int b;
+
     float distance;
-} join;
+
+    float distance_opti;
+    vec* /*int*/ distance_opti_node_a_passer;
+};
 
 struct graph
 {
     int    _nb; // nb nodes et joins
     node*  _nodes;  
     join** _joins;
+
+    float x_min;
+    float x_max;
+    float x_etendu;
+
+    float y_min;
+    float y_max;
+    float y_etendu;
+    
+    rectf draw_dest;
 };
-typedef struct graph graph; 
 
 graph* graph_empty();
 void   graph_free(graph*g);
@@ -73,9 +88,8 @@ void graph_set_node_x_y(graph * g , int idx, float x, float y);
 int graph_nb_node_exist(graph * g);
 int graph_nb_join_exist(graph * g);
 
-void graph_node_colorier_blanc(graph * g, int idx);
-void graph_node_colorier_noir (graph * g, int idx);
-void graph_colorier_nodes_blanc(graph * g);
+void graph_node_annoter(graph * g, int idx, int val);
+void graph_nodes_toute_annoter(graph * g, int val);
 
 bool graph_node_en_blanc(graph* g, int idx);
 bool graph_node_en_noir (graph* g, int idx);
