@@ -5,8 +5,8 @@ typedef struct
    float hue;
    float color_change_speed;
    texture* steve;
-   sprite_sheet* froggyS;
-   anim* froggyAnim;
+//    sprite_sheet* froggyS;
+//    anim* froggyAnim;
    graph* graph_test;
 } state;
 
@@ -24,10 +24,10 @@ void scene_martin_load(argument arg)
     s->color_change_speed = 0.7;
     set_bg_color(arg);
     s->steve = texture_create(c, "asset/steve.png");
-    s->froggyS = sprite_sheet_create(c, "asset/froggyChair.png", 54, 54);
-    s->froggyAnim = animation_create(s->froggyS, frequence_s(20));
+    // s->froggyS = sprite_sheet_create(c, "asset/froggyChair.png", 54, 54);
+    // s->froggyAnim = animation_create(s->froggyS, frequence_s(20));
 
-    s->graph_test = graph_gen_nul_equi(100, rectanglef(0, 0, 1920, 1080));
+    s->graph_test = graph_gen_nul_equi(10, rectanglef(0, 0, 400, 400));
 
 }
 
@@ -36,6 +36,7 @@ void scene_martin_unload(argument arg)
     obtenir_state;
     texture_free(s->steve);
     // rip la mémoire occuper par froggyS et froggyAnim
+    // n'inclue pas froggyAnim dans cette affaire, il est innocent...
 }
 
 void scene_martin_update(argument arg)
@@ -47,6 +48,8 @@ void scene_martin_update(argument arg)
 
     c->pen_x = (c->window_width/2) -  c->mouse_x;
     c->pen_y = (c->window_height/2) -  c->mouse_y;
+
+    
 
 }
 void scene_martin_draw(argument arg)
@@ -66,21 +69,22 @@ void scene_martin_draw(argument arg)
     int offset_y = 0;
     float radius = 20;
     float scale = 1;
+    pen_color(c,rgb(0,0,0));
     repeat(i, graph_get_nb_node(g))
     {
-        pen_color(c,hsv(i%180,1,1));
 
         float x = graph_node_x(g,i);
         float y =graph_node_y(g,i);
         pen_circle(c,scale*x +offset_x,scale*y+offset_y, radius);
+        //SDL_Log("noeud n°%d, x = %F; y = %f", i, x, y);
         
-        for(int k = 0; k < graph_node_get_nb_neighbors(g,i); k++)
-        {
-            int j = graph_get_node_neighbors(g,i,k);
-            float xj = graph_node_x(g,j);
-            float yj =graph_node_y(g,j);
-            pen_line(c,scale*x +offset_x,scale*y+offset_y,scale*xj +offset_x,scale*yj+offset_y);
-        }
+        // for(int k = 0; k < graph_node_get_nb_neighbors(g,i); k++)
+        // {
+        //     int j = graph_get_node_neighbors(g,i,k);
+        //     float xj = graph_node_x(g,j);
+        //     float yj =graph_node_y(g,j);
+        //     pen_line(c,scale*x +offset_x,scale*y+offset_y,scale*xj +offset_x,scale*yj+offset_y);
+        // }
     }
 }
 

@@ -268,9 +268,12 @@ graph* graph_gen_nul_equi(int nb_node, rectf area_contained)
     float cellH = area_contained.h / tableH;
 
     bool** occuped = create_array(bool*, tableH);
+    if (!occuped) {SDL_Log("L'allocation de la colonne a échoué\n"); return null;}
+
     for (int i = 0; i < tableH; i++)
     {
         occuped[i] = (bool*)calloc(sizeof(bool) * tableW);
+        if (!occuped[i]) {SDL_Log("L'allocation de la ligne %d a échoué\n", i); return null;}
     }
 
     bool crise_du_logement = false;
@@ -280,12 +283,14 @@ graph* graph_gen_nul_equi(int nb_node, rectf area_contained)
         int it = 0;
         do
         {
-            i = rand()%tableH; j = rand()%tableW;
-            i++;
+            i = rand()%(tableH); j = rand()%(tableW);
+            it++;
         } while (occuped[i][j] && it <= area);
         if (it > area) {crise_du_logement = true;}
-        node* new_node = graph_add_node_x_y(g, j * cellW + rand()%(int)cellW,
+
+        graph_add_node_x_y(g, j * cellW + rand()%(int)cellW,
                                             i * cellH + rand()%(int)cellH); 
+        nb_node--;
 
         for (int k = -1; k < 2; k++)
         {
@@ -297,6 +302,11 @@ graph* graph_gen_nul_equi(int nb_node, rectf area_contained)
         }
     }
     
-
+    for (int i = 0; i < tableH; i++)
+    {
+        free(occuped[i]);
+    }
+    free(occuped);
+    
     return g;
 }

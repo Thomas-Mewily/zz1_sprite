@@ -14,7 +14,7 @@ gcc -O0 -fdiagnostics-color=always -g ./src/*.c ./src/context/*.c ./src/util/*.c
 
 void init()
 {
-    srand(current_time);
+    srand(0);
     printf("Compilation de %s\n", current_time);
     SDL_version nb;
     SDL_VERSION(&nb);
