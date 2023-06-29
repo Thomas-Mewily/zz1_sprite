@@ -3,10 +3,7 @@
 void global_state_load(context* c)
 {
     gs = create(the_global_state);
-
-    //gs->g = graph_complet(6, 1);
-    gs->g = graph_generate(5, rectanglef(40, 40, window_width(c), window_height(c)), 0.2);
-
+    gs->g = graph_complet(4);
 }
 
 void global_state_unload(context* c)
@@ -22,4 +19,23 @@ void global_state_update(context* c)
 void global_state_draw(context* c)
 {
     pen_graph(c, gs->g);
+}
+
+
+bool global_state_event(context* c, event* ev)
+{
+    switch (ev->type)
+    {
+        case SDL_KEYDOWN:
+        {
+            switch (ev->key.keysym.sym)
+            {
+                case SDLK_d: gs->g->draw_text_info = !gs->g->draw_text_info; break;
+                default: break;
+            }
+        } break;
+        default: break;
+    }
+
+    return false;
 }
