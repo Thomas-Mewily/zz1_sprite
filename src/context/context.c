@@ -17,10 +17,13 @@ context* context_create(char* window_name, int width, int height, Uint32 flags)
     if(camera_load(c) == false ) { return null; }
     if(pen_load(c) == false ) { return null; }
     if(scene_context_load(c) == false ) { return null; }
+    if(input_load(c) == false ) { return null; }
     
+    global_state_load(c);
+
     c->should_exit = false;
     twice(context_update(c););
-
+    
     // //Charge la font sous différentes tailles 
     // c->font_small           = TTF_OpenFont(FONT_PATH, 20); check_font_charged(c->font_small);
     // c->font_medium          = TTF_OpenFont(FONT_PATH, 30); check_font_charged(c->font_medium);
@@ -37,11 +40,12 @@ void contexte_free(context* c)
     // TTF_CloseFont(c->font_medium);
     // TTF_CloseFont(c->font_big);
     // TTF_CloseFont(c->font_fullscreen);
-    
+    global_state_unload(c);
     scene_context_unload(c);
     pen_unload(c);
     camera_unload(c);
     window_unload(c);
+    input_unload(c);
 }
 
 void context_update(context* c)
@@ -51,12 +55,6 @@ void context_update(context* c)
 
     //printf("window %i %i, mouse %i %i\n", c->window_width, c->window_height, c->mouse_x, c->mouse_y);
     // todo faire/dépalcer le fichier input dans context ?
-    c->mouse_old_flag = c->mouse_flag;
-    c->mouse_old_x = c->mouse_x;
-    c->mouse_old_y = c->mouse_y;
-    c->mouse_flag = SDL_GetMouseState(&(c->mouse_x), &(c->mouse_y));
-    c->kb_state = SDL_GetKeyboardState(NULL);
-
 
     c->timer = from_ms(SDL_GetTicks());
 
@@ -68,11 +66,9 @@ void context_update(context* c)
             c->should_exit = true;
             continue;
         }
-        if(camera_event(c, &ev))
-        {
-            // camera consumed input
-            continue;
-        }
+
+        if(input_event(c, &ev))  { continue; }
+        if(camera_event(c, &ev)) { continue; }
 
         switch (ev.type)
         {
@@ -91,12 +87,13 @@ void context_update(context* c)
             } break;
             default: break;
         }
-
         scene_event(c, (scene*)(c->scene), &ev);
     }
 
+    input_update(c);
     camera_update(c);
     scene_update(c, (scene*)(c->scene));
+    global_state_update(c);
 }
 
 void context_draw(context* c)

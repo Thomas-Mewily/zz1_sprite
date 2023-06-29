@@ -1,0 +1,22 @@
+#include "base.h"
+
+void global_state_load(context* c)
+{
+    gs = create(the_global_state);
+    gs->g = graph_complet(6, 1);
+}
+
+void global_state_unload(context* c)
+{
+    graph_free(gs->g);
+    free(gs);
+}
+
+void global_state_update(context* c)
+{
+    gs->g->draw_dest = window_rectf(c);
+}
+void global_state_draw(context* c)
+{
+    pen_graph(c, gs->g);
+}

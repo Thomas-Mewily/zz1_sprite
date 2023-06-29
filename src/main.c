@@ -15,6 +15,7 @@ gource
 
 void sdl_load()
 {
+    srand(0);
     printf("Compilation de %s\n", current_time);
     SDL_version nb;
     SDL_VERSION(&nb);

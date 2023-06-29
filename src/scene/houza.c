@@ -16,6 +16,7 @@ void scene_houza_load(argument arg)
     //s->a = ant_create(s->a);
 
     sce->info.background_color = rgb(200,0,0);
+    //graph_printf(s->g);
     //s->steve = texture_create(c, "asset/Steve.png");
 }
 
@@ -45,6 +46,9 @@ void scene_houza_draw(argument arg)
     obtenir_state;
     
 
+    //pen_graph(c, s->g);
+
+    #if 0
     float radius = c->screen_height/32.0f;
 
     float scale = c->window_height/2-radius;
@@ -75,6 +79,7 @@ void scene_houza_draw(argument arg)
             pen_line(c,scale*x +offset_x,scale*y+offset_y,scale*xj +offset_x,scale*yj+offset_y);
         }
     }
+    #endif
 
 
    rectf fourmis = rectanglef(10,10  ,20,20);
@@ -140,5 +145,3 @@ void scene_houza_printf(argument arg)
     obtenir_state;
     printf("Parallax de houza\n");
 }
-
-#undef obtenir_state

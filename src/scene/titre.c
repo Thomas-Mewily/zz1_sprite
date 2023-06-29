@@ -22,7 +22,7 @@ void scene_titre_draw(argument arg)
 {
     obtenir_state;
     pen_circle(c, window_width(c)/2, window_height(c)/2, window_height(c)/32.0 * (s->nbFoisPresser+2));
-    pen_formatted_text_at_center(c, window_width(c)/3,window_height(c)/2, FONT_SIZE_NORMAL, 0.5, 0.5, "UwU tick: %i", c->timer);
+    pen_formatted_text_at_center(c, window_width(c)/2,window_height(c)/2, FONT_SIZE_NORMAL, 0.5, 0.5, "UwU tick: %i", c->timer);
 }
 
 bool scene_titre_event (argument arg) 
@@ -54,5 +54,3 @@ void scene_titre_printf(argument arg)
     obtenir_state;
     printf("Nb presser = %i\n", s->nbFoisPresser);
 }
-
-#undef obtenir_state

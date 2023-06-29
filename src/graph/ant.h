@@ -16,15 +16,16 @@ typedef struct
     angle direction; // Il existe une fonction angle_from_vector(x,y) -> angle
 
     // Si node_source_idx == node_destination_idx, la fourni ne bouge plus
-    graph* g;
     int node_source_idx;
     int node_destination_idx;
+    graph* g;
+    vec* /* de int*/ chemin_a_parcourir;
     int node_source_idy;
     int node_destination_idy;
     //ant_state state;
 } ant;
 
-ant*  ant_create(ant*a);
+void ant_init(ant* a);
 
 float ant_source_x(ant* a);
 float ant_source_y(ant* a);
