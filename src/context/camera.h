@@ -2,6 +2,17 @@
 #define CONTEXT_CAMERA_H
 #include "base.h"
 
+typedef struct
+{
+    float x;
+    float y;
+    float scale_x;
+    float scale_y;
+}camera_state;
+
+camera_state camera_get_state(context* c);
+void camera_set_state(context* c, camera_state s);
+
 bool camera_load(context* c);
 void camera_unload(context* c);
 

@@ -54,5 +54,3 @@ void scene_titre_printf(argument arg)
     obtenir_state;
     printf("Nb presser = %i\n", s->nbFoisPresser);
 }
-
-#undef obtenir_state

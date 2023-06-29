@@ -29,6 +29,12 @@ typedef struct
 
     int mouse_old_x;
     int mouse_old_y;
+
+    int mouse_delta_x;
+    int mouse_delta_y;
+
+    bool mouse_left_button_down;
+
     int32 mouse_old_flag;
     const Uint8* kb_state;
 

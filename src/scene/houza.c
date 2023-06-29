@@ -4,15 +4,16 @@
 typedef struct 
 {
    //texture* steve;
-   graph* g;
+   //graph* g;
 } state;
 
 void scene_houza_load(argument arg)
 {
     obtenir_state;
 
-    s->g = graph_complet(20,1);
+    //s->g = graph_complet(20,1);
     sce->info.background_color = rgb(200,0,0);
+    //graph_printf(s->g);
     //s->steve = texture_create(c, "asset/Steve.png");
 }
 
@@ -20,7 +21,7 @@ void scene_houza_load(argument arg)
 void scene_houza_unload(argument arg)
 {
     obtenir_state;
-    graph_free(s->g);
+    //graph_free(s->g);
    // texture_free(s->steve);
 }
 
@@ -38,6 +39,9 @@ void scene_houza_draw(argument arg)
 {
     obtenir_state;
 
+    //pen_graph(c, s->g);
+
+    #if 0
     float radius = c->screen_height/32.0f;
 
     float scale = c->window_height/2-radius;
@@ -63,6 +67,7 @@ void scene_houza_draw(argument arg)
             pen_line(c,scale*x +offset_x,scale*y+offset_y,scale*xj +offset_x,scale*yj+offset_y);
         }
     }
+    #endif
 
    #if 0
     //texture* t =  s->steve;
@@ -123,5 +128,3 @@ void scene_houza_printf(argument arg)
     obtenir_state;
     printf("Parallax de houza\n");
 }
-
-#undef obtenir_state

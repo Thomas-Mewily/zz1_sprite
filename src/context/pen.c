@@ -296,3 +296,61 @@ void pen_unload(context* c)
 {
     texture_free(c->_pen_font);
 }
+
+// graph -> windows pixel
+float pen_get_graph_pos_x(float pos, graph* g)
+{
+    return (pos-g->x_min)/g->x_etendu * g->draw_dest.w + g->draw_dest.x;
+}
+
+// graph -> windows pixel
+float pen_get_graph_pos_y(float pos, graph* g)
+{
+    return (pos-g->y_min)/g->y_etendu * g->draw_dest.h + g->draw_dest.y;
+}
+
+void pen_graph(context* c, graph* g)
+{
+    /*
+    camera_state cs = camera_get_state(c);
+    c->camera_x -= posX;
+    c->camera_y -= posY;
+    //todo le centre à l'écran
+    c->camera_scale_x *= height_pixel;
+    c->camera_scale_y *= height_pixel;*/
+
+    repeat(i, graph_get_nb_node(g))
+    {
+        pen_node(c, g, i);
+
+        for(int k = 0; k < graph_node_get_nb_neighbors(g,i); k++)
+        {
+            int j = graph_get_node_neighbors(g,i,k);
+            if(j < i)
+            {
+                pen_join(c, g, i, j);
+            }
+        }
+    }
+
+    //camera_set_state(c, cs);
+}
+
+void pen_node (context* c, graph* g, int i)
+{
+    pen_color(c, color_black);
+    float radius = c->screen_height/64.0;
+    float x = pen_get_graph_pos_x(graph_node_x(g,i), g);
+    float y = pen_get_graph_pos_y(graph_node_y(g,i), g);
+    pen_oval(c, x, y, radius/c->camera_scale_x, radius/c->camera_scale_y);
+}
+
+void pen_join (context* c, graph* g, int a, int b)
+{
+    pen_color(c, color_black);
+    float x1 = pen_get_graph_pos_x(graph_node_x(g,a), g);
+    float y1 = pen_get_graph_pos_y(graph_node_y(g,a), g);
+    float x2 = pen_get_graph_pos_x(graph_node_x(g,b), g);
+    float y2 = pen_get_graph_pos_y(graph_node_y(g,b), g);
+    pen_line(c,x1, y1, x2, y2);
+}
