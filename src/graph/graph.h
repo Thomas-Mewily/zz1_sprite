@@ -68,7 +68,7 @@ void graph_add_join(graph*g , int a, int b);
 float graph_node_x(graph * g , int idx);
 float graph_node_y(graph * g , int idx);
 
-//float graph_set_node_x_y(graph * g , int idx, float x, float y);todo
+void graph_set_node_x_y(graph * g , int idx, float x, float y);
 
 int graph_nb_node_exist(graph * g);
 int graph_nb_join_exist(graph * g);

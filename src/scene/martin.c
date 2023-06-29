@@ -46,8 +46,8 @@ void scene_martin_update(argument arg)
     s->hue += s->color_change_speed;
     if (s->hue >= 360) {s->hue = 0;}
 
-    c->pen_x = (c->window_width/2) -  c->mouse_x;
-    c->pen_y = (c->window_height/2) -  c->mouse_y;
+    camera_set_x(c, window_width(c)/2-input_mouse_x(c)/2);
+    camera_set_y(c, window_width(c)/2-input_mouse_y(c)/2);
 
     
 

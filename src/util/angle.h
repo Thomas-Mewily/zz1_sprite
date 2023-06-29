@@ -9,6 +9,8 @@ typedef float angle;
 angle from_degree(float val);
 angle from_radian(float val);
 
+#define angle_from_vector(x,y) atan2f((float)(y), (float)(x))
+
 float as_degree(angle);
 float as_radian(angle);
 

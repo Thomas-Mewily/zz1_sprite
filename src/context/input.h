@@ -19,8 +19,16 @@
 #define is_key_pull_down_with_context(sdl_scan_code) is_key_pull_down(c, sdl_scan_code)
 #define is_key_pull_changed_with_context(sdl_scan_code) is_key_pull_changed(c, sdl_scan_code)
 
-
-
 #define is_key_pressed(newState)
+
+int input_mouse_x(context* c);
+int input_mouse_y(context* c);
+int input_mouse_old_x(context* c);
+int input_mouse_old_y(context* c);
+int input_mouse_delta_x(context* c);
+int input_mouse_delta_y(context* c);
+int32 input_mouse_flag(context* c);
+const Uint8* input_kb_state(context* c);
+
 
 #endif

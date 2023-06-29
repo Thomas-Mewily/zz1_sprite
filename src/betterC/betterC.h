@@ -12,6 +12,9 @@
 #include <stdlib.h>
 #include <string.h>
 //#include <time.h>
+#include <stdarg.h>
+
+
 //#pragma GCC diagnostic ignored "-Wunknown-pragmas"
 #pragma GCC diagnostic ignored "-Wcomment"
 

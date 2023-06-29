@@ -74,4 +74,7 @@ void scene_set_inactive(context* c, scene* sce);
 
 #define scene_set(context, name) scene_switch(context, scene_create(name))
 
+bool scene_context_load(context* c);
+void scene_context_unload(context* c);
+
 #endif

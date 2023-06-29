@@ -10,9 +10,10 @@ gcc -O0 -fdiagnostics-color=always -g ./src/*.c ./src/context/*.c ./src/util/*.c
 
 gcc -O0 -fdiagnostics-color=always -g ./src/*.c ./src/context/*.c ./src/util/*.c ./src/collection/*.c ./src/scene/*.c ./src/graph/*.c -Wall -Wextra -Wno-unused-parameter -Iinclude -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -o ./bin/main.exe
 ./bin/main.exe
+gource
 */
 
-void init()
+void sdl_load()
 {
     srand(0);
     printf("Compilation de %s\n", current_time);
@@ -32,7 +33,7 @@ void init()
     // }
 }
 
-void unload()
+void sdl_unload()
 {
     IMG_Quit();
     SDL_Quit();
@@ -40,13 +41,11 @@ void unload()
 
 int main(int argc, char *argv[])
 {
-    (void)argc;
-    (void)argv;
-    init();
+    UNUSED(argc); UNUSED(argv);
+    sdl_load();
     test_debug();
 
     context* c = context_create("Houzayfa M, Martin J, Thomas T. Version de " current_time, 960, 540, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
-    pen_init(c);
     
     window_center_coef(c, 0.5, 0.5);
 
@@ -58,9 +57,8 @@ int main(int argc, char *argv[])
         context_draw(c);
     }
 
-    pen_unload(c);
     contexte_free(c);
-    unload();
+    sdl_unload();
 
     return 0;
 }

@@ -11,48 +11,17 @@
 context* context_create(char* window_name, int width, int height, Uint32 flags)
 {
     context* c = create(context);
-    c->window = SDL_CreateWindow(window_name,
-                                            SDL_WINDOWPOS_CENTERED,
-                                            SDL_WINDOWPOS_CENTERED,
-                                            width,
-                                            height,
-                                            flags);
-    if (c->window == NULL)
-    {
-        printf("Impossible de creer la fenetre: %s\n", SDL_GetError());
-        return null;
-    }
 
-    c->renderer = SDL_CreateRenderer(c->window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    if (c->renderer == NULL)
-    {
-        printf("Impossible de creer le renderer: %s\n", SDL_GetError());
-        SDL_DestroyWindow(c->window);
-        return null;
-    }
-
-    c->window_width = width;
-    c->window_width = height;
-    SDL_GetWindowSize(c->window, &c->window_width, &c->window_height);
-    
-    c->pen_x = 0;
-    c->pen_y = 0;
-    c->pen_scale = 1;
-    c->pen_mode  = 2;
-    c->pen_move_rotation = from_degree(0);
-    c->_pen_is_down = false;
-
-    repeat(i, 3)
-    {
-        c->_pen_vertex[i].tex_coord.x = 0;
-        c->_pen_vertex[i].tex_coord.y = 0;
-    }
+    // todo better handling if failed (to unload previosuly loaded module)
+    if(window_load(c, window_name, width, height, flags) == false) { return null; }
+    if(camera_load(c) == false ) { return null; }
+    if(pen_load(c) == false ) { return null; }
+    if(scene_context_load(c) == false ) { return null; }
     
     c->should_exit = false;
-    c->scene = null;
-
     twice(context_update(c););
 
+    global_state_load(c);
 
     // //Charge la font sous différentes tailles 
     // c->font_small           = TTF_OpenFont(FONT_PATH, 20); check_font_charged(c->font_small);
@@ -63,45 +32,58 @@ context* context_create(char* window_name, int width, int height, Uint32 flags)
     return c;
 }
 
+
+void contexte_free(context* c)
+{
+    // TTF_CloseFont(c->font_small);
+    // TTF_CloseFont(c->font_medium);
+    // TTF_CloseFont(c->font_big);
+    // TTF_CloseFont(c->font_fullscreen);
+    global_state_unload(c);
+    scene_context_unload(c);
+    pen_unload(c);
+    camera_unload(c);
+    window_unload(c);
+}
+
 void context_update(context* c)
 {
-    SDL_DisplayMode screen;
-    SDL_GetCurrentDisplayMode(0, &screen);
-    c->screen_width  = screen.w;
-    c->screen_height = screen.h;
+    window_update(c); // Oh shit, it's gonna take a loooong time...
 
-    SDL_GetWindowPosition(c->window, &c->window_x, &c->window_y);
-    SDL_GetWindowSize(c->window, &c->window_width, &c->window_height);
-
-    c->window_ratio_width_div_height = c->screen_width/(float)c->screen_height;
-    c->window_ratio_height_div_width = c->screen_height/(float)c->screen_width;
 
     //printf("window %i %i, mouse %i %i\n", c->window_width, c->window_height, c->mouse_x, c->mouse_y);
-
+    // todo faire/dépalcer le fichier input dans context ?
     c->mouse_old_flag = c->mouse_flag;
     c->mouse_old_x = c->mouse_x;
     c->mouse_old_y = c->mouse_y;
     c->mouse_flag = SDL_GetMouseState(&(c->mouse_x), &(c->mouse_y));
     c->kb_state = SDL_GetKeyboardState(NULL);
 
+
     c->timer = from_ms(SDL_GetTicks());
 
-
-
-    SDL_Event event;
-    while(SDL_PollEvent(&event))
+    SDL_Event ev;
+    while(SDL_PollEvent(&ev))
     {
-        bool event_consumed = false;
-        switch (event.type)
+        if(ev.type == SDL_QUIT)
         {
-            case SDL_QUIT: c->should_exit = true; break;
-            
+            c->should_exit = true;
+            continue;
+        }
+        if(camera_event(c, &ev))
+        {
+            // camera consumed input
+            continue;
+        }
+
+        switch (ev.type)
+        {
             case SDL_KEYDOWN:
             case SDL_KEYUP:
             {
-                switch (event.key.keysym.sym)
+                switch (ev.key.keysym.sym)
                 {
-                    case SDLK_ESCAPE: c->should_exit = true; break;
+                    case SDLK_ESCAPE: c->should_exit = true; continue;
                     // Debug
                     case SDLK_d: scene_printf(c, (scene*)(c->scene)); break;
                     // menu Principal
@@ -111,16 +93,12 @@ void context_update(context* c)
             } break;
             default: break;
         }
-        if(event_consumed == false)
-        {
-            scene_event(c, (scene*)(c->scene), &event);
-        }
+
+        scene_event(c, (scene*)(c->scene), &ev);
     }
 
+    camera_update(c);
     scene_update(c, (scene*)(c->scene));
-
-
-
 }
 
 void context_draw(context* c)
@@ -129,15 +107,5 @@ void context_draw(context* c)
     SDL_RenderPresent(c->renderer);
 }
 
-void contexte_free(context* c)
-{
-    // TTF_CloseFont(c->font_small);
-    // TTF_CloseFont(c->font_medium);
-    // TTF_CloseFont(c->font_big);
-    // TTF_CloseFont(c->font_fullscreen);
-    
-    
-    scene_unload(c, (scene*)(c->scene));
-    SDL_DestroyRenderer(c->renderer);
-    SDL_DestroyWindow(c->window);
-}
+void context_should_exit_application(context* c, bool should_exit) { c->should_exit = should_exit; }
+scene* context_get_current_scene(context* c) { return (scene*)c->scene; }

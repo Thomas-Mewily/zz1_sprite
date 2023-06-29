@@ -3,6 +3,8 @@
 //#include "../include/SDL2/SDL_ttf.h"
 //#include <SDL2/SDL_ttf.h>
 
+// en ms. SDL_Tick
+typedef Uint32 time;
 typedef SDL_Texture texture;
 typedef SDL_Vertex vertex;
 

@@ -4,18 +4,20 @@
 
 #define PEN_MODE_HOLLOW 0x1
 #define PEN_MODE_FILLED 0x2
+#define PEN_MODE_FILL PEN_MODE_FILLED
 
-#define FONT_SIZE_SMALL (c->window_height)/30
-#define FONT_SIZE_NORMAL (c->window_height)/16
-#define FONT_SIZE_BIG (c->window_height)/10
-#define FONT_SIZE_FULLSCREEN (c->window_height)*0.8
 
+#define FONT_SIZE_SMALL      (c->screen_height/30.0f)
+#define FONT_SIZE_NORMAL     (c->screen_height/16.0f)
+#define FONT_SIZE_BIG        (c->screen_height/10.0f)
+#define FONT_SIZE_FULLSCREEN (c->screen_height*0.8f )
 
 
 void pen_color(context* c, color co);
 color pen_get_color(context* c);
 
 void pen_clear(context* c);
+
 void pen_mode(context* c, uint32 mode);
 
 
@@ -27,6 +29,7 @@ void pen_animation_at(context* c, animation* a, float x, float y, float scaleX, 
 void pen_animation_at_center(context* c, animation* a, float x, float y, float scaleX, float scaleY, float coef_centerX, float coef_centerY, time t);
 void pen_animation(context* c, animation* a, rectf dest, time t);
 
+/*
 bool pen_is_down(context*  c);
 void pen_down(context* c);
 void pen_up(context* c);
@@ -35,6 +38,7 @@ void pen_goto(context* c, float x, float y);
 void pen_goto_with_color(context* c, float x, float y, color co);
 void pen_move(context* c, float step);
 void pen_rotate(context* c, angle a);
+*/
 
 void pen_rect(context* c, rectf r);
 void pen_line(context* c, float x1, float y1, float x2, float y2);
@@ -58,12 +62,19 @@ void pen_triangle(context* c,
                 ); 
 
 
-void pen_text_at(context* c, const char* text, float x, float y, float pixel_ligne_height);
-void pen_text_at_center(context* c, const char* text, float x, float y, float pixel_ligne_height, float centerX, float centerY);
+void pen_text_at(context* c, char* text, float x, float y, float pixel_ligne_height);
+void pen_text_at_center(context* c, char* text, float x, float y, float pixel_ligne_height, float centerX, float centerY);
+
+#define pen_formatted_text_at_center(context, x, y, pixel_ligne_height, centerX, centerY, format, ...)\
+{\
+   char s[2048]; \
+   sprintf(s, format, __VA_ARGS__);\
+   pen_text_at_center(c, s, x, y, pixel_ligne_height, centerX, centerY);\
+}
 
 void pen_char_at(context* c, char letter, float x, float y, float pixel_ligne_height);
 void pen_char(context* c, char letter, rectf dest);
 
-void pen_init(context* c);
+bool pen_load(context* c);
 void pen_unload(context* c);
 #endif

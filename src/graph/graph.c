@@ -104,6 +104,12 @@ bool graph_join_exist(graph*g, int a, int b)
 }
 bool graph_node_exist(graph*g, int idx)      { return graph_get_node(g, idx)->exist;  }
 
+void update_join_length(graph*g , int a , int b)
+{
+    join* j = graph_get_join(g ,a ,b);
+    j->distance = length(graph_node_x(g,a),graph_node_y(g,a),graph_node_x(g,b),graph_node_y(g,b));
+}
+
 void graph_add_join(graph*g , int a , int b)
 {
     bool a_exist = graph_node_exist(g, a);
@@ -111,9 +117,8 @@ void graph_add_join(graph*g , int a , int b)
     bool j_exist = graph_join_exist(g, a, b);
     if(a_exist && b_exist && (j_exist == false) && a != b)
     {
-        join* j = graph_get_join(g ,a ,b);
-        j->exist = true;
-        j->distance = length(graph_node_x(g,a),graph_node_y(g,a),graph_node_x(g,b),graph_node_y(g,b));
+        graph_get_join(g ,a ,b)->exist = true;
+        update_join_length(g, a, b);
         vec_add(graph_get_node(g, a)->neightbors, int, b);
         vec_add(graph_get_node(g, b)->neightbors, int, a);
     }
@@ -309,4 +314,14 @@ graph* graph_gen_nul_equi(int nb_node, rectf area_contained)
     free(occuped);
     
     return g;
+void graph_set_node_x_y(graph * g , int a, float x, float y)
+{
+    graph_check_index(g, a);
+    graph_get_node(g, a)->x = x;
+    graph_get_node(g, a)->y = y;
+    repeat(n, graph_node_get_nb_neighbors(g, a))
+    {
+        int b = graph_get_node_neighbors(g, a, n);
+        update_join_length(g, a, b);
+    }
 }
