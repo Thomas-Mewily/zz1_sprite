@@ -69,7 +69,8 @@ void context_update(context* c)
 
         if(input_event(c, &ev))  { continue; }
         if(camera_event(c, &ev)) { continue; }
-
+        if(global_state_event(c, &ev)) { continue; }
+        
         switch (ev.type)
         {
             case SDL_KEYDOWN:

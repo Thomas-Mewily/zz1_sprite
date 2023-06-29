@@ -340,17 +340,40 @@ void pen_node (context* c, graph* g, int i)
 {
     pen_color(c, color_black);
     float radius = c->screen_height/64.0;
+    node* n = graph_get_node(g, i);
     float x = pen_get_graph_pos_x(graph_node_x(g,i), g);
     float y = pen_get_graph_pos_y(graph_node_y(g,i), g);
     pen_oval(c, x, y, radius/c->camera_scale_x, radius/c->camera_scale_y);
+
+    if(g->draw_text_info)
+    {
+        float txt_x = x;
+        float txt_y = y;
+        pen_formatted_text_at_center(c, txt_x, txt_y, FONT_SIZE_NORMAL, 0.5, 1, "%i",  n->idx);
+    }
 }
 
 void pen_join (context* c, graph* g, int a, int b)
 {
+    if(graph_join_exist(g, a, b) == false) { return; }
+    
+
     pen_color(c, color_black);
     float x1 = pen_get_graph_pos_x(graph_node_x(g,a), g);
     float y1 = pen_get_graph_pos_y(graph_node_y(g,a), g);
     float x2 = pen_get_graph_pos_x(graph_node_x(g,b), g);
     float y2 = pen_get_graph_pos_y(graph_node_y(g,b), g);
+
+
     pen_line(c,x1, y1, x2, y2);
+
+    if(g->draw_text_info)
+    {
+        float txt_x = (x1 + x2)/2;
+        float txt_y = (y1 + y2)/2;
+        float txt_y_offset = FONT_SIZE_SMALL/2;
+
+        pen_formatted_text_at_center(c, txt_x, txt_y+txt_y_offset, FONT_SIZE_SMALL, 0.5, 0.5, "%.3f",  graph_get_join(g, a, b)->distance);
+        pen_formatted_text_at_center(c, txt_x, txt_y-txt_y_offset, FONT_SIZE_SMALL, 0.5, 0.5, "%.3f",  graph_join_get_distance_opti(g, a, b));
+    }
 }

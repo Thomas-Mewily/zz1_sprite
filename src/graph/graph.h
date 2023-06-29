@@ -39,6 +39,7 @@ struct join
     vec* /*int*/ distance_opti_node_a_passer;
 };
 
+float graph_join_get_distance_opti(graph* g, int a, int b);
 struct graph
 {
     int    _nb; // nb nodes et joins
@@ -54,7 +55,12 @@ struct graph
     float y_etendu;
     
     rectf draw_dest;
+    bool  draw_text_info;
+
+    bool doit_calculer_distance_opti;
 };
+
+
 
 graph* graph_empty();
 void   graph_free(graph*g);
@@ -96,11 +102,11 @@ bool graph_node_en_noir (graph* g, int idx);
 
 void graph_printf(graph* g);
 
-graph* graph_complet(int nb_noeud, float radius);
+graph* graph_complet(int nb_noeud);
 
 graph* graph_gen_nul_equi(int nb_node, rectf area_contained);
 void graph_link_arbre_couvrant(graph* g);
 void graph_link_fill_joins(graph* g, float proba);
 
-
+void graph_calculer_distance_opti(graph* g);
 #endif
