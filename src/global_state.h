@@ -10,6 +10,17 @@ struct the_global_state
 {
     // graph du jeu
     graph* g;
+    sprite_sheet* goblinS;
+
+    anim* goblin_anim_down_walk;
+    anim* goblin_anim_right_walk;
+    anim* goblin_anim_up_walk;
+    anim* goblin_anim_left_walk;
+
+    anim* goblin_anim_down_idle;
+    anim* goblin_anim_right_idle;
+    anim* goblin_anim_up_idle;
+    anim* goblin_anim_left_idle;
 };
 
 void global_state_load(context* c);
