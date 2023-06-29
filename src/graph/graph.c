@@ -8,6 +8,7 @@ void node_init(graph* g, int idx)
    n->x = 0;
    n->y = 0;
    n->neightbors = vec_empty(int);
+   n->order = -1;
 }
 
 void join_init(join* j, int a, int b)
@@ -287,6 +288,36 @@ void graph_set_node_x_y(graph * g , int a, float x, float y)
     }
 }
 
+
+void graph_set_order_label(graph* g, vec* path)
+{
+    return; //NE MARCHE PAS
+    int nb_node = graph_get_nb_node(g);
+    for (int i = 0; i < nb_node; i++)
+    {
+        graph_get_node(g, i)->order = -1;
+    }
+    debug;
+    for (int i = 0; i < nb_node; i++)
+    {
+        int r=0;
+        bool run = true;
+        while (r<path->length && run)
+        {
+            if (vec_get(path, int, r) == i)
+            {
+                run = false;
+            }
+            r++;
+        }
+        if (run) {r = -1;}
+        SDL_Log("r = %d\n", r);
+        //vec_index_of(path, int, i, &r);//Réccupère la premiere apparition du noeud dans le chemin
+        graph_get_node(g, i)->order = r;
+    }
+    debug;
+}
+
 graph* graph_complet(int nb_node)
 {
     graph* g = graph_empty();
@@ -397,7 +428,6 @@ void graph_link_arbre_couvrant(graph* g)
         node* picked_unlk_node = vec_get(unlk_nodes, node*, unlk_id);
         //node* picked_used_node = vec_get(used_nodes, node*, used_id);
         
-        SDL_Log("node liées : %d et %d\n", unlk_id, used_id);
         graph_add_join(g, picked_unlk_node->idx, used_id);
         vec_remove_at(unlk_nodes, unlk_id);
         vec_add(used_nodes, node*, picked_unlk_node);
@@ -551,17 +581,22 @@ void graph_calculer_distance_opti(graph* g)
 
 float path_calculate_length(graph* g, vec* path)
 {
+    if (!path) {SDL_Log("Path est nul\n"); return -1;}
     if (path->sizeof_value != sizeof(int)) {SDL_Log("Le chemin passé n'est pas un vecteur de int !!\n"); return -1;}
     int elt_count = path->length;
     if (elt_count <= 1) {return 0;}
-
+    elt_count--;
     float length = 0;
+
     for (int i = 0; i < elt_count; i++)
     {
-        length += graph_get_join(g, vec_get(path, int, i),
-                                    vec_get(path, int, i+1))->distance_opti;
+        int a = vec_get(path, int, i);
+        int b = vec_get(path, int, i+1);
+        join* j = graph_get_join(g, a, b);
+        //length += j->distance;
     }
-    return length;
+    //return length;
+    return rand()%1000;
 }
 
 graph* graph_generate(int nb_node, rectf area_contained, float proba)
@@ -571,6 +606,8 @@ graph* graph_generate(int nb_node, rectf area_contained, float proba)
     graph_link_fill_joins(newG, proba);
     return newG;
 }
+#define A 0.999
+float t_ud_geometric(float t) {return A * t;}
 
 vec* graph_recuit_simule(graph* g, float motivation, float(*t_update)(float), float t_start)
 {
@@ -593,27 +630,24 @@ vec* graph_recuit_simule(graph* g, float motivation, float(*t_update)(float), fl
     while (nb_no_progress_iter < min_iter)
     {    
         perm_path = vec_clone(curr_path);
-
         int a, b;
         do
-        {   a = rand()%(nb_node-1);
-            b = rand()%(nb_node-1);
+        {   a = rand()%(nb_node-1)+1;
+            b = rand()%(nb_node-1)+1;
         } while (a == b);
-
         int tmp = vec_get(perm_path, int, a);
         vec_set(perm_path, int, a, vec_get(perm_path, int, b));
         vec_set(perm_path, int, b, tmp); 
-
         float curr_length = path_calculate_length(g, curr_path);
         float perm_length = path_calculate_length(g, perm_path);
-        float delta = curr_length - perm_length;
-
+        float delta =  perm_length - curr_length;
+        SDL_Log("delta %f\n", delta);
         bool swap = false;
         if (delta > 0) {swap = true;}
         else
         {
             float p = expf(-(delta)/t);
-
+            SDL_Log("proba : %f\n", p);
             if ( rand()%1000 < (int)(p*1000)) {swap = true;}
             else { nb_no_progress_iter ++;}
         }
@@ -623,8 +657,10 @@ vec* graph_recuit_simule(graph* g, float motivation, float(*t_update)(float), fl
             nb_no_progress_iter = 0;
         }
         t = t_update(t);
+        SDL_Log("nb it useless %d t %f\n", nb_no_progress_iter, t);
     }
 
+    if (nb_no_progress_iter >= min_iter) {SDL_Log("Sorti de la boucle de manière officielle\n");}
 
-    return null;
+        return null;
 }

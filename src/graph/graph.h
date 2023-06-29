@@ -26,6 +26,7 @@ struct node
 
     int annotation; // Cache pour savoir si on est déjà passer sur le noeud 
     int selected_flag;
+    int order;
 };
 struct join
 {
@@ -100,6 +101,8 @@ void graph_nodes_toute_annoter(graph * g, int val);
 bool graph_node_en_blanc(graph* g, int idx);
 bool graph_node_en_noir (graph* g, int idx);
 
+void graph_set_order_label(graph* g, vec* path);
+
 void graph_printf(graph* g);
 
 graph* graph_complet(int nb_noeud);
@@ -108,13 +111,13 @@ graph* graph_gen_nul_equi(int nb_node, rectf area_contained);
 void graph_link_arbre_couvrant(graph* g);
 void graph_link_fill_joins(graph* g, float proba);
 
+float path_calculate_length(graph* g, vec* path);
 void graph_calculer_distance_opti(graph* g);
 vec* graph_recuit_simule(graph* g, float motivation, float(*t_update)(float), float t_start);
 
 graph* graph_generate(int nb_node, rectf area_contained, float proba);
 
-
-float path_calculate_length(graph* g, vec* path);
+float t_ud_geometric(float t);
 
 
 #endif
