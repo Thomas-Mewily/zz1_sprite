@@ -3,7 +3,22 @@
 void global_state_load(context* c)
 {
     gs = create(the_global_state);
-    gs->g = graph_complet(4);
+    gs->g = graph_empty();
+    //gs->g = graph_generate(8, rectanglef(0, 0, 16, 9), 0.25f);
+
+    graph* g = gs->g;
+    //gs->g = graph_complet(4);
+    
+    int a = graph_add_node_x_y(g, 0,  0);
+    int b = graph_add_node_x_y(g, 1,  0);
+    int x = graph_add_node_x_y(g, 1, -1);
+    int y = graph_add_node_x_y(g, 0.7, -2);
+    int z = graph_add_node_x_y(g, 1.5, -1.5);
+    graph_add_join(g, a, b);
+    graph_add_join(g, b, x);
+    graph_add_join(g, x, y);
+    graph_add_join(g, y, z);
+    graph_add_join(g, z, x);
 }
 
 void global_state_unload(context* c)

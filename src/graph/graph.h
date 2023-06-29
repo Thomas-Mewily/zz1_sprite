@@ -30,7 +30,7 @@ struct node
 };
 struct join
 {
-    bool exist;
+    bool _exist;
     int a;
     int b;
 

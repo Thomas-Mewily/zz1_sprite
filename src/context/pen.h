@@ -7,10 +7,11 @@
 #define PEN_MODE_FILL PEN_MODE_FILLED
 
 
-#define FONT_SIZE_SMALL      (c->screen_height/30.0f)
-#define FONT_SIZE_NORMAL     (c->screen_height/16.0f)
-#define FONT_SIZE_BIG        (c->screen_height/10.0f)
-#define FONT_SIZE_FULLSCREEN (c->screen_height*0.8f )
+#define FONT_SIZE_MAX_NB_SCREEN_HEIGHT(nb) (c->screen_height/((float)nb)/(camera_scale_y(c)))
+#define FONT_SIZE_SMALL      FONT_SIZE_MAX_NB_SCREEN_HEIGHT(30)
+#define FONT_SIZE_NORMAL     FONT_SIZE_MAX_NB_SCREEN_HEIGHT(16)
+#define FONT_SIZE_BIG        FONT_SIZE_MAX_NB_SCREEN_HEIGHT(10)
+#define FONT_SIZE_FULLSCREEN FONT_SIZE_MAX_NB_SCREEN_HEIGHT(2)
 
 
 void pen_color(context* c, color co);
@@ -61,7 +62,6 @@ void pen_triangle(context* c,
                             float x2, float y2,
                             float x3, float y3
                 ); 
-
 
 void pen_text_at(context* c, char* text, float x, float y, float pixel_ligne_height);
 void pen_text_at_center(context* c, char* text, float x, float y, float pixel_ligne_height, float centerX, float centerY);

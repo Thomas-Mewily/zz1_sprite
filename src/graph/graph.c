@@ -15,7 +15,7 @@ void join_init(join* j, int a, int b)
 {
    j->a = a;
    j->b = b;
-   j->exist = false;
+   j->_exist = false;
 
    j->distance_opti = -1;
    j->distance_opti_node_a_passer = vec_empty(int);
@@ -120,14 +120,14 @@ vec* graph_node_get_neighbors_vec(graph*g , int idx){
 bool graph_join_exist(graph*g, int a, int b) 
 { 
     if(a == b) { return false; }
-    return graph_get_join(g, a, b)->exist;
+    return graph_get_join(g, a, b)->_exist;
 }
-bool graph_node_exist(graph*g, int idx)      { return graph_get_node(g, idx)->exist;  }
+bool graph_node_exist(graph*g, int idx)   { return graph_get_node(g, idx)->exist;  }
 
 void update_join_length(graph*g , int a , int b)
 {
     join* j = graph_get_join(g ,a ,b);
-    j->distance = length(graph_node_x(g,a),graph_node_y(g,a),graph_node_x(g,b),graph_node_y(g,b));
+    j->distance = length(graph_node_x(g,a), graph_node_y(g,a), graph_node_x(g,b), graph_node_y(g,b));
 }
 
 void graph_add_join(graph*g , int a , int b)
@@ -137,7 +137,7 @@ void graph_add_join(graph*g , int a , int b)
     bool j_exist = graph_join_exist(g, a, b);
     if(a_exist && b_exist && (j_exist == false) && a != b)
     {
-        graph_get_join(g ,a ,b)->exist = true;
+        graph_get_join(g ,a ,b)->_exist = true;
         update_join_length(g, a, b);
         vec_add(graph_get_node(g, a)->neightbors, int, b);
         vec_add(graph_get_node(g, b)->neightbors, int, a);
@@ -155,7 +155,7 @@ int graph_add_node_x_y(graph* g, float x, float y)
     int i = g->_nb;
     repeat(j, g->_nb)
     {
-        join_init(&(g->_joins[g->_nb][j]), i, j);
+        join_init(&(g->_joins[i][j]), i, j);
     }
     g->_nb++;
 
@@ -484,7 +484,6 @@ void join_set_distance_opti_parcours(join* j, float distance, vec* /* int */ che
 
 void graph_calculer_distance_noeud(graph* g, int source)
 {   
-    #if 0
     graph_check_index(g, source);
     graph_nodes_toute_annoter(g, annoter_blanc);
     graph_node_annoter(g, source, annoter_noir);
@@ -493,12 +492,12 @@ void graph_calculer_distance_noeud(graph* g, int source)
     vec* chemin_source_vers_source = vec_empty(int);
     vec_push(chemin_source_vers_source, int, source);
     vec_push(prev, reach_info, create_reach_info(source, 0, chemin_source_vers_source));
-
+    
     forever
     {
         float d_min = 10E10;
 
-        int a_prev_idx = -1;
+        int best_a_idx_in_prev = -1;
         int best_a = -1;
         int best_b = -1;
 
@@ -509,77 +508,55 @@ void graph_calculer_distance_noeud(graph* g, int source)
             int a = info->node_idx;
 
             int a_nb_neighbors = graph_node_get_nb_neighbors(g, a);
-            debug;
 
             for(int k = 0; k < a_nb_neighbors; k++)
             {   
                 int b = graph_get_node_neighbors(g, a, k);
-                debug;
                 if(graph_node_en_noir(g, b)) { continue; } // déjà parcouru
-                debug;
                 
                 join* j = graph_get_join(g, a, b);
-                if(!j->exist) { continue; } // le join existe pas
-                debug;
+                if(!(j->_exist)) { continue; } // le join existe pas
 
-                float longueur_pour_aller_sur_b = longueur_depuis_a + j->distance; 
-                if(longueur_pour_aller_sur_b < d_min)
+                float longueur_pour_aller_sur_b_depuis_a = longueur_depuis_a + j->distance; 
+                if(longueur_pour_aller_sur_b_depuis_a < d_min)
                 {
-                    d_min = longueur_pour_aller_sur_b;
-                    a_prev_idx = i;
+                    d_min = longueur_pour_aller_sur_b_depuis_a;
+                    best_a_idx_in_prev = i;
                     best_a = a;
                     best_b = b;
                 }
             }   
         }
 
-        debug;
 
         if(best_a == -1)
         {
             goto end;
         }
 
-        // on traite le join entre a et b
-        printf("a = %i, b = %i\n", best_a, best_b);
-        graph_get_join(g, best_a, best_b)->distance_opti = d_min;
-        debug;
+        reach_info* best = &(vec_get(prev, reach_info, best_a_idx_in_prev));
 
-        vec* /* int */ chemin_vers_best_b = vec_clone(vec_get(prev, reach_info, a_prev_idx).chemin);
-        debug;
+        vec* /* int */ chemin_vers_best_b = vec_clone(best->chemin);
 
         vec_push(chemin_vers_best_b, int, best_b);
-        debug;
 
-        join_set_distance_opti_parcours(graph_get_join(g, best_a, best_b), d_min, chemin_vers_best_b);
-        debug;
+        float distance_total_from_source = d_min;
+        join_set_distance_opti_parcours(graph_get_join(g, source, best_b), distance_total_from_source, chemin_vers_best_b);
 
-        vec_push(prev, reach_info, create_reach_info(best_b, d_min, chemin_vers_best_b));
+        vec_push(prev, reach_info, create_reach_info(best_b,  distance_total_from_source, chemin_vers_best_b));
 
         graph_node_annoter(g, best_b, annoter_noir);
-        debug;
 
     }
-
     end:
     debug;
 
-    /*
-    while(prev->length > 0)
+    repeat(i, prev->length)
     {
-        debug;
-        vec* v = vec_pop(prev, reach_info).chemin;
-        debug;
+        vec* v = vec_get(prev, reach_info, i).chemin;
         vec_free_lazy(v);
-        debug;
-    }*/
-
-    debug;
-
-    
+    }
     vec_free_lazy(prev);
-    vec_free_lazy(chemin_source_vers_source);
-    #endif
 }
 
 void graph_calculer_distance_opti(graph* g)
@@ -590,7 +567,7 @@ void graph_calculer_distance_opti(graph* g)
         {
             if(i != j)
             {
-                graph_get_join(g, i, j)->distance_opti = 10E10;
+                graph_get_join(g, i, j)->distance_opti = -1;
                 vec_clear(graph_get_join(g, i, j)->distance_opti_node_a_passer);
             }
         }
@@ -682,5 +659,8 @@ vec* graph_recuit_simule(graph* g, float motivation, float(*t_update)(float), fl
         t = t_update(t);
         SDL_Log("nb it useless %d t %f\n", nb_no_progress_iter, t);
     }
+
     if (nb_no_progress_iter >= min_iter) {SDL_Log("Sorti de la boucle de manière officielle\n");}
+
+        return null;
 }
