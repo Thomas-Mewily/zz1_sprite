@@ -83,6 +83,13 @@ void scene_martin_draw(argument arg)
     pen_graph(c, gs->g);
     pen_draw_trajet(c, gs->g, gs->path_rs);
 
+    // Cancel camera zoom
+    camera_state cs = camera_get_state(c);
+    camera_set_state(c, camera_state_default());
+    // Not affected by scrolling or scalling
+    pen_formatted_text_at_center(c, 0, 0, FONT_SIZE_NORMAL, 0, 0, "Temps Recuit : %.1f", gs->longueur_rs);
+    camera_set_state(c, cs);
+
 }
 
 bool scene_martin_event (argument arg) 
