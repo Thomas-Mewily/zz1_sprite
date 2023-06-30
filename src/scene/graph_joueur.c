@@ -77,7 +77,7 @@ bool scene_graph_joueur_event (argument arg)
             node* n = graph_get_node_touched_by_mouse(c, gs->g);
             if(n != null)
             {
-                traveler_travel_node(gs->goblin_traveler, n->idx);
+                traveler_travel_node(gs->goblin_traveler, n->idx, false);
             }
             return true;
         }   

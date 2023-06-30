@@ -370,6 +370,7 @@ void pen_node (context* c, graph* g, int i)
     switch (g->draw_text_info)
     {
         case GRAPH_DISPLAY_MODE_MINIMAL_TEXT:
+        case GRAPH_DISPLAY_MODE_MINIMAL_TEXT_COLORED:
         case GRAPH_DISPLAY_MODE_LOT_OF_TEXT:
         {
             float txt_x = x;
@@ -403,7 +404,7 @@ void pen_join (context* c, graph* g, int a, int b)
     if(exist == false && g->draw_text_info != GRAPH_DISPLAY_MODE_LOT_OF_TEXT) {  return; }
 
     color co = color_black;
-    if(g->draw_text_info == GRAPH_DISPLAY_MODE_LOT_OF_TEXT)
+    if(g->draw_text_info == GRAPH_DISPLAY_MODE_LOT_OF_TEXT || g->draw_text_info == GRAPH_DISPLAY_MODE_MINIMAL_TEXT_COLORED)
     {
         if(exist == false){ co = rgba(0,255,0,0); }
         else if(j->distance_opti < j->distance)
@@ -420,7 +421,7 @@ void pen_join (context* c, graph* g, int a, int b)
 
     pen_line(c,x1, y1, x2, y2);
 
-    if(g->draw_text_info)
+    if(g->draw_text_info == GRAPH_DISPLAY_MODE_LOT_OF_TEXT || g->draw_text_info == GRAPH_DISPLAY_MODE_GRAPHIC || g->draw_text_info == GRAPH_DISPLAY_MODE_MINIMAL_TEXT)
     {
         //float txt_x = (x1 + x2)/2;
         //float txt_y = (y1 + y2)/2;
@@ -434,8 +435,9 @@ void pen_join (context* c, graph* g, int a, int b)
         //float coef1 = 1 + diag/(length(x1, y1, mx, my)+0.1*diag);
         //float coef2 = 1 + diag/(length(x2, y2, mx, my)+0.1*diag);
         
-        float coef1 = 1 + (length(x1, y1, mx, my)+0.1);
-        float coef2 = 1 + (length(x2, y2, mx, my)+0.1);
+        float avg = length(x1, y1, x2, y2);
+        float coef1 = avg/2 + length(x2, y2, mx, my);
+        float coef2 = avg/2 + length(x1, y1, mx, my);
 
         //coef1 = 1;
         //coef2 = 1;
@@ -444,21 +446,12 @@ void pen_join (context* c, graph* g, int a, int b)
         float txt_x = (x1 * coef1 + x2 * coef2) / ( coef1 + coef2);
         float txt_y = (y1 * coef1 + y2 * coef2) / ( coef1 + coef2);
 
-        /*
-        float xm = input_mouse_x(c);
-        float ym = input_mouse_y(c);
-
-        float t = ((xm-x1)*(x2-x1)+(ym-y1)*(y2-y1))/(squared((x2-x1))+squared(y2-y1));
-        float xs= x1+t*(x2-x1);
-        float ys= y1+t*(y2-y1);
-
-        txt_x = xs;
-        txt_x = ys;*/
         pen_formatted_text_at_center(c, txt_x, txt_y-txt_y_offset, font_size, 0.5, 0.5, "%.1f",  graph_get_join(g, a, b)->distance);
 
         if(g->draw_text_info == GRAPH_DISPLAY_MODE_LOT_OF_TEXT)
         {
-            pen_formatted_text_at_center(c, txt_x, txt_y+txt_y_offset, font_size, 0.5, 0.5, "%.1f",  graph_join_get_distance_opti(g, a, b));
+            pen_formatted_text_at_center(c, txt_x, txt_y+txt_y_offset, font_size, 0.5, 0.5, "b%.1f",  graph_join_get_distance_opti(g, a, b));
+            pen_formatted_text_at_center(c, txt_x, txt_y+3*txt_y_offset, font_size, 0.5, 0.5, "f%.4f",  j->testosterone);
         }
     }
 }

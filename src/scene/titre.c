@@ -29,7 +29,9 @@ void scene_titre_draw(argument arg)
     camera_state cs = camera_get_state(c);
     camera_set_state(c, camera_state_default());
     // Not affected by scrolling or scalling
-    pen_text_at_center(c, "Titre", 0, 0, FONT_SIZE_NORMAL, 0, 0);
+    
+    pen_formatted_text_at_center(c, 0, 0, FONT_SIZE_NORMAL, 0, 0, "Titre (G: %i nodes)", gs->nb_node);
+    pen_formatted_text_at_center(c, 0, FONT_SIZE_NORMAL, FONT_SIZE_NORMAL, 0, 0, "(FDRJHPM)", gs->nb_node);
     camera_set_state(c, cs);
     //pen_circle(c, window_width(c)/2, window_height(c)/2, window_height(c)/32.0 * (s->nbFoisPresser+2));
     //pen_formatted_text_at_center(c, window_width(c)/2,window_height(c)/2, FONT_SIZE_NORMAL, 0.5, 0.5, "UwU tick: %i", c->timer);

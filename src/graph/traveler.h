@@ -49,15 +49,17 @@ typedef struct
     traveler_end_action reach_end_action;
     traveler_state state;
     traveler_node_action node_action;
+
+    color color;
 } traveler;
 
 traveler* traveler_create(graph* g, float distance_per_second);
 void traveler_free(traveler* t);
 // perdu, aucune traversé
 bool traveler_is_nowhere(traveler* t); 
-void traveler_travel_node(traveler* t, int idx);
-void traveler_add_travel(traveler* t, trajet* tr_will_be_copied);
-void traveler_set_travel(traveler* t, trajet* tr_will_be_copied);
+void traveler_travel_node(traveler* t, int idx, bool optimized_mode);
+void traveler_add_travel(traveler* t, trajet* tr_will_be_copied, bool optimized_mode);
+void traveler_set_travel(traveler* t, trajet* tr_will_be_copied, bool optimized_mode);
 bool traveler_can_travel(traveler* t);
 
 float traveler_source_x(traveler* t);

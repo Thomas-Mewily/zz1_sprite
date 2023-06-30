@@ -35,6 +35,9 @@ void join_init(join* j, int a, int b)
    j->distance = -1;
    j->distance_opti = -1;
    j->distance_opti_node_a_passer = vec_empty(int);
+
+   j->testosterone = 1;
+   j->old_testosterone = 1;
 }
 
 void node_free(node* n)
@@ -87,7 +90,7 @@ graph* graph_empty()
    g->_nodes = null;
    g->_joins = null;
    g->_nb = 0;
-   g->draw_text_info = GRAPH_DISPLAY_MODE_GRAPHIC;
+   g->draw_text_info = GRAPH_DISPLAY_MODE_MINIMAL_TEXT;
    return g;
 }
 
@@ -100,11 +103,7 @@ void graph_was_edited(graph* g)
 
 float graph_join_get_distance_opti(graph* g, int a, int b)
 {
-    if(g->doit_calculer_distance_opti)
-    {
-        g->doit_calculer_distance_opti = false;
-        graph_calculer_distance_opti(g);
-    }
+    graph_calculer_distance_opti(g);
     return graph_get_join(g, a, b)->distance_opti;
 }
 
@@ -600,6 +599,8 @@ void graph_calculer_distance_noeud(graph* g, int source)
 
 void graph_calculer_distance_opti(graph* g)
 {
+    if(g->doit_calculer_distance_opti == false) return;
+    g->doit_calculer_distance_opti = false;
     repeat(i, graph_get_nb_node(g))
     {
         repeat(j, graph_get_nb_node(g))
@@ -649,11 +650,9 @@ void graph_change_distances(graph* g)
 {
     repeat(i, graph_get_nb_node(g))
     {
-        repeat(j, graph_get_nb_node(g))
+        repeat(j, i)
         {
-            if(i == j) continue;
-            
-            float futur_distance = graph_get_join(g,i,j)->distance * (rand()%4+1);
+            float futur_distance = graph_get_join(g,i,j)->distance * (rand()%800/100.0f+1);
             graph_join_set_distance(g, i, j, futur_distance);
         }
     }

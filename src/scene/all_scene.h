@@ -25,5 +25,6 @@ UNUSED(ev);  \
 #include "houza.h"
 #include "martin.h"
 #include "graph_joueur.h"
+#include "fourmi.h"
 
 //#pragma GCC diagnostic warning "-Wunused-parameter"

@@ -19,8 +19,15 @@ void global_state_reset_traveler(context* c)
     {
         traveler_free(gs->goblin_traveler);
     }
-    gs->goblin_traveler = traveler_create(gs->g, length(0,0,gs->g->x_etendu,gs->g->y_etendu)/1.0);
-    traveler_travel_node(gs->goblin_traveler, 0);
+    gs->goblin_traveler = traveler_create(gs->g, gs->g->rectangle_length*2.0);
+    traveler_travel_node(gs->goblin_traveler, 0, false);
+    if(gs->g != null)
+    {
+        repeat(i, graph_get_nb_node(gs->g)-1)
+        {
+            graph_get_node(gs->g, i+1)->etat = node_a_visiter;
+        }
+    }
 }
 
 void global_state_new_get_graph(context* c)
@@ -30,27 +37,6 @@ void global_state_new_get_graph(context* c)
         graph_free(gs->g);
     }
 
-    //gs->g = graph_generate(200, rectanglef(0, 0, 160, 90), 0.25f);
-    //gs->g = graph_generate(100, rectanglef(0, 0, 160, 90), 0.25f);
-    //gs->g = graph_generate( 8, rectanglef(0, 0, 16, 9), 0.25f);
-    gs->g = graph_generate( 3+(rand()%10), rectanglef(0, 0, 16*4, 9*4), 0.25f);
-    graph_change_distances(gs->g);
-    //gs->g = graph_complet(8);
-
-    global_state_reset_traveler(c);
-}
-
-void global_state_load(context* c)
-{
-    gs = create(the_global_state);
-    gs->g = null;
-    gs->goblin_traveler = null;
-    //get_graph(c);
-    gs->path_rs = vec_empty(int);
-    global_state_new_get_graph(c);
-    gs->longueur_rs = 10E10;
-
-    
     /*
     gs->g = graph_empty();
 
@@ -59,14 +45,36 @@ void global_state_load(context* c)
     int a = graph_add_node_x_y(g, 0,  0);
     int b = graph_add_node_x_y(g, 1,  0);
     int x = graph_add_node_x_y(g, 1, -1);
-    int y = graph_add_node_x_y(g, 0.7, -2);
-    int z = graph_add_node_x_y(g, 1.5, -1.5);
+    //int y = graph_add_node_x_y(g, 0.7, -2);
+    //int z = graph_add_node_x_y(g, 1.5, -1.5);
     graph_add_join(g, a, b);
     graph_add_join(g, b, x);
-    graph_add_join(g, x, y);
-    graph_add_join(g, y, z);
-    graph_add_join(g, z, x);
+    //graph_add_join(g, x, y);
+    //graph_add_join(g, y, z);
+    //graph_add_join(g, z, x);
     */
+    //gs->g = graph_generate(200, rectanglef(0, 0, 160, 90), 0.25f);
+    //gs->g = graph_generate(100, rectanglef(0, 0, 160, 90), 0.25f);
+    //gs->g = graph_generate( 3, rectanglef(0, 0, 16, 9), 0.25f);
+    gs->g = graph_generate( gs->nb_node, rectanglef(0, 0, sqrt(gs->nb_node)*16, sqrt(gs->nb_node)*9), 0.25f);
+    graph_change_distances(gs->g);
+    //gs->g = graph_complet(8);
+    global_state_reset_traveler(c);
+}
+
+void global_state_load(context* c)
+{
+    gs = create(the_global_state);
+    gs->nb_node = 6;
+    gs->g = null;
+    gs->goblin_traveler = null;
+    //get_graph(c);
+    gs->path_rs = vec_empty(int);
+    global_state_new_get_graph(c);
+    gs->longueur_rs = 10E10;
+
+    
+
 
     gs->gobelin_texture = texture_create(c, "asset/gobelin.png");
 
@@ -141,8 +149,12 @@ bool global_state_event(context* c, event* ev)
                 case SDLK_m: scene_set(c, martin); return true;
                 case SDLK_t: scene_set(c, thomas_parallax); return true;
                 case SDLK_h: scene_set(c, houza); return true;
-                case SDLK_j: scene_set(c, graph_joueur); return true;
+                case SDLK_j: scene_set(c, graph_joueur); gs->g->draw_text_info = GRAPH_DISPLAY_MODE_GRAPHIC; return true;
+                case SDLK_f: scene_set(c, fourmi); return true;
                 case SDLK_g: gs->g->draw_text_info = (gs->g->draw_text_info+1) % GRAPH_DISPLAY_MODE_MODULO ; return true;
+                case SDLK_UP: case SDLK_RIGHT: gs->nb_node++; return true;
+                case SDLK_DOWN: case SDLK_LEFT: gs->nb_node = gs->nb_node <= 2 ? 2 : gs->nb_node-1; return true;
+
                 case SDLK_r: global_state_reset_traveler(c); return true;
                 
                 // Debug

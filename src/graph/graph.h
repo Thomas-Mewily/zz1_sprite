@@ -27,6 +27,8 @@ struct node
     int annotation; // Cache pour savoir si on est déjà passer sur le noeud 
     int selected_flag;
     int order;
+
+    int   fourmi_nb_passage;
 };
 struct join
 {
@@ -38,6 +40,10 @@ struct join
 
     float distance_opti;
     vec* /*int*/ distance_opti_node_a_passer;
+
+    // Les fourmis sont bodybuilder
+    float testosterone;
+    float old_testosterone;
 };
 
 #define NODE_RADIUS_PIXEL (c->screen_height/64.0)
@@ -50,10 +56,11 @@ bool graph_node_is_touched_by_mouse(context* c, graph* g, int idx);
 float graph_join_get_distance_opti(graph* g, int a, int b);
 
 typedef int graph_display_mode;
-#define GRAPH_DISPLAY_MODE_NO_TEXT      0
-#define GRAPH_DISPLAY_MODE_MINIMAL_TEXT 1
-#define GRAPH_DISPLAY_MODE_LOT_OF_TEXT  2
-#define GRAPH_DISPLAY_MODE_GRAPHIC      3
+#define GRAPH_DISPLAY_MODE_NO_TEXT          0
+#define GRAPH_DISPLAY_MODE_MINIMAL_TEXT     1
+#define GRAPH_DISPLAY_MODE_MINIMAL_TEXT_COLORED  2
+#define GRAPH_DISPLAY_MODE_LOT_OF_TEXT  3
+#define GRAPH_DISPLAY_MODE_GRAPHIC      4
 #define GRAPH_DISPLAY_MODE_MODULO       (GRAPH_DISPLAY_MODE_GRAPHIC+1)
 struct graph
 {

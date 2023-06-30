@@ -124,7 +124,8 @@ typedef struct
     fprintf(f, "\n");\
 }
 
-#define vec_printf(v, type, format) vec_fprintf(stdout, v, type, format)
+#define vec_printf(v, type, format) /*LoL*/
+//vec_fprintf(stdout, v, type, format)
 
 vec* _vec_empty(nuint sizeof_type);
 vec* _vec_new_with_capacity(nuint sizeof_type, nuint capacity);

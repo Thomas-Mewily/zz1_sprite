@@ -8,8 +8,8 @@
 
 
 #define FONT_SIZE_MAX_NB_SCREEN_HEIGHT(nb) (c->screen_height/((float)nb)/(camera_scale_y(c)))
-//#define FONT_SIZE_SMALL      FONT_SIZE_MAX_NB_SCREEN_HEIGHT(32)
-#define FONT_SIZE_SMALL      FONT_SIZE_MAX_NB_SCREEN_HEIGHT(24)
+#define FONT_SIZE_SMALL      FONT_SIZE_MAX_NB_SCREEN_HEIGHT(32)
+//#define FONT_SIZE_SMALL      FONT_SIZE_MAX_NB_SCREEN_HEIGHT(24)
 #define FONT_SIZE_NORMAL     FONT_SIZE_MAX_NB_SCREEN_HEIGHT(16)
 #define FONT_SIZE_BIG        FONT_SIZE_MAX_NB_SCREEN_HEIGHT(10)
 #define FONT_SIZE_FULLSCREEN FONT_SIZE_MAX_NB_SCREEN_HEIGHT(2)
@@ -67,11 +67,11 @@ void pen_triangle(context* c,
 void pen_text_at(context* c, char* text, float x, float y, float pixel_ligne_height);
 void pen_text_at_center(context* c, char* text, float x, float y, float pixel_ligne_height, float centerX, float centerY);
 
-#define pen_formatted_text_at_center(context, x, y, pixel_ligne_height, centerX, centerY, format, ...)\
+#define pen_formatted_text_at_center(context, _x, _y, pixel_ligne_height, _centerX, _centerY, format, ...)\
 {\
-   char s[2048]; \
-   sprintf(s, format, __VA_ARGS__);\
-   pen_text_at_center(c, s, x, y, pixel_ligne_height, centerX, centerY);\
+   char _s[2048]; \
+   sprintf(_s, format, __VA_ARGS__);\
+   pen_text_at_center(c, _s, _x, _y, pixel_ligne_height, _centerX, _centerY);\
 }
 
 void pen_char_at(context* c, char letter, float x, float y, float pixel_ligne_height);

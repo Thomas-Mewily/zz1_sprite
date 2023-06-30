@@ -35,14 +35,14 @@ void traveler_free(traveler* t)
     free(t);
 }
 
-bool traveler_is_nowhere(traveler* t) { return t->chemin == null || trajet_is_empty(t->chemin) || t->source_idx < 0 || t->source_idx >= trajet_length(t->chemin); }
+bool traveler_is_nowhere(traveler* t) { return trajet_is_empty(t->chemin) || t->source_idx < 0 || t->source_idx >= trajet_length(t->chemin); }
 bool traveler_can_travel(traveler* t) 
 {
     return (!traveler_is_nowhere(t) && (t->source_idx+1) < trajet_length(t->chemin));
 }
 
 
-void traveler_travel_node(traveler* t, int idx)
+void traveler_travel_node(traveler* t, int idx, bool optimized_mode)
 {
     if(traveler_is_nowhere(t) || traveler_can_travel(t) == false)
     {
@@ -50,28 +50,58 @@ void traveler_travel_node(traveler* t, int idx)
         if(t->source_idx < 0) { t->source_idx = 0; }
         t->state = TRAVELER_STATE_WAIT_TO_WALK;
     }
-    trajet_add_node(t->chemin, idx);
-    if(t->chemin->length >= 2)
+
+    if(!optimized_mode)
     {
-        join* j = graph_get_join(t->g, trajet_get(t->chemin, trajet_length(t->chemin)-1), trajet_get(t->chemin, trajet_length(t->chemin)-2));
-        if(j == null || j->_exist == false || j->distance < 0)
+        if(t->chemin->length >= 1)
         {
-            vec_remove_end(t->chemin);
+            join* j = graph_get_join(t->g, trajet_get(t->chemin, trajet_length(t->chemin)-1), idx);
+            if(j == null || j->_exist == false || j->distance < 0) return;
+        }
+        trajet_add_node(t->chemin, idx);
+    }else
+    {
+        if(t->chemin->length >= 1)
+        {
+            int a = trajet_get(t->chemin, trajet_length(t->chemin)-1);
+            join* j = graph_get_join(t->g, a, idx);
+            if(j == null) return;
+            graph_calculer_distance_opti(t->g);
+
+            if(vec_get(j->distance_opti_node_a_passer, int, 0) == idx)
+            {
+                for(int i = j->distance_opti_node_a_passer->length-1; i >= 0; i--)
+                {
+                    traveler_travel_node(t, vec_get(j->distance_opti_node_a_passer, int, i), false);
+                }
+            }else
+            {
+                repeat(i, j->distance_opti_node_a_passer->length)
+                {
+                    traveler_travel_node(t, vec_get(j->distance_opti_node_a_passer, int, i), false);
+                }
+            }
+            
+
+        }else
+        {
+            trajet_add_node(t->chemin, idx);
         }
     }
 }
-void traveler_add_travel(traveler* t, trajet* tr_will_be_copied)
+void traveler_add_travel(traveler* t, trajet* tr_will_be_copied, bool optimized_mode)
 {
+    if(tr_will_be_copied == null) return;
     repeat(i, tr_will_be_copied->length)
     {
-        trajet_add_node(t->chemin, trajet_get(tr_will_be_copied, i));
+        traveler_travel_node(t, trajet_get(tr_will_be_copied, i), optimized_mode);
     }
 }
-void traveler_set_travel(traveler* t, trajet* tr_will_be_copied)
+void traveler_set_travel(traveler* t, trajet* tr_will_be_copied, bool optimized_mode)
 {
+    vec_clear(t->chemin);
     if(tr_will_be_copied == null) { return; }
-    if(t->chemin != null) { vec_free_lazy(t->chemin); }
-    t->chemin = vec_clone(tr_will_be_copied);
+    traveler_add_travel(t, tr_will_be_copied, optimized_mode);
     t->source_idx = 0;
     t->state = TRAVELER_STATE_WAIT_TO_WALK;
 }
@@ -199,7 +229,10 @@ void traveler_update(context* c, traveler* t)
         if(traveler_is_nowhere(t))
         {
             t->source_idx--;
+            traveler_set_state(c, t, TRAVELER_STATE_WAIT);
+        }else
+        {
+            traveler_set_state(c, t, TRAVELER_STATE_WAIT_TO_WALK);
         }
-        traveler_set_state(c, t, TRAVELER_STATE_WAIT_TO_WALK);
     }
 }

@@ -20,6 +20,8 @@ struct the_global_state
     trajet* path_rs;
 
     traveler* goblin_traveler;
+
+    int nb_node;
 };
 
 
