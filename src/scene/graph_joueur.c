@@ -8,11 +8,15 @@ typedef struct
 void scene_graph_joueur_load(argument arg)
 {
     obtenir_state;
-    
+    global_state_reset_traveler(c);
 }
 
 void scene_graph_joueur_unload(argument arg) { obtenir_state; }
-void scene_graph_joueur_update(argument arg) { obtenir_state; }
+void scene_graph_joueur_update(argument arg) 
+{ 
+    obtenir_state;
+    traveler_update(c, gs->goblin_traveler);    
+}
 
 int direction_to_gobelin_animation(angle a)
 {

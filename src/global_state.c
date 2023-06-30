@@ -97,7 +97,7 @@ void global_state_update(context* c)
 {
     gs->g->draw_dest = window_rectf(c);
     
-    traveler_update(c, gs->goblin_traveler);
+    //traveler_update(c, gs->goblin_traveler);
     //printf("%i\n", (int)as_degree(gs->goblin_traveler->direction));
     //printf("%i\n", (int)traveler_time(gs->goblin_traveler));
     /*
