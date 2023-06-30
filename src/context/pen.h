@@ -83,4 +83,8 @@ void pen_node (context* c, graph* g, int idx);
 
 bool pen_load(context* c);
 void pen_unload(context* c);
+
+void pen_draw_trajet(context* c, graph* g, trajet* t);
+// return join length
+//float pen_draw_join_direction(context* c, graph* g, int a, int b);
 #endif

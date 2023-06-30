@@ -5,6 +5,7 @@
 #define sqrt(val_float)  (sqrtf)((float)(val_float))
 #define pow(x_float, y_float) (powf)((float)(x_float),(float)(y_float))
 #define abs(val_float) (fabsf)((float)(val_float))
+#define mod(a,b) (fmodf)((float)(a), (float)(b))
 
 float squared(float x);
 

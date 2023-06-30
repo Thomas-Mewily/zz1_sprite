@@ -68,6 +68,8 @@ struct graph
     float y_min;
     float y_max;
     float y_etendu;
+
+    float rectangle_length; // basé sur l'étendu
     
     rectf draw_dest;
     graph_display_mode  draw_text_info;

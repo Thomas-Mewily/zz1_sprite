@@ -8,7 +8,6 @@
 #define traveler_STOP 2
 typedef int traveler_state;*/
 
-typedef vec /*of int*/ trajet;
 typedef int traveler_end_action;
 typedef int traveler_state;
 typedef int traveler_node_action;

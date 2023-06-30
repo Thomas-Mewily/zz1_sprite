@@ -461,3 +461,71 @@ void pen_join (context* c, graph* g, int a, int b)
         }
     }
 }
+
+
+void pen_line_in_graph(context* c, graph* g, float x1, float y1, float x2, float y2)
+{
+    x1 = camera_graph_pos_2_cam_pos_x(c, g, x1);
+    y1 = camera_graph_pos_2_cam_pos_y(c, g, y1);
+    x2 = camera_graph_pos_2_cam_pos_x(c, g, x2);
+    y2 = camera_graph_pos_2_cam_pos_y(c, g, y2);
+
+    pen_line(c, x1, y1, x2, y2);
+}
+
+// inside graph
+void pen_draw_arrow(context* c, graph* g, float x, float y, angle a)
+{
+    angle a2 = from_degree(135);
+    float radius = 0.1 * NODE_RADIUS_PIXEL;// / camera_scale_x(c);
+    pen_line_in_graph(c, g, x, y, x+cos(a-a2)*radius, y+sin(a-a2)*radius);
+    pen_line_in_graph(c, g, x, y, x+cos(a+a2)*radius, y+sin(a+a2)*radius);
+}
+
+float pen_draw_join_direction(context* c, graph* g, int a, int b)
+{
+    join* j = graph_get_join(g, a, b);
+    if(j == null) return 0;
+
+
+    float x1 = graph_node_x(g, a);
+    float y1 = graph_node_y(g, a);
+
+    float x2 = graph_node_x(g, b);
+    float y2 = graph_node_y(g, b);
+
+    float dx = x2-x1;
+    float dy = y2-y1;
+
+    float l1 = j->distance;
+    float l2  = length(x1, y1, x2, y2);
+
+    float slow = l2/l1;
+
+    angle ang = angle_from_vector(dx, dy);
+
+    //float speed = g->rectangle_length / 32.0;
+    float step = 1/5.0f;
+
+    for(float i = mod(second(timer_scene(c)*slow), step); i < 1; i += step)
+    {
+        pen_draw_arrow(c, g, x1+dx*i, y1+dy*i, ang);
+    }
+
+    pen_line_in_graph(c, g, x1, y1, x2, y2);
+
+    return l1 / g->rectangle_length;
+}
+
+void pen_draw_trajet(context* c, graph* g, trajet* t)
+{
+    if(t == null || trajet_length(t) <= 1) return;
+
+    float hue = 140;
+    for(int i = 0; i<trajet_length(t)-1; i++)
+    {
+        pen_color(c, hsv(hue, 1, 1));
+        pen_draw_join_direction(c, g, trajet_get(t, i), trajet_get(t, i+1));
+        hue += 360/10.0f;
+    }
+}

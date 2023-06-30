@@ -303,6 +303,7 @@ void recalculer_etendu(graph * g)
 
     g->x_etendu = g->x_max - g->x_min;
     g->y_etendu = g->y_max - g->y_min;
+    g->rectangle_length = length(0,0, g->x_etendu, g->y_etendu);
 }
 
 void graph_set_node_x_y(graph * g , int a, float x, float y)

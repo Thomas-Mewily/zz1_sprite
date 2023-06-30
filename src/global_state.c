@@ -27,12 +27,21 @@ void get_graph(context* c)
     graph_change_distances(gs->g);
     //gs->g = graph_complet(8);
 
+    if(gs->goblin_traveler != null)
+    {
+        traveler_free(gs->goblin_traveler);
+    }
+
+    gs->goblin_traveler = traveler_create(gs->g, length(0,0,gs->g->x_etendu,gs->g->y_etendu)/1.0);
+    traveler_travel_node(gs->goblin_traveler, 0);
+
 }
 
 void global_state_load(context* c)
 {
     gs = create(the_global_state);
     gs->g = null;
+    gs->goblin_traveler = null;
     get_graph(c);
 
     
@@ -84,8 +93,7 @@ void global_state_load(context* c)
     gs->goblin_anim_left_idle->last_frame = 7; */
 
     gs->gobelin_texture = texture_create(c, "asset/gobelin.png");
-    gs->goblin_traveler = traveler_create(gs->g, length(0,0,gs->g->x_etendu,gs->g->y_etendu)/1.0);
-    traveler_travel_node(gs->goblin_traveler, 0);
+
 
     gs->diamant = sprite_sheet_create(c, "asset/diamant.png", 16, 16);
     gs->diamant_anim = animation_create(gs->diamant, frequence_s(16));
@@ -162,14 +170,20 @@ void global_state_draw(context* c)
         rect src = rectangle(traveler_time(t) / (frequence_s(frame_fps)) % nb_frame * 24,
                         (4*(is_base_anim?0:1)+direction)*32,24,32);
         pen_texture_at_center(c, gs->gobelin_texture, src, camera_graph2cam_x(c,g,t->x), camera_graph2cam_y(c,g,t->y), 3, 3, 0.5, 0.5);
+    
+        pen_draw_trajet(c, gs->g, gs->goblin_traveler->chemin);
+
+
+        // Cancel camera zoom
+        camera_state cs = camera_get_state(c);
+        camera_set_state(c, camera_state_default());
+        // Not affected by scrolling or scalling
+        pen_formatted_text_at_center(c, 0, 0, FONT_SIZE_NORMAL, 0, 0, "Temps : %.1f", gs->goblin_traveler->total_distance_traveled);
+        camera_set_state(c, cs);
     }
 
 
-    camera_state cs = camera_get_state(c);
-    camera_set_state(c, camera_state_default());
-    // Not affected by scrolling or scalling
-    pen_formatted_text_at_center(c, 0, 0, FONT_SIZE_NORMAL, 0, 0, "Score : %.1f", gs->goblin_traveler->total_distance_traveled);
-    camera_set_state(c, cs);
+
     //if(traveler_can_travel(t))
     
     //pen_animation_at_center(c, gs->gobelin_texture, window_width(c)/2, window_height(c)/2, 4,4, 0.5, 0.5, timer_since_launch(c));

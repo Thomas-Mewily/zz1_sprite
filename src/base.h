@@ -5,9 +5,10 @@ typedef struct the_global_state the_global_state;
 
 #include "betterC.h"
 #include "SDL.h"
-#include "struct_forward_declaration.h"
 
 #include "collection/vec.h"
+
+#include "struct_forward_declaration.h"
 
 #include "util/math.h"
 #include "util/angle.h"
