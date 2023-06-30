@@ -681,7 +681,7 @@ trajet* graph_gen_starting_trajet(graph* g)
 float t_ud_geometric(float* t) {return A * *t;}
 
 #define MOTIVATION 0.5
-void graph_recuit_simule_n_it(graph* g, trajet* starting_path, int n, float(*t_update)(float*), float* t, int* nb_no_progress_iter)
+bool graph_recuit_simule_n_it(graph* g, trajet* starting_path, int n, float(*t_update)(float*), float* t, int* nb_no_progress_iter)
 {
     int nb_node = graph_get_nb_node(g);
 
@@ -730,7 +730,7 @@ void graph_recuit_simule_n_it(graph* g, trajet* starting_path, int n, float(*t_u
         t_update(t);
         n--;
     }
-
-    if (*nb_no_progress_iter >= min_iter) {SDL_Log("Sorti de la boucle de manière officielle\n");}
+    if (*nb_no_progress_iter >= min_iter) {SDL_Log("Sorti de la boucle de manière officielle\n"); return true;}
     vec_free_lazy(perm_path);
+    return false;
 }

@@ -130,7 +130,7 @@ void graph_link_fill_joins(graph* g, float proba);
 float path_calculate_length(graph* g, vec* path);
 void graph_calculer_distance_opti(graph* g);
 trajet* graph_gen_starting_trajet(graph* g);
-void graph_recuit_simule_n_it(graph* g, trajet* starting_path, int nb_tentative_session, float(*t_update)(float*), float* t, int* nb_no_progress_iter);
+bool graph_recuit_simule_n_it(graph* g, trajet* starting_path, int nb_tentative_session, float(*t_update)(float*), float* t, int* nb_no_progress_iter);
 
 graph* graph_generate(int nb_node, rectf area_contained, float proba);
 void graph_join_set_distance(graph* g, int a, int b, float distance);
