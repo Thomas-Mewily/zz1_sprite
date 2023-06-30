@@ -127,7 +127,7 @@ bool global_state_event(context* c, event* ev)
     switch (ev->type)
     {
         //mousePress(ev->button.);
-        case SDL_KEYDOWN: case SDL_KEYUP:
+        case SDL_KEYDOWN: //case SDL_KEYUP:
         {
             switch (ev->key.keysym.sym)
             {
