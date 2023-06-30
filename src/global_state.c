@@ -159,6 +159,8 @@ void global_state_draw(context* c)
     
     if(gs->g->draw_text_info == GRAPH_DISPLAY_MODE_GRAPHIC)
     {
+        pen_draw_trajet(c, gs->g, gs->goblin_traveler->chemin);
+
         graph* g = gs->g;
         traveler* t = gs->goblin_traveler;
 
@@ -167,13 +169,11 @@ void global_state_draw(context* c)
         int frame_fps = is_base_anim ? 3 : 8;
         int direction = direction_to_gobelin_animation(t->direction);
 
+
         rect src = rectangle(traveler_time(t) / (frequence_s(frame_fps)) % nb_frame * 24,
                         (4*(is_base_anim?0:1)+direction)*32,24,32);
         pen_texture_at_center(c, gs->gobelin_texture, src, camera_graph2cam_x(c,g,t->x), camera_graph2cam_y(c,g,t->y), 3, 3, 0.5, 0.5);
     
-        pen_draw_trajet(c, gs->g, gs->goblin_traveler->chemin);
-
-
         // Cancel camera zoom
         camera_state cs = camera_get_state(c);
         camera_set_state(c, camera_state_default());

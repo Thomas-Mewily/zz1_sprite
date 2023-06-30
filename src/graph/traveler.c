@@ -182,6 +182,7 @@ void traveler_update(context* c, traveler* t)
     {
         float x_add = dt* traveler_current_delta_x(t);
         float y_add = dt* traveler_current_delta_y(t);
+
         t->x = traveler_source_x(t) +  x_add;
         t->y = traveler_source_y(t) +  y_add;
         t->direction = angle_from_vector(x_add, y_add);
