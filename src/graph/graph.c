@@ -714,7 +714,7 @@ bool graph_recuit_simule_n_it(graph* g, trajet* starting_path, int n, float(*t_u
         {
             float p = expf(-(delta)/ *t);
             if ( rand()%1000 < (int)(p*1000)) {swap = true;}
-            else { *nb_no_progress_iter ++;}
+            else { (*nb_no_progress_iter)++;}
         }
         if (swap)
         {

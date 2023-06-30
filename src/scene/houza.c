@@ -24,12 +24,9 @@ void scene_houza_load(argument arg)
     int nb_node = 10;
     if(gs->g)
     {
-        debug;
         graph_free(gs->g);
     }
-    debug;
     gs->g = graph_generate(nb_node, rectanglef(0,0, window_width(c), window_height(c)), 0.2);
-    debug;
 
 }
 

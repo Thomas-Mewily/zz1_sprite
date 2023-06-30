@@ -118,7 +118,7 @@ typedef struct
     {\
         repeat(_i, _v->length)\
         {\
-            fprintf(f, format, vec_get(v, type, _i));\
+            fprintf(f, format, (type)vec_get(v, type, _i));\
         }\
     }\
     fprintf(f, "\n");\
