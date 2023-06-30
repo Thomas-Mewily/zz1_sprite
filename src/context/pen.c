@@ -436,6 +436,9 @@ void pen_join (context* c, graph* g, int a, int b)
         float coef1 = 1 + (length(x1, y1, mx, my)+0.1);
         float coef2 = 1 + (length(x2, y2, mx, my)+0.1);
 
+        //coef1 = 1;
+        //coef2 = 1;
+
 
         float txt_x = (x1 * coef1 + x2 * coef2) / ( coef1 + coef2);
         float txt_y = (y1 * coef1 + y2 * coef2) / ( coef1 + coef2);
