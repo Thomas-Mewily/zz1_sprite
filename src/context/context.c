@@ -80,10 +80,6 @@ void context_update(context* c)
                 switch (ev.key.keysym.sym)
                 {
                     case SDLK_ESCAPE: c->should_exit = true; continue;
-                    // Debug
-                    case SDLK_d: scene_printf(c, (scene*)(c->scene)); break;
-                    // menu Principal
-                    case SDLK_p: scene_set(c, titre); break;
                     default: break;
                 }
             } break;
