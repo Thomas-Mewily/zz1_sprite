@@ -43,7 +43,7 @@ void global_state_load(context* c)
     gs->g = null;
     gs->goblin_traveler = null;
     get_graph(c);
-
+    gs->path_rs = vec_empty(int);
     
 
     /*
@@ -155,32 +155,32 @@ int direction_to_gobelin_animation(angle a)
 
 void global_state_draw(context* c)
 {
-    pen_graph(c, gs->g);
+    // pen_graph(c, gs->g);
     
-    if(gs->g->draw_text_info == GRAPH_DISPLAY_MODE_GRAPHIC)
-    {
-        pen_draw_trajet(c, gs->g, gs->goblin_traveler->chemin);
+    // if(gs->g->draw_text_info == GRAPH_DISPLAY_MODE_GRAPHIC)
+    // {
+    //     pen_draw_trajet(c, gs->g, gs->goblin_traveler->chemin);
 
-        graph* g = gs->g;
-        traveler* t = gs->goblin_traveler;
+    //     graph* g = gs->g;
+    //     traveler* t = gs->goblin_traveler;
 
-        int is_base_anim = t->state == TRAVELER_STATE_WAIT_TO_WALK;
-        int nb_frame = is_base_anim ? 2 : 4;
-        int frame_fps = is_base_anim ? 3 : 8;
-        int direction = direction_to_gobelin_animation(t->direction);
+    //     int is_base_anim = t->state == TRAVELER_STATE_WAIT_TO_WALK;
+    //     int nb_frame = is_base_anim ? 2 : 4;
+    //     int frame_fps = is_base_anim ? 3 : 8;
+    //     int direction = direction_to_gobelin_animation(t->direction);
 
 
-        rect src = rectangle(traveler_time(t) / (frequence_s(frame_fps)) % nb_frame * 24,
-                        (4*(is_base_anim?0:1)+direction)*32,24,32);
-        pen_texture_at_center(c, gs->gobelin_texture, src, camera_graph2cam_x(c,g,t->x), camera_graph2cam_y(c,g,t->y), 3, 3, 0.5, 0.5);
+    //     rect src = rectangle(traveler_time(t) / (frequence_s(frame_fps)) % nb_frame * 24,
+    //                     (4*(is_base_anim?0:1)+direction)*32,24,32);
+    //     pen_texture_at_center(c, gs->gobelin_texture, src, camera_graph2cam_x(c,g,t->x), camera_graph2cam_y(c,g,t->y), 3, 3, 0.5, 0.5);
     
-        // Cancel camera zoom
-        camera_state cs = camera_get_state(c);
-        camera_set_state(c, camera_state_default());
-        // Not affected by scrolling or scalling
-        pen_formatted_text_at_center(c, 0, 0, FONT_SIZE_NORMAL, 0, 0, "Temps : %.1f", gs->goblin_traveler->total_distance_traveled);
-        camera_set_state(c, cs);
-    }
+    //     // Cancel camera zoom
+    //     camera_state cs = camera_get_state(c);
+    //     camera_set_state(c, camera_state_default());
+    //     // Not affected by scrolling or scalling
+    //     pen_formatted_text_at_center(c, 0, 0, FONT_SIZE_NORMAL, 0, 0, "Temps : %.1f", gs->goblin_traveler->total_distance_traveled);
+    //     camera_set_state(c, cs);
+    // }
 
 
 

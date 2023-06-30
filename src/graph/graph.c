@@ -626,18 +626,15 @@ float path_calculate_length(graph* g, vec* path)
     if (elt_count <= 1) {return 0;}
     elt_count--;
     float length = 0;
-    UNUSED(length);
     for (int i = 0; i < elt_count; i++)
     {
         int a = vec_get(path, int, i);
         int b = vec_get(path, int, i+1);
-        join* j = graph_get_join(g, a, b);
-        UNUSED(j);
-
-        //length += j->distance;
+        if (a==b) {continue;}
+        length += graph_join_get_distance_opti(g, a, b);
     }
-    //return length;
-    return rand()%1000;
+    return length;
+    //return rand()%1000;
 }
 
 graph* graph_generate(int nb_node, rectf area_contained, float proba)
@@ -677,7 +674,7 @@ vec* graph_recuit_simule(graph* g, float motivation, float(*t_update)(float), fl
     vec_add(curr_path, int, node_depart);
     for (int i = 1; i < nb_node; i++)
     {
-        vec_add(curr_path, int, node_depart);
+        vec_add(curr_path, int, i);
     }
     vec_add(curr_path, int, node_depart);
     //curr_path est de la forme [0 1 2 3 4 ... N-1 N 0]
@@ -692,32 +689,43 @@ vec* graph_recuit_simule(graph* g, float motivation, float(*t_update)(float), fl
         {   a = rand()%(nb_node-1)+1;
             b = rand()%(nb_node-1)+1;
         } while (a == b);
+        SDL_Log("avant ");
+        vec_printf_int(perm_path);
+
         int tmp = vec_get(perm_path, int, a);
         vec_set(perm_path, int, a, vec_get(perm_path, int, b));
         vec_set(perm_path, int, b, tmp); 
+        SDL_Log("après ");
+        vec_printf_int(perm_path);
         float curr_length = path_calculate_length(g, curr_path);
         float perm_length = path_calculate_length(g, perm_path);
         float delta =  perm_length - curr_length;
-        SDL_Log("delta %f\n", delta);
         bool swap = false;
         if (delta > 0) {swap = true;}
         else
         {
             float p = expf(-(delta)/t);
-            SDL_Log("proba : %f\n", p);
             if ( rand()%1000 < (int)(p*1000)) {swap = true;}
             else { nb_no_progress_iter ++;}
         }
         if (swap)
         {
-            vec_copy(perm_path, curr_path, 0, perm_path->length, 0);
+            
+            SDL_Log("on garde\n");
+            //vec_copy(perm_path, curr_path, 0, perm_path->length, 0);
+            for (int i = 0; i < perm_path->length; i++)
+            {
+                vec_set(curr_path, int, i, vec_get(perm_path, int, i));
+            }
+            
             nb_no_progress_iter = 0;
         }
+        else {SDL_Log("on laisse\n");}
         t = t_update(t);
-        SDL_Log("nb it useless %d t %f\n", nb_no_progress_iter, t);
+        // SDL_Delay(100);
     }
 
     if (nb_no_progress_iter >= min_iter) {SDL_Log("Sorti de la boucle de manière officielle\n");}
-
-        return null;
+    vec_free_lazy(perm_path);
+    return curr_path;
 }

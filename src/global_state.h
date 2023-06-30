@@ -29,6 +29,8 @@ struct the_global_state
     anim* goblin_anim_left_idle;
     */
 
+    trajet* path_rs;
+
     traveler* goblin_traveler;
 };
 
