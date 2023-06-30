@@ -12,7 +12,7 @@ void scene_houza_load(argument arg)
 {
     obtenir_state;
 
-    s->g = graph_complet(20,1);
+    s->g = graph_complet(20);
     //s->a = ant_create(s->a);
 
     sce->info.background_color = rgb(200,0,0);
