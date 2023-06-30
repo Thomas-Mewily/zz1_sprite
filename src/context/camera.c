@@ -27,7 +27,7 @@ void camera_unload(context* c){ UNUSED(c); }
 
 void camera_update(context* c)
 {
-    if(c->mouse_left_button_down)
+    if(camera_can_scroll(c) && c->mouse_left_button_down)
     {
         c->camera_x -= c->mouse_delta_x/c->camera_scale_x;
         c->camera_y -= c->mouse_delta_y/c->camera_scale_y;
