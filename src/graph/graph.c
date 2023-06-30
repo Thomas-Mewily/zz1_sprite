@@ -4,13 +4,13 @@ float graph_node_length_pixel_from_point(context* c, graph* g, int idx, float x,
 {
     return length(x, y, camera_graph_pos_2_pixel_pos_x(c, g, graph_node_x(g, idx)), camera_graph_pos_2_pixel_pos_y(c, g, graph_node_y(g, idx)));
 }
-bool graph_node_touched_by(context* c, graph* g, int idx, float x, float y)
+bool graph_node_is_touched_by(context* c, graph* g, int idx, float x, float y)
 {
     return graph_node_length_pixel_from_point(c, g, idx, x, y) < NODE_RADIUS_PIXEL*1.5;
 }
-bool graph_node_touched_by_mouse(context* c, graph* g, int idx) 
+bool graph_node_is_touched_by_mouse(context* c, graph* g, int idx) 
 {
-    return graph_node_touched_by(c, g, idx, input_mouse_x(c), input_mouse_y(c));
+    return graph_node_is_touched_by(c, g, idx, input_mouse_x(c), input_mouse_y(c));
 }
 
 
@@ -21,6 +21,7 @@ void node_init(graph* g, int idx)
    n->exist = false;
    n->x = 0;
    n->y = 0;
+   n->etat = node_a_visiter;
    n->neightbors = vec_empty(int);
    n->order = -1;
 }
@@ -31,6 +32,7 @@ void join_init(join* j, int a, int b)
    j->b = b;
    j->_exist = false;
 
+   j->distance = -1;
    j->distance_opti = -1;
    j->distance_opti_node_a_passer = vec_empty(int);
 }
@@ -85,7 +87,7 @@ graph* graph_empty()
    g->_nodes = null;
    g->_joins = null;
    g->_nb = 0;
-   g->draw_text_info = GRAPH_DISPLAY_MODE_MINIMAL_TEXT;
+   g->draw_text_info = GRAPH_DISPLAY_MODE_GRAPHIC;
    return g;
 }
 
@@ -266,6 +268,18 @@ void graph_printf(graph* g)
     {
         graph_printf_node(g, i);
     }
+}
+
+node* graph_get_node_touched_by_mouse(context* c, graph* g)
+{
+    repeat(i, graph_get_nb_node(g))
+    {
+        if(graph_node_is_touched_by_mouse(c, g, i))
+        {
+            return graph_get_node(g, i);
+        }
+    }
+    return null;
 }
 
 void recalculer_etendu(graph * g)
@@ -632,6 +646,22 @@ graph* graph_generate(int nb_node, rectf area_contained, float proba)
     graph_link_fill_joins(newG, proba);
     return newG;
 }
+
+void graph_change_distances(graph* g)
+{
+    repeat(i, graph_get_nb_node(g))
+    {
+        repeat(j, graph_get_nb_node(g))
+        {
+            if(i == j) continue;
+            
+            float futur_distance = graph_get_join(g,i,j)->distance * (rand()%4+1);
+            graph_join_set_distance(g, i, j, futur_distance);
+        }
+    }
+}
+
+
 #define A 0.999
 float t_ud_geometric(float t) {return A * t;}
 

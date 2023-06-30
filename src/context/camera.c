@@ -124,6 +124,20 @@ void camera_set_state(context* c, camera_state s)
     c->camera_scale_y = s.scale_y;
 }
 
+camera_state camera_state_create(float x, float y, float scale_x, float scale_y)
+{
+    camera_state s;
+    s.x = x;
+    s.y = y;
+    s.scale_x = scale_x;
+    s.scale_y = scale_y;
+    return s;
+}
+camera_state camera_state_default()
+{
+    return camera_state_create(0,0,1,1);
+}
+
 float camera_pixel_pos_2_graph_pos_x(context* c, graph* g, float pos)
 {
     UNUSED(c);
@@ -159,3 +173,20 @@ float camera_graph_pos_2_cam_pos_y(context* c, graph* g, float pos)
 
 float camera_cam_pos_2_pixel_pos_x(context* c, float x) { return (x - camera_x(c))*camera_scale_x(c); }
 float camera_cam_pos_2_pixel_pos_y(context* c, float y) { return (y - camera_y(c))*camera_scale_y(c); }
+
+float camera_pixel_pos_2_cam_pos_x(context* c, float pos) { return pos/camera_scale_x(c)+camera_x(c); }
+float camera_pixel_pos_2_cam_pos_y(context* c, float pos) { return pos/camera_scale_y(c)+camera_y(c); }
+
+
+
+// dumb typedef
+float camera_graph2cam_x(context* c, graph* g, float pos)
+{
+    UNUSED(c);
+    return camera_graph_pos_2_cam_pos_x(c, g, pos);
+}
+float camera_graph2cam_y(context* c, graph* g, float pos)
+{
+    UNUSED(c);
+    return camera_graph_pos_2_cam_pos_y(c, g, pos);
+}

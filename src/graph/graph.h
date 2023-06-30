@@ -44,8 +44,8 @@ struct join
 
 
 float graph_node_length_pixel_from_point(context* c, graph* g, int idx, float x, float y);
-bool graph_node_touched_by(context* c, graph* g, int idx, float x, float y);
-bool graph_node_touched_by_mouse(context* c, graph* g, int idx);
+bool graph_node_is_touched_by(context* c, graph* g, int idx, float x, float y);
+bool graph_node_is_touched_by_mouse(context* c, graph* g, int idx);
 
 float graph_join_get_distance_opti(graph* g, int a, int b);
 
@@ -53,6 +53,8 @@ typedef int graph_display_mode;
 #define GRAPH_DISPLAY_MODE_NO_TEXT      0
 #define GRAPH_DISPLAY_MODE_MINIMAL_TEXT 1
 #define GRAPH_DISPLAY_MODE_LOT_OF_TEXT  2
+#define GRAPH_DISPLAY_MODE_GRAPHIC      3
+#define GRAPH_DISPLAY_MODE_MODULO       (GRAPH_DISPLAY_MODE_GRAPHIC+1)
 struct graph
 {
     int    _nb; // nb nodes et joins
@@ -129,6 +131,9 @@ vec* graph_recuit_simule(graph* g, float motivation, float(*t_update)(float), fl
 
 graph* graph_generate(int nb_node, rectf area_contained, float proba);
 void graph_join_set_distance(graph* g, int a, int b, float distance);
+
+node* graph_get_node_touched_by_mouse(context* c, graph* g);
+void graph_change_distances(graph* g);
 
 float t_ud_geometric(float t);
 

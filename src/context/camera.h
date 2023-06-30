@@ -10,6 +10,8 @@ typedef struct
     float scale_y;
 }camera_state;
 
+camera_state camera_state_create(float x, float y, float scale_x, float scale_y);
+camera_state camera_state_default();
 camera_state camera_get_state(context* c);
 void camera_set_state(context* c, camera_state s);
 
@@ -46,5 +48,11 @@ float camera_cam_pos_2_pixel_pos_y(context* c, float y);
 
 float camera_graph_pos_2_pixel_pos_x(context* c, graph* g, float pos);
 float camera_graph_pos_2_pixel_pos_y(context* c, graph* g, float pos);
+
+float camera_pixel_pos_2_cam_pos_x(context* c, float pos);
+float camera_pixel_pos_2_cam_pos_y(context* c, float pos);
+
+float camera_graph2cam_x(context* c, graph* g, float pos);
+float camera_graph2cam_y(context* c, graph* g, float pos);
 
 #endif

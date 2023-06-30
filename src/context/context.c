@@ -70,7 +70,6 @@ void context_update(context* c)
         }
 
         if(input_event(c, &ev))  { continue; }
-        if(camera_event(c, &ev)) { continue; }
         if(global_state_event(c, &ev)) { continue; }
         
         switch (ev.type)
@@ -90,7 +89,8 @@ void context_update(context* c)
             } break;
             default: break;
         }
-        scene_event(c, (scene*)(c->scene), &ev);
+        if(scene_event(c, (scene*)(c->scene), &ev)) { continue; }
+        if(camera_event(c, &ev)) { continue; }
     }
 
     input_update(c);

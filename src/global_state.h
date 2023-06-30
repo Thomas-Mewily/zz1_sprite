@@ -10,6 +10,12 @@ struct the_global_state
 {
     // graph du jeu
     graph* g;
+    texture* gobelin_texture;
+
+    sprite_sheet* diamant;
+    anim* diamant_anim;
+
+    /*
     sprite_sheet* goblinS;
 
     anim* goblin_anim_down_walk;
@@ -21,7 +27,11 @@ struct the_global_state
     anim* goblin_anim_right_idle;
     anim* goblin_anim_up_idle;
     anim* goblin_anim_left_idle;
+    */
+
+    traveler* goblin_traveler;
 };
+
 
 void global_state_load(context* c);
 void global_state_unload(context* c);

@@ -33,7 +33,7 @@ typedef struct
 #define vec_remove_end(v)\
 {\
     vec* _v = (v);\
-    check(("vec_remove_end() : vec have no element", _v->length >= 0));\
+    check(_v->length >= 0);\
     _v->length--;\
     vec_shrink_if_needed(_v);\
 }

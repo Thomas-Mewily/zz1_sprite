@@ -348,8 +348,6 @@ void pen_graph(context* c, graph* g)
 
 void pen_node (context* c, graph* g, int i)
 {
-
-
     float radius = NODE_RADIUS_PIXEL;
     node* n = graph_get_node(g, i);
     float x = camera_graph_pos_2_cam_pos_x(c, g, graph_node_x(g,i));
@@ -359,7 +357,7 @@ void pen_node (context* c, graph* g, int i)
     pen_oval(c, x, y, radius/c->camera_scale_x, radius/c->camera_scale_y);
 
     color co = rgb(192,192,192);
-    if(graph_get_nb_node(g) <= 32 && graph_node_touched_by_mouse(c,g,i))
+    if(graph_get_nb_node(g) <= 32 && graph_node_is_touched_by_mouse(c,g,i))
     {
         co = color_white;
     }
@@ -369,12 +367,29 @@ void pen_node (context* c, graph* g, int i)
     pen_oval(c, x, y, radius/c->camera_scale_x, radius/c->camera_scale_y);
     //pen_rect(c, rectanglef(x-radius/c->camera_scale_x/2, y-radius/c->camera_scale_y/2, radius/c->camera_scale_x, radius/c->camera_scale_y));
 
-    if(g->draw_text_info)
+    switch (g->draw_text_info)
     {
-        float txt_x = x;
-        float txt_y = y;
-        //pen_formatted_text_at_center(c, txt_x, txt_y, FONT_SIZE_NORMAL, 0.5, 1, "#%i order%i",  n->idx, n->order);
-        pen_formatted_text_at_center(c, txt_x, txt_y, FONT_SIZE_NORMAL, 0.5, 1, "%i",  n->idx);
+        case GRAPH_DISPLAY_MODE_MINIMAL_TEXT:
+        case GRAPH_DISPLAY_MODE_LOT_OF_TEXT:
+        {
+            float txt_x = x;
+            float txt_y = y;
+            //pen_formatted_text_at_center(c, txt_x, txt_y, FONT_SIZE_NORMAL, 0.5, 1, "#%i order%i",  n->idx, n->order);
+            pen_formatted_text_at_center(c, txt_x, txt_y, FONT_SIZE_NORMAL, 0.5, 1, "%i",  n->idx);
+        }
+        break;
+    
+        case GRAPH_DISPLAY_MODE_GRAPHIC:
+        {
+            if(n->etat == node_a_visiter)
+            {
+                float scale = 4;
+                pen_animation_at_center(c, gs->diamant_anim, x, y, scale, scale, 0.5, 0.5, timer_since_launch(c));
+            }
+        }
+        break;
+        default: break;
+            
     }
 }
 
@@ -407,9 +422,23 @@ void pen_join (context* c, graph* g, int a, int b)
 
     if(g->draw_text_info)
     {
-        float txt_x = (x1 + x2)/2;
-        float txt_y = (y1 + y2)/2;
-        float txt_y_offset = FONT_SIZE_SMALL/2;
+        //float txt_x = (x1 + x2)/2;
+        //float txt_y = (y1 + y2)/2;
+        float txt_y_offset = FONT_SIZE_SMALL*0.35;
+
+        float mx = camera_pixel_pos_2_cam_pos_x(c, input_mouse_x(c));
+        float my = camera_pixel_pos_2_cam_pos_y(c, input_mouse_y(c));
+
+        //float diag = (g->x_etendu*g->y_etendu);
+        //float coef1 = 1 + diag/(length(x1, y1, mx, my)+0.1*diag);
+        //float coef2 = 1 + diag/(length(x2, y2, mx, my)+0.1*diag);
+        
+        float coef1 = 1 + (length(x1, y1, mx, my)+0.1);
+        float coef2 = 1 + (length(x2, y2, mx, my)+0.1);
+
+
+        float txt_x = (x1 * coef1 + x2 * coef2) / ( coef1 + coef2);
+        float txt_y = (y1 * coef1 + y2 * coef2) / ( coef1 + coef2);
 
         /*
         float xm = input_mouse_x(c);

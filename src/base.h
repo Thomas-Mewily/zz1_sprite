@@ -5,7 +5,7 @@ typedef struct the_global_state the_global_state;
 
 #include "betterC.h"
 #include "SDL.h"
-#include "struct_foward_declaration.h"
+#include "struct_forward_declaration.h"
 
 #include "collection/vec.h"
 
@@ -30,7 +30,7 @@ typedef struct the_global_state the_global_state;
 #include "context/pen.h"
 
 #include "graph/graph.h"
-#include "graph/ant.h"
+#include "graph/traveler.h"
 
 #include "scene/all_scene.h"
 

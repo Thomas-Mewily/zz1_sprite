@@ -1,4 +1,5 @@
 #include "base.h"
+
 #define FPS_IDLE 500
 #define FPS_WALK 200
 
@@ -23,20 +24,9 @@ void get_graph(context* c)
     //gs->g = graph_generate(100, rectanglef(0, 0, 160, 90), 0.25f);
     //gs->g = graph_generate( 8, rectanglef(0, 0, 16, 9), 0.25f);
     gs->g = graph_generate( 3+(rand()%10), rectanglef(0, 0, 16*4, 9*4), 0.25f);
-    
+    graph_change_distances(gs->g);
     //gs->g = graph_complet(8);
-    graph* g = gs->g;
 
-    repeat(i, graph_get_nb_node(g))
-    {
-        repeat(j, graph_get_nb_node(g))
-        {
-            if(i == j) continue;
-            
-            float futur_distance = graph_get_join(g,i,j)->distance * (rand()%4+1);
-            graph_join_set_distance(g, i, j, futur_distance);
-        }
-    }
 }
 
 void global_state_load(context* c)
@@ -64,6 +54,7 @@ void global_state_load(context* c)
     graph_add_join(g, z, x);
     */
 
+    /*
     gs->goblinS = sprite_sheet_create(c, "asset/goblin.png", 24, 32);
 
     gs->goblin_anim_down_walk = animation_create(gs->goblinS, FPS_WALK);
@@ -90,11 +81,19 @@ void global_state_load(context* c)
     gs->goblin_anim_up_idle->last_frame = 5; 
     gs->goblin_anim_left_idle = animation_create(gs->goblinS, FPS_IDLE);
     gs->goblin_anim_left_idle->first_frame = 6; 
-    gs->goblin_anim_left_idle->last_frame = 7; 
+    gs->goblin_anim_left_idle->last_frame = 7; */
+
+    gs->gobelin_texture = texture_create(c, "asset/gobelin.png");
+    gs->goblin_traveler = traveler_create(gs->g, length(0,0,gs->g->x_etendu,gs->g->y_etendu)/1.0);
+    traveler_travel_node(gs->goblin_traveler, 0);
+
+    gs->diamant = sprite_sheet_create(c, "asset/diamant.png", 16, 16);
+    gs->diamant_anim = animation_create(gs->diamant, frequence_s(16));
 }
 
 void global_state_unload(context* c)
 {
+    /*
     free_animation(gs->goblin_anim_down_walk);
     free_animation(gs->goblin_anim_right_walk);
     free_animation(gs->goblin_anim_up_walk);
@@ -105,15 +104,24 @@ void global_state_unload(context* c)
     free_animation(gs->goblin_anim_up_idle);
     free_animation(gs->goblin_anim_left_idle);
     sprite_sheet_free(gs->goblinS);
+    */
 
+    texture_free(gs->gobelin_texture);
+    sprite_sheet_free(gs->diamant);
+    animation_free(gs->diamant_anim);
     graph_free(gs->g);
+
+    traveler_free(gs->goblin_traveler);
     free(gs);
 }
 
 void global_state_update(context* c)
 {
     gs->g->draw_dest = window_rectf(c);
-
+    
+    traveler_update(c, gs->goblin_traveler);
+    //printf("%i\n", (int)as_degree(gs->goblin_traveler->direction));
+    //printf("%i\n", (int)traveler_time(gs->goblin_traveler));
     /*
     if(c->nb_update % 10)
     {
@@ -123,15 +131,53 @@ void global_state_update(context* c)
     }*/
 }
 
+int direction_to_gobelin_animation(angle a)
+{
+    // bidouille
+    float x = cos(a);
+    float y = sin(a);
+    if(abs(x) > abs(y))
+    {
+        if(x > 0) return 2;
+        return 3;
+    }
+    if(y > 0) return 0;
+    return 1;
+}
+
 void global_state_draw(context* c)
 {
     pen_graph(c, gs->g);
+    
+    if(gs->g->draw_text_info == GRAPH_DISPLAY_MODE_GRAPHIC)
+    {
+        graph* g = gs->g;
+        traveler* t = gs->goblin_traveler;
+
+        int is_base_anim = t->state == TRAVELER_STATE_WAIT_TO_WALK;
+        int nb_frame = is_base_anim ? 2 : 4;
+        int frame_fps = is_base_anim ? 3 : 8;
+        int direction = direction_to_gobelin_animation(t->direction);
+
+        rect src = rectangle(traveler_time(t) / (frequence_s(frame_fps)) % nb_frame * 24,
+                        (4*(is_base_anim?0:1)+direction)*32,24,32);
+        pen_texture_at_center(c, gs->gobelin_texture, src, camera_graph2cam_x(c,g,t->x), camera_graph2cam_y(c,g,t->y), 3, 3, 0.5, 0.5);
+    }
+
+
+    camera_state cs = camera_get_state(c);
+    camera_set_state(c, camera_state_default());
+    // Not affected by scrolling or scalling
+    pen_formatted_text_at_center(c, 0, 0, FONT_SIZE_NORMAL, 0, 0, "Score : %.1f", gs->goblin_traveler->total_distance_traveled);
+    camera_set_state(c, cs);
+    //if(traveler_can_travel(t))
+    
+    //pen_animation_at_center(c, gs->gobelin_texture, window_width(c)/2, window_height(c)/2, 4,4, 0.5, 0.5, timer_since_launch(c));
 }
 
 void global_state_printf(context* c)
 {
     get_graph(c);
-
 }
 
 
@@ -143,10 +189,20 @@ bool global_state_event(context* c, event* ev)
         {
             switch (ev->key.keysym.sym)
             {
-                case SDLK_g: gs->g->draw_text_info = (gs->g->draw_text_info+1) % (GRAPH_DISPLAY_MODE_LOT_OF_TEXT+1) ; break;
+                case SDLK_g: gs->g->draw_text_info = (gs->g->draw_text_info+1) % GRAPH_DISPLAY_MODE_MODULO ; break;
                 default: break;
             }
         } break;
+        case SDL_MOUSEBUTTONDOWN:
+        {
+            node* n = graph_get_node_touched_by_mouse(c, gs->g);
+            if(n != null)
+            {
+                traveler_travel_node(gs->goblin_traveler, n->idx);
+            }
+            return true;
+        }   
+        break;
         default: break;
     }
 
