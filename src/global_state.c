@@ -13,6 +13,16 @@ gcc -O0 -fdiagnostics-color=always -g ./src/*.c ./src/context/*.c ./src/util/*.c
 gource
 */
 
+void global_state_reset_traveler(context* c)
+{
+    if(gs->goblin_traveler != null)
+    {
+        traveler_free(gs->goblin_traveler);
+    }
+    gs->goblin_traveler = traveler_create(gs->g, length(0,0,gs->g->x_etendu,gs->g->y_etendu)/1.0);
+    traveler_travel_node(gs->goblin_traveler, 0);
+}
+
 void global_state_new_get_graph(context* c)
 {
     if(gs->g != null)
@@ -27,14 +37,7 @@ void global_state_new_get_graph(context* c)
     graph_change_distances(gs->g);
     //gs->g = graph_complet(8);
 
-    if(gs->goblin_traveler != null)
-    {
-        traveler_free(gs->goblin_traveler);
-    }
-
-    gs->goblin_traveler = traveler_create(gs->g, length(0,0,gs->g->x_etendu,gs->g->y_etendu)/1.0);
-    traveler_travel_node(gs->goblin_traveler, 0);
-
+    global_state_reset_traveler(c);
 }
 
 void global_state_load(context* c)
@@ -137,6 +140,7 @@ bool global_state_event(context* c, event* ev)
                 case SDLK_h: scene_set(c, houza); return true;
                 case SDLK_j: scene_set(c, graph_joueur); return true;
                 case SDLK_g: gs->g->draw_text_info = (gs->g->draw_text_info+1) % GRAPH_DISPLAY_MODE_MODULO ; return true;
+                case SDLK_r: global_state_reset_traveler(c); return true;
                 
                 // Debug
                 case SDLK_d: 

@@ -43,4 +43,6 @@ void global_state_draw(context* c);
 void global_state_printf(context* c);
 
 void global_state_new_get_graph(context* c);
+void global_state_reset_traveler(context* c);
+
 #endif
