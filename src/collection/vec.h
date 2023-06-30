@@ -14,7 +14,8 @@ typedef struct
 #define vec_set(v, type, idx, value) vec_get(v, type, idx) = value
 
 #define vec_peek(v, type) (vec_get(v, type, v->length-1))
-#define vec_pop(v, type)  (vec_get(v, type, --(v->length)))
+// pas sur que ça marche
+//#define vec_pop(v, type)  (vec_get(v, type, --(v->length)))
 
 #define reinterpret_cast(ptr_exp, type) (&ptr_exp)
 
@@ -32,7 +33,7 @@ typedef struct
 #define vec_remove_end(v)\
 {\
     vec* _v = (v);\
-    check(("vec_remove_end() : vec have no element", _v->length >= 0));\
+    check(_v->length >= 0);\
     _v->length--;\
     vec_shrink_if_needed(_v);\
 }
@@ -57,18 +58,17 @@ typedef struct
 {\
     vec* _v = (v);\
     type _value = (value);\
-    int idx = -1;\
+    int _idx = -1;\
 \
-    repeat(i, _v->length)\
+    repeat(_i, _v->length)\
     {\
-        if(vec_get(_v, type, i) == _value)\
+        if(vec_get(_v, type, _i) == _value)\
         {\
-            idx = i;\
+            _idx = _i;\
             break;\
         }\
     }\
-    idx;\
-    *int_ptr_result = idx\
+    *int_ptr_result = _idx;\
 }
 
 #define vec_insert(v, type, idx, value)\

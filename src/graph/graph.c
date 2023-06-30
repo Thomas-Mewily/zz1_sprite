@@ -1,5 +1,19 @@
 #include "base.h"
 
+float graph_node_length_pixel_from_point(context* c, graph* g, int idx, float x, float y)
+{
+    return length(x, y, camera_graph_pos_2_pixel_pos_x(c, g, graph_node_x(g, idx)), camera_graph_pos_2_pixel_pos_y(c, g, graph_node_y(g, idx)));
+}
+bool graph_node_is_touched_by(context* c, graph* g, int idx, float x, float y)
+{
+    return graph_node_length_pixel_from_point(c, g, idx, x, y) < NODE_RADIUS_PIXEL*1.5;
+}
+bool graph_node_is_touched_by_mouse(context* c, graph* g, int idx) 
+{
+    return graph_node_is_touched_by(c, g, idx, input_mouse_x(c), input_mouse_y(c));
+}
+
+
 void node_init(graph* g, int idx)
 {
    node* n = graph_get_node(g, idx);
@@ -7,15 +21,18 @@ void node_init(graph* g, int idx)
    n->exist = false;
    n->x = 0;
    n->y = 0;
+   n->etat = node_a_visiter;
    n->neightbors = vec_empty(int);
+   n->order = -1;
 }
 
 void join_init(join* j, int a, int b)
 {
    j->a = a;
    j->b = b;
-   j->exist = false;
+   j->_exist = false;
 
+   j->distance = -1;
    j->distance_opti = -1;
    j->distance_opti_node_a_passer = vec_empty(int);
 }
@@ -70,7 +87,7 @@ graph* graph_empty()
    g->_nodes = null;
    g->_joins = null;
    g->_nb = 0;
-   g->draw_text_info = true;
+   g->draw_text_info = GRAPH_DISPLAY_MODE_GRAPHIC;
    return g;
 }
 
@@ -79,6 +96,7 @@ void graph_was_edited(graph* g)
 {
     g->doit_calculer_distance_opti = true;
 }
+
 
 float graph_join_get_distance_opti(graph* g, int a, int b)
 {
@@ -119,14 +137,16 @@ vec* graph_node_get_neighbors_vec(graph*g , int idx){
 bool graph_join_exist(graph*g, int a, int b) 
 { 
     if(a == b) { return false; }
-    return graph_get_join(g, a, b)->exist;
+    return graph_get_join(g, a, b)->_exist;
 }
-bool graph_node_exist(graph*g, int idx)      { return graph_get_node(g, idx)->exist;  }
+bool graph_node_exist(graph*g, int idx)   { return graph_get_node(g, idx)->exist;  }
 
 void update_join_length(graph*g , int a , int b)
 {
+    if(graph_join_exist(g, a, b) == false) return;
     join* j = graph_get_join(g ,a ,b);
-    j->distance = length(graph_node_x(g,a),graph_node_y(g,a),graph_node_x(g,b),graph_node_y(g,b));
+    j->distance = length(graph_node_x(g,a), graph_node_y(g,a), graph_node_x(g,b), graph_node_y(g,b));
+    g->doit_calculer_distance_opti = true;
 }
 
 void graph_add_join(graph*g , int a , int b)
@@ -136,7 +156,7 @@ void graph_add_join(graph*g , int a , int b)
     bool j_exist = graph_join_exist(g, a, b);
     if(a_exist && b_exist && (j_exist == false) && a != b)
     {
-        graph_get_join(g ,a ,b)->exist = true;
+        graph_get_join(g ,a ,b)->_exist = true;
         update_join_length(g, a, b);
         vec_add(graph_get_node(g, a)->neightbors, int, b);
         vec_add(graph_get_node(g, b)->neightbors, int, a);
@@ -154,7 +174,7 @@ int graph_add_node_x_y(graph* g, float x, float y)
     int i = g->_nb;
     repeat(j, g->_nb)
     {
-        join_init(&(g->_joins[g->_nb][j]), i, j);
+        join_init(&(g->_joins[i][j]), i, j);
     }
     g->_nb++;
 
@@ -250,6 +270,18 @@ void graph_printf(graph* g)
     }
 }
 
+node* graph_get_node_touched_by_mouse(context* c, graph* g)
+{
+    repeat(i, graph_get_nb_node(g))
+    {
+        if(graph_node_is_touched_by_mouse(c, g, i))
+        {
+            return graph_get_node(g, i);
+        }
+    }
+    return null;
+}
+
 void recalculer_etendu(graph * g)
 {
     g->x_etendu = 0;
@@ -271,6 +303,7 @@ void recalculer_etendu(graph * g)
 
     g->x_etendu = g->x_max - g->x_min;
     g->y_etendu = g->y_max - g->y_min;
+    g->rectangle_length = length(0,0, g->x_etendu, g->y_etendu);
 }
 
 void graph_set_node_x_y(graph * g , int a, float x, float y)
@@ -279,12 +312,50 @@ void graph_set_node_x_y(graph * g , int a, float x, float y)
     graph_get_node(g, a)->x = x;
     graph_get_node(g, a)->y = y;
     recalculer_etendu(g);
-    graph_was_edited(g);
     repeat(n, graph_node_get_nb_neighbors(g, a))
     {
         int b = graph_get_node_neighbors(g, a, n);
         update_join_length(g, a, b);
     }
+    graph_was_edited(g);
+    
+}
+
+void graph_join_set_distance(graph* g, int a, int b, float distance)
+{
+    if(graph_join_exist(g, a, b) == false) return;
+    graph_get_join(g, a, b)->distance = distance;
+    graph_was_edited(g);
+}
+
+
+void graph_set_order_label(graph* g, vec* path)
+{
+    return; //NE MARCHE PAS
+    int nb_node = graph_get_nb_node(g);
+    for (int i = 0; i < nb_node; i++)
+    {
+        graph_get_node(g, i)->order = -1;
+    }
+    debug;
+    for (int i = 0; i < nb_node; i++)
+    {
+        int r=0;
+        bool run = true;
+        while (r<path->length && run)
+        {
+            if (vec_get(path, int, r) == i)
+            {
+                run = false;
+            }
+            r++;
+        }
+        if (run) {r = -1;}
+        SDL_Log("r = %d\n", r);
+        //vec_index_of(path, int, i, &r);//Réccupère la premiere apparition du noeud dans le chemin
+        graph_get_node(g, i)->order = r;
+    }
+    debug;
 }
 
 graph* graph_complet(int nb_node)
@@ -453,7 +524,6 @@ void join_set_distance_opti_parcours(join* j, float distance, vec* /* int */ che
 
 void graph_calculer_distance_noeud(graph* g, int source)
 {   
-    #if 0
     graph_check_index(g, source);
     graph_nodes_toute_annoter(g, annoter_blanc);
     graph_node_annoter(g, source, annoter_noir);
@@ -462,12 +532,12 @@ void graph_calculer_distance_noeud(graph* g, int source)
     vec* chemin_source_vers_source = vec_empty(int);
     vec_push(chemin_source_vers_source, int, source);
     vec_push(prev, reach_info, create_reach_info(source, 0, chemin_source_vers_source));
-
+    
     forever
     {
         float d_min = 10E10;
 
-        int a_prev_idx = -1;
+        int best_a_idx_in_prev = -1;
         int best_a = -1;
         int best_b = -1;
 
@@ -478,77 +548,54 @@ void graph_calculer_distance_noeud(graph* g, int source)
             int a = info->node_idx;
 
             int a_nb_neighbors = graph_node_get_nb_neighbors(g, a);
-            debug;
 
             for(int k = 0; k < a_nb_neighbors; k++)
             {   
                 int b = graph_get_node_neighbors(g, a, k);
-                debug;
                 if(graph_node_en_noir(g, b)) { continue; } // déjà parcouru
-                debug;
                 
                 join* j = graph_get_join(g, a, b);
-                if(!j->exist) { continue; } // le join existe pas
-                debug;
+                if(!(j->_exist)) { continue; } // le join existe pas
 
-                float longueur_pour_aller_sur_b = longueur_depuis_a + j->distance; 
-                if(longueur_pour_aller_sur_b < d_min)
+                float longueur_pour_aller_sur_b_depuis_a = longueur_depuis_a + j->distance; 
+                if(longueur_pour_aller_sur_b_depuis_a < d_min)
                 {
-                    d_min = longueur_pour_aller_sur_b;
-                    a_prev_idx = i;
+                    d_min = longueur_pour_aller_sur_b_depuis_a;
+                    best_a_idx_in_prev = i;
                     best_a = a;
                     best_b = b;
                 }
             }   
         }
 
-        debug;
 
         if(best_a == -1)
         {
             goto end;
         }
 
-        // on traite le join entre a et b
-        printf("a = %i, b = %i\n", best_a, best_b);
-        graph_get_join(g, best_a, best_b)->distance_opti = d_min;
-        debug;
+        reach_info* best = &(vec_get(prev, reach_info, best_a_idx_in_prev));
 
-        vec* /* int */ chemin_vers_best_b = vec_clone(vec_get(prev, reach_info, a_prev_idx).chemin);
-        debug;
+        vec* /* int */ chemin_vers_best_b = vec_clone(best->chemin);
 
         vec_push(chemin_vers_best_b, int, best_b);
-        debug;
 
-        join_set_distance_opti_parcours(graph_get_join(g, best_a, best_b), d_min, chemin_vers_best_b);
-        debug;
+        float distance_total_from_source = d_min;
+        join_set_distance_opti_parcours(graph_get_join(g, source, best_b), distance_total_from_source, chemin_vers_best_b);
 
-        vec_push(prev, reach_info, create_reach_info(best_b, d_min, chemin_vers_best_b));
+        vec_push(prev, reach_info, create_reach_info(best_b,  distance_total_from_source, chemin_vers_best_b));
 
         graph_node_annoter(g, best_b, annoter_noir);
-        debug;
 
     }
-
     end:
-    debug;
 
-    /*
-    while(prev->length > 0)
+    repeat(i, prev->length)
     {
-        debug;
-        vec* v = vec_pop(prev, reach_info).chemin;
-        debug;
+        vec* v = vec_get(prev, reach_info, i).chemin;
         vec_free_lazy(v);
-        debug;
-    }*/
-
-    debug;
-
-    
+    }
     vec_free_lazy(prev);
-    vec_free_lazy(chemin_source_vers_source);
-    #endif
 }
 
 void graph_calculer_distance_opti(graph* g)
@@ -578,22 +625,19 @@ float path_calculate_length(graph* g, vec* path)
     int elt_count = path->length;
     if (elt_count <= 1) {return 0;}
     elt_count--;
-debug;
     float length = 0;
-
+    UNUSED(length);
     for (int i = 0; i < elt_count; i++)
     {
-        debug;
         int a = vec_get(path, int, i);
-        debug;
         int b = vec_get(path, int, i+1);
-        debug;
         join* j = graph_get_join(g, a, b);
-        debug;
+        UNUSED(j);
+
         //length += j->distance;
     }
     //return length;
-    return rand()%100;
+    return rand()%1000;
 }
 
 graph* graph_generate(int nb_node, rectf area_contained, float proba)
@@ -603,6 +647,22 @@ graph* graph_generate(int nb_node, rectf area_contained, float proba)
     graph_link_fill_joins(newG, proba);
     return newG;
 }
+
+void graph_change_distances(graph* g)
+{
+    repeat(i, graph_get_nb_node(g))
+    {
+        repeat(j, graph_get_nb_node(g))
+        {
+            if(i == j) continue;
+            
+            float futur_distance = graph_get_join(g,i,j)->distance * (rand()%4+1);
+            graph_join_set_distance(g, i, j, futur_distance);
+        }
+    }
+}
+
+
 #define A 0.999
 float t_ud_geometric(float t) {return A * t;}
 
@@ -624,36 +684,27 @@ vec* graph_recuit_simule(graph* g, float motivation, float(*t_update)(float), fl
 
     int nb_no_progress_iter = 0;
     int min_iter = nb_node * motivation;
-    debug;
     while (nb_no_progress_iter < min_iter)
     {    
-        debug;
         perm_path = vec_clone(curr_path);
-        debug;
         int a, b;
         do
         {   a = rand()%(nb_node-1)+1;
             b = rand()%(nb_node-1)+1;
         } while (a == b);
-        debug;
         int tmp = vec_get(perm_path, int, a);
-        debug;
         vec_set(perm_path, int, a, vec_get(perm_path, int, b));
-        debug;
         vec_set(perm_path, int, b, tmp); 
-debug;
         float curr_length = path_calculate_length(g, curr_path);
-        debug;
         float perm_length = path_calculate_length(g, perm_path);
-        debug;
-        float delta = curr_length - perm_length;
-        debug;
+        float delta =  perm_length - curr_length;
+        SDL_Log("delta %f\n", delta);
         bool swap = false;
         if (delta > 0) {swap = true;}
         else
         {
             float p = expf(-(delta)/t);
-
+            SDL_Log("proba : %f\n", p);
             if ( rand()%1000 < (int)(p*1000)) {swap = true;}
             else { nb_no_progress_iter ++;}
         }
@@ -662,9 +713,11 @@ debug;
             vec_copy(perm_path, curr_path, 0, perm_path->length, 0);
             nb_no_progress_iter = 0;
         }
-        debug;
         t = t_update(t);
-        debug;
+        SDL_Log("nb it useless %d t %f\n", nb_no_progress_iter, t);
     }
+
     if (nb_no_progress_iter >= min_iter) {SDL_Log("Sorti de la boucle de manière officielle\n");}
+
+        return null;
 }

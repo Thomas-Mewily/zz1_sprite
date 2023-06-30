@@ -8,7 +8,7 @@ scene* scene_create_arg(char name[256], scene_fn load, scene_fn unload, scene_fn
 
     i->message = message;
 
-    i->background_color = color_black;
+    i->background_color = rgb(127, 51, 64);//color_black;
     repeat(k, scene_name_max_length)
     {
         i->name[k] = name[k];
@@ -75,8 +75,12 @@ void scene_draw(context* c, scene* sce)
 void scene_printf(context* c, scene* sce)
 {
     if(sce == null) return;
-    printf("scene %s:\n", sce->info.name);
+
+    printf("global state printf :\n");
+    global_state_printf(c);
+    printf("scene %s printf:\n", sce->info.name);
     sce->info.printf(get_argument);
+
     printf("\n");
 }
 
@@ -91,6 +95,11 @@ void scene_set_active(context* c, scene* sce)
     if(sce == null) { return;}
     if(sce->info.is_loaded == false)
     {
+        /*
+        if(((scene*)c->scene))
+        {
+            sce->info.background_color = ((scene*)c->scene)->info.background_color;
+        }*/
         sce->info.is_loaded = true;
         sce->info.load(get_argument);
     }

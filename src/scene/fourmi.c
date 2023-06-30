@@ -9,11 +9,13 @@ typedef struct
 void scene_fourmi_load(argument arg)
 {
     obtenir_state;
+    /*
+
     s->ants = vec_empty(ant);
     repeat(i, 50)
     {
         
-    }
+    }*/
 }
 
 void scene_fourmi_unload(argument arg)

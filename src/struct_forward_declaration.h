@@ -14,3 +14,4 @@ typedef SDL_Event event;
 typedef struct node node;
 typedef struct join join;
 typedef struct graph graph;
+typedef vec /*of int*/ trajet;

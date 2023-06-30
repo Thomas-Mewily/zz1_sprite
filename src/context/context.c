@@ -21,6 +21,8 @@ context* context_create(char* window_name, int width, int height, Uint32 flags)
     
     global_state_load(c);
 
+    c->timer = 0;
+    c->nb_update = 0;
     c->should_exit = false;
     twice(context_update(c););
     
@@ -52,11 +54,11 @@ void context_update(context* c)
 {
     window_update(c); // Oh shit, it's gonna take a loooong time...
 
-
     //printf("window %i %i, mouse %i %i\n", c->window_width, c->window_height, c->mouse_x, c->mouse_y);
     // todo faire/dépalcer le fichier input dans context ?
 
     c->timer = from_ms(SDL_GetTicks());
+    c->nb_update++;
 
     SDL_Event ev;
     while(SDL_PollEvent(&ev))
@@ -68,7 +70,6 @@ void context_update(context* c)
         }
 
         if(input_event(c, &ev))  { continue; }
-        if(camera_event(c, &ev)) { continue; }
         if(global_state_event(c, &ev)) { continue; }
         
         switch (ev.type)
@@ -79,16 +80,13 @@ void context_update(context* c)
                 switch (ev.key.keysym.sym)
                 {
                     case SDLK_ESCAPE: c->should_exit = true; continue;
-                    // Debug
-                    case SDLK_d: scene_printf(c, (scene*)(c->scene)); break;
-                    // menu Principal
-                    case SDLK_p: scene_set(c, titre); break;
                     default: break;
                 }
             } break;
             default: break;
         }
-        scene_event(c, (scene*)(c->scene), &ev);
+        if(scene_event(c, (scene*)(c->scene), &ev)) { continue; }
+        if(camera_event(c, &ev)) { continue; }
     }
 
     input_update(c);

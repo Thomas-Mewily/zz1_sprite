@@ -15,7 +15,7 @@ void scene_thomas_parallax_load(argument arg)
 {
     obtenir_state;
 
-    sce->info.background_color = color_black;
+    sce->info.background_color = rgb(107, 51, 135);
 
     s->parallax[0] = load_parallax(1);
     s->parallax[1] = load_parallax(2);

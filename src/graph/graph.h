@@ -26,10 +26,11 @@ struct node
 
     int annotation; // Cache pour savoir si on est déjà passer sur le noeud 
     int selected_flag;
+    int order;
 };
 struct join
 {
-    bool exist;
+    bool _exist;
     int a;
     int b;
 
@@ -39,7 +40,21 @@ struct join
     vec* /*int*/ distance_opti_node_a_passer;
 };
 
+#define NODE_RADIUS_PIXEL (c->screen_height/64.0)
+
+
+float graph_node_length_pixel_from_point(context* c, graph* g, int idx, float x, float y);
+bool graph_node_is_touched_by(context* c, graph* g, int idx, float x, float y);
+bool graph_node_is_touched_by_mouse(context* c, graph* g, int idx);
+
 float graph_join_get_distance_opti(graph* g, int a, int b);
+
+typedef int graph_display_mode;
+#define GRAPH_DISPLAY_MODE_NO_TEXT      0
+#define GRAPH_DISPLAY_MODE_MINIMAL_TEXT 1
+#define GRAPH_DISPLAY_MODE_LOT_OF_TEXT  2
+#define GRAPH_DISPLAY_MODE_GRAPHIC      3
+#define GRAPH_DISPLAY_MODE_MODULO       (GRAPH_DISPLAY_MODE_GRAPHIC+1)
 struct graph
 {
     int    _nb; // nb nodes et joins
@@ -53,9 +68,11 @@ struct graph
     float y_min;
     float y_max;
     float y_etendu;
+
+    float rectangle_length; // basé sur l'étendu
     
     rectf draw_dest;
-    bool  draw_text_info;
+    graph_display_mode  draw_text_info;
 
     bool doit_calculer_distance_opti;
 };
@@ -100,6 +117,8 @@ void graph_nodes_toute_annoter(graph * g, int val);
 bool graph_node_en_blanc(graph* g, int idx);
 bool graph_node_en_noir (graph* g, int idx);
 
+void graph_set_order_label(graph* g, vec* path);
+
 void graph_printf(graph* g);
 
 graph* graph_complet(int nb_noeud);
@@ -113,6 +132,10 @@ void graph_calculer_distance_opti(graph* g);
 vec* graph_recuit_simule(graph* g, float motivation, float(*t_update)(float), float t_start);
 
 graph* graph_generate(int nb_node, rectf area_contained, float proba);
+void graph_join_set_distance(graph* g, int a, int b, float distance);
+
+node* graph_get_node_touched_by_mouse(context* c, graph* g);
+void graph_change_distances(graph* g);
 
 float t_ud_geometric(float t);
 

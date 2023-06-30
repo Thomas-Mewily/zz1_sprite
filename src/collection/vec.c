@@ -22,6 +22,7 @@ vec* _vec_new_with_capacity(nuint sizeof_type, nuint capacity)
 
 void vec_free_lazy(vec* v)
 {
+    if(v == null) return;
     free(v->values);
     free(v);
 }

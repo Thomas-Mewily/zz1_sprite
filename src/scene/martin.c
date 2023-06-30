@@ -5,8 +5,6 @@ typedef struct
    float hue;
    float color_change_speed;
    texture* steve;
-//    sprite_sheet* froggyS;
-//    anim* froggyAnim;
    graph* graph_test;
 } state;
 
@@ -24,19 +22,22 @@ void scene_martin_load(argument arg)
     s->color_change_speed = 0.7;
     set_bg_color(arg);
     s->steve = texture_create(c, "asset/steve.png");
-    // s->froggyS = sprite_sheet_create(c, "asset/froggyChair.png", 54, 54);
-    // s->froggyAnim = animation_create(s->froggyS, frequence_s(20));
 
     int nb_node = 10;
     s->graph_test = graph_generate(nb_node, rectanglef(40, 40, window_width(c), window_height(c)), 0.2);
 
-    graph_recuit_simule(s->graph_test, 5, &t_ud_geometric, 10);
+    vec* path = graph_recuit_simule(s->graph_test, 0.5, &t_ud_geometric, 1000);
+    UNUSED(path);
+
+    debug;
+    //graph_set_order_label(s->graph_test, path);
 }
 
 void scene_martin_unload(argument arg)
 {
     obtenir_state;
     texture_free(s->steve);
+    
     // rip la mémoire occuper par froggyS et froggyAnim
     // n'inclue pas froggyAnim dans cette affaire, il est innocent...
 }

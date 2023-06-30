@@ -3,6 +3,7 @@
 
 typedef struct 
 {
+    int dummy;
    //texture* steve;
    graph* g;
    ant* a;

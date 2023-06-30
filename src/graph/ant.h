@@ -34,5 +34,3 @@ float ant_destination_y(ant* a);
 
 void ant_update(time delta_time, ant* a);
 void ant_display(context* t, ant* a);
-
-#endif

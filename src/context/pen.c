@@ -31,11 +31,8 @@ void pen_line(context* c, float x1, float y1, float x2, float y2) { pen_pixel_li
 void pen_dot(context* c, float x, float y) { pen_pixel(c, x, y); }
 void pen_rect(context* c, rectf r) { pen_pixel_rect(c, r); }
 
-#define X(x) apply_x_offset(c, x)
-#define Y(y) apply_y_offset(c, y)
-
-float apply_x_offset(context* c, float x) { return (x - camera_x(c))*camera_scale_x(c); }
-float apply_y_offset(context* c, float y) { return (y - camera_y(c))*camera_scale_y(c); }
+#define X(x) camera_cam_pos_2_pixel_pos_x(c, x)
+#define Y(y) camera_cam_pos_2_pixel_pos_y(c, y)
 
 rectf apply_offset(context* c, rectf r)
 {
@@ -44,16 +41,29 @@ rectf apply_offset(context* c, rectf r)
 
 void pen_pixel(context* c, float x, float y) { SDL_RenderDrawPointF(renderer, X(x), Y(y)); }
 void pen_pixel_line(context* c, float x1, float y1, float x2, float y2) { SDL_RenderDrawLineF(renderer, X(x1), Y(y1), X(x2), Y(y2)); }
-void pen_pixel_rect(context* c, rectf r) { r = apply_offset(c, r); SDL_RenderFillRectF(renderer, &r); }
+void pen_pixel_rect(context* c, rectf r) 
+{ 
+    r = apply_offset(c, r);
+    SDL_RenderFillRectF(renderer, &r);
+}
 void pen_circle(context* c, float x, float y, float radius) { pen_oval(c, x, y, radius, radius); }
 void pen_oval(context* c, float x, float y, float radius_x, float radius_y)
 {
+    rectf dest_pixel = apply_offset(c, rectanglef(x-radius_x,y-radius_y,2*radius_x,2*radius_y));
+    if(dest_pixel.x > window_width(c) || dest_pixel.y > window_height(c) ||
+        dest_pixel.x +dest_pixel.w < 0 || dest_pixel.y +dest_pixel.h < 0
+      )
+      {
+        return; // ovale off screen
+      }
+
     if((c->pen_mode) & PEN_MODE_FILLED)
     {
-        int stepPrecision = 2;
-        for(int rx = 0; rx <= radius_x+1; rx+=stepPrecision)
+        float stepPrecision = 2/c->camera_scale_y;
+        float rx_max = radius_x+1/c->camera_scale_y;
+        for(float rx = 0; rx < rx_max; rx+=stepPrecision)
         {
-            int height = ((float)(radius_y))*sqrt(1-(1-rx/(float)radius_x)*(1-rx/(float)radius_x));
+            float height = radius_y*sqrt(1-(1-rx/radius_x)*(1-rx/radius_x));
             pen_rect(c, rectanglef(x-radius_x+rx,y-height, stepPrecision, 2*height));
             pen_rect(c, rectanglef(x+radius_x-rx,y-height, stepPrecision, 2*height));
         }
@@ -215,7 +225,7 @@ void pen_animation(context* c, animation* a, rectf dest, time t)
 
 void pen_text_at(context* c, char* text, float x, float y, float pixel_ligne_height)
 {
-    int offset_x = 0; int offset_y = 0;
+    float offset_x = 0; int offset_y = 0;
     float step = pixel_ligne_height/LETTER_HEIGHT* LETTER_WIDTH;
     int text_length = (int)strlen(text);
     for (int i = 0; i < text_length; i++)
@@ -297,18 +307,6 @@ void pen_unload(context* c)
     texture_free(c->_pen_font);
 }
 
-// graph -> windows pixel
-float pen_get_graph_pos_x(float pos, graph* g)
-{
-    return (pos-g->x_min)/g->x_etendu * g->draw_dest.w + g->draw_dest.x;
-}
-
-// graph -> windows pixel
-float pen_get_graph_pos_y(float pos, graph* g)
-{
-    return (pos-g->y_min)/g->y_etendu * g->draw_dest.h + g->draw_dest.y;
-}
-
 void pen_graph(context* c, graph* g)
 {
     /*
@@ -319,61 +317,217 @@ void pen_graph(context* c, graph* g)
     c->camera_scale_x *= height_pixel;
     c->camera_scale_y *= height_pixel;*/
 
-    repeat(i, graph_get_nb_node(g))
+    if(g->draw_text_info == GRAPH_DISPLAY_MODE_LOT_OF_TEXT)
     {
-        pen_node(c, g, i);
-
-        for(int k = 0; k < graph_node_get_nb_neighbors(g,i); k++)
+        repeat(i, graph_get_nb_node(g))
         {
-            int j = graph_get_node_neighbors(g,i,k);
-            if(j < i)
+            pen_node(c, g, i);
+
+            repeat(j, i)
+            {   
+                pen_join(c, g, i, j);
+            }
+        }
+    }else
+    {
+        repeat(i, graph_get_nb_node(g))
+        {
+            pen_node(c, g, i);
+
+            for(int k = 0; k < graph_node_get_nb_neighbors(g, i); k++)
             {
+                int j = graph_get_node_neighbors(g,i,k);
                 pen_join(c, g, i, j);
             }
         }
     }
+
 
     //camera_set_state(c, cs);
 }
 
 void pen_node (context* c, graph* g, int i)
 {
-    pen_color(c, color_black);
-    float radius = c->screen_height/64.0;
+    float radius = NODE_RADIUS_PIXEL;
     node* n = graph_get_node(g, i);
-    float x = pen_get_graph_pos_x(graph_node_x(g,i), g);
-    float y = pen_get_graph_pos_y(graph_node_y(g,i), g);
+    float x = camera_graph_pos_2_cam_pos_x(c, g, graph_node_x(g,i));
+    float y = camera_graph_pos_2_cam_pos_y(c, g, graph_node_y(g,i));
+
+    pen_color(c, color_black);
     pen_oval(c, x, y, radius/c->camera_scale_x, radius/c->camera_scale_y);
 
-    if(g->draw_text_info)
+    color co = rgb(192,192,192);
+    if(graph_get_nb_node(g) <= 32 && graph_node_is_touched_by_mouse(c,g,i))
     {
-        float txt_x = x;
-        float txt_y = y;
-        pen_formatted_text_at_center(c, txt_x, txt_y, FONT_SIZE_NORMAL, 0.5, 1, "%i",  n->idx);
+        co = color_white;
+    }
+    pen_color(c, co);
+
+    radius *= 0.8;
+    pen_oval(c, x, y, radius/c->camera_scale_x, radius/c->camera_scale_y);
+    //pen_rect(c, rectanglef(x-radius/c->camera_scale_x/2, y-radius/c->camera_scale_y/2, radius/c->camera_scale_x, radius/c->camera_scale_y));
+
+    switch (g->draw_text_info)
+    {
+        case GRAPH_DISPLAY_MODE_MINIMAL_TEXT:
+        case GRAPH_DISPLAY_MODE_LOT_OF_TEXT:
+        {
+            float txt_x = x;
+            float txt_y = y;
+            //pen_formatted_text_at_center(c, txt_x, txt_y, FONT_SIZE_NORMAL, 0.5, 1, "#%i order%i",  n->idx, n->order);
+            pen_formatted_text_at_center(c, txt_x, txt_y, FONT_SIZE_NORMAL, 0.5, 1, "%i",  n->idx);
+        }
+        break;
+    
+        case GRAPH_DISPLAY_MODE_GRAPHIC:
+        {
+            if(n->etat == node_a_visiter)
+            {
+                float scale = 4;
+                pen_animation_at_center(c, gs->diamant_anim, x, y, scale, scale, 0.5, 0.5, timer_since_launch(c));
+            }
+        }
+        break;
+        default: break;
+            
     }
 }
 
 void pen_join (context* c, graph* g, int a, int b)
 {
-    if(graph_join_exist(g, a, b) == false) { return; }
+    if(a == b) { return; }
+    join* j = graph_get_join(g,a,b);
+    bool exist = graph_join_exist(g, a, b);
+
+    // node existe pas
+    if(exist == false && g->draw_text_info != GRAPH_DISPLAY_MODE_LOT_OF_TEXT) {  return; }
+
+    color co = color_black;
+    if(g->draw_text_info == GRAPH_DISPLAY_MODE_LOT_OF_TEXT)
+    {
+        if(exist == false){ co = rgba(0,255,0,0); }
+        else if(j->distance_opti < j->distance)
+        {
+            co = color_red;
+        }
+    }
+    pen_color(c, co);
     
-
-    pen_color(c, color_black);
-    float x1 = pen_get_graph_pos_x(graph_node_x(g,a), g);
-    float y1 = pen_get_graph_pos_y(graph_node_y(g,a), g);
-    float x2 = pen_get_graph_pos_x(graph_node_x(g,b), g);
-    float y2 = pen_get_graph_pos_y(graph_node_y(g,b), g);
-
+    float x1 = camera_graph_pos_2_cam_pos_x(c, g, graph_node_x(g,a));
+    float y1 = camera_graph_pos_2_cam_pos_y(c, g, graph_node_y(g,a));
+    float x2 = camera_graph_pos_2_cam_pos_x(c, g, graph_node_x(g,b));
+    float y2 = camera_graph_pos_2_cam_pos_y(c, g, graph_node_y(g,b));
 
     pen_line(c,x1, y1, x2, y2);
 
     if(g->draw_text_info)
     {
-        float txt_x = (x1 + x2)/2;
-        float txt_y = (y1 + y2)/2;
-        float txt_y_offset = FONT_SIZE_SMALL/2;
+        //float txt_x = (x1 + x2)/2;
+        //float txt_y = (y1 + y2)/2;
+        float font_size = FONT_SIZE_SMALL;
+        float txt_y_offset = font_size*0.35;
 
-        pen_formatted_text_at_center(c, txt_x, txt_y+txt_y_offset, FONT_SIZE_SMALL, 0.5, 0.5, "%.3f",  graph_get_join(g, a, b)->distance);
-        pen_formatted_text_at_center(c, txt_x, txt_y-txt_y_offset, FONT_SIZE_SMALL, 0.5, 0.5, "%.3f",  graph_join_get_distance_opti(g, a, b));
+        float mx = camera_pixel_pos_2_cam_pos_x(c, input_mouse_x(c));
+        float my = camera_pixel_pos_2_cam_pos_y(c, input_mouse_y(c));
+
+        //float diag = (g->x_etendu*g->y_etendu);
+        //float coef1 = 1 + diag/(length(x1, y1, mx, my)+0.1*diag);
+        //float coef2 = 1 + diag/(length(x2, y2, mx, my)+0.1*diag);
+        
+        float coef1 = 1 + (length(x1, y1, mx, my)+0.1);
+        float coef2 = 1 + (length(x2, y2, mx, my)+0.1);
+
+        //coef1 = 1;
+        //coef2 = 1;
+
+
+        float txt_x = (x1 * coef1 + x2 * coef2) / ( coef1 + coef2);
+        float txt_y = (y1 * coef1 + y2 * coef2) / ( coef1 + coef2);
+
+        /*
+        float xm = input_mouse_x(c);
+        float ym = input_mouse_y(c);
+
+        float t = ((xm-x1)*(x2-x1)+(ym-y1)*(y2-y1))/(squared((x2-x1))+squared(y2-y1));
+        float xs= x1+t*(x2-x1);
+        float ys= y1+t*(y2-y1);
+
+        txt_x = xs;
+        txt_x = ys;*/
+        pen_formatted_text_at_center(c, txt_x, txt_y-txt_y_offset, font_size, 0.5, 0.5, "%.1f",  graph_get_join(g, a, b)->distance);
+
+        if(g->draw_text_info == GRAPH_DISPLAY_MODE_LOT_OF_TEXT)
+        {
+            pen_formatted_text_at_center(c, txt_x, txt_y+txt_y_offset, font_size, 0.5, 0.5, "%.1f",  graph_join_get_distance_opti(g, a, b));
+        }
+    }
+}
+
+
+void pen_line_in_graph(context* c, graph* g, float x1, float y1, float x2, float y2)
+{
+    x1 = camera_graph_pos_2_cam_pos_x(c, g, x1);
+    y1 = camera_graph_pos_2_cam_pos_y(c, g, y1);
+    x2 = camera_graph_pos_2_cam_pos_x(c, g, x2);
+    y2 = camera_graph_pos_2_cam_pos_y(c, g, y2);
+
+    pen_line(c, x1, y1, x2, y2);
+}
+
+// inside graph
+void pen_draw_arrow(context* c, graph* g, float x, float y, angle a)
+{
+    angle a2 = from_degree(135);
+    float radius = 0.1 * NODE_RADIUS_PIXEL;// / camera_scale_x(c);
+    pen_line_in_graph(c, g, x, y, x+cos(a-a2)*radius, y+sin(a-a2)*radius);
+    pen_line_in_graph(c, g, x, y, x+cos(a+a2)*radius, y+sin(a+a2)*radius);
+}
+
+float pen_draw_join_direction(context* c, graph* g, int a, int b)
+{
+    join* j = graph_get_join(g, a, b);
+    if(j == null) return 0;
+
+
+    float x1 = graph_node_x(g, a);
+    float y1 = graph_node_y(g, a);
+
+    float x2 = graph_node_x(g, b);
+    float y2 = graph_node_y(g, b);
+
+    float dx = x2-x1;
+    float dy = y2-y1;
+
+    float l1 = j->distance;
+    float l2  = length(x1, y1, x2, y2);
+
+    float slow = l2/l1;
+
+    angle ang = angle_from_vector(dx, dy);
+
+    //float speed = g->rectangle_length / 32.0;
+    float step = 1/5.0f;
+
+    for(float i = mod(second(timer_scene(c)*slow), step); i < 1; i += step)
+    {
+        pen_draw_arrow(c, g, x1+dx*i, y1+dy*i, ang);
+    }
+
+    pen_line_in_graph(c, g, x1, y1, x2, y2);
+
+    return l1 / g->rectangle_length;
+}
+
+void pen_draw_trajet(context* c, graph* g, trajet* t)
+{
+    if(t == null || trajet_length(t) <= 1) return;
+
+    float hue = 140;
+    for(int i = 0; i<trajet_length(t)-1; i++)
+    {
+        pen_color(c, hsv(mod(hue, 360), 1, 1));
+        pen_draw_join_direction(c, g, trajet_get(t, i), trajet_get(t, i+1));
+        hue += 360/8.0f;
+        //hue += 140.0f;
     }
 }
