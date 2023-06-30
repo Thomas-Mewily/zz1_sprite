@@ -424,7 +424,8 @@ void pen_join (context* c, graph* g, int a, int b)
     {
         //float txt_x = (x1 + x2)/2;
         //float txt_y = (y1 + y2)/2;
-        float txt_y_offset = FONT_SIZE_SMALL*0.35;
+        float font_size = FONT_SIZE_SMALL;
+        float txt_y_offset = font_size*0.35;
 
         float mx = camera_pixel_pos_2_cam_pos_x(c, input_mouse_x(c));
         float my = camera_pixel_pos_2_cam_pos_y(c, input_mouse_y(c));
@@ -453,11 +454,11 @@ void pen_join (context* c, graph* g, int a, int b)
 
         txt_x = xs;
         txt_x = ys;*/
-        pen_formatted_text_at_center(c, txt_x, txt_y-txt_y_offset, FONT_SIZE_SMALL, 0.5, 0.5, "%.2f",  graph_get_join(g, a, b)->distance);
+        pen_formatted_text_at_center(c, txt_x, txt_y-txt_y_offset, font_size, 0.5, 0.5, "%.1f",  graph_get_join(g, a, b)->distance);
 
         if(g->draw_text_info == GRAPH_DISPLAY_MODE_LOT_OF_TEXT)
         {
-            pen_formatted_text_at_center(c, txt_x, txt_y+txt_y_offset, FONT_SIZE_SMALL, 0.5, 0.5, "%.2f",  graph_join_get_distance_opti(g, a, b));
+            pen_formatted_text_at_center(c, txt_x, txt_y+txt_y_offset, font_size, 0.5, 0.5, "%.1f",  graph_join_get_distance_opti(g, a, b));
         }
     }
 }
