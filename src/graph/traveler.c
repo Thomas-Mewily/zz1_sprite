@@ -6,6 +6,7 @@ trajet* trajet_empty() { return vec_empty(int); }
 bool trajet_is_empty(trajet* t) { return t->length == 0; }
 void trajet_add_node(trajet* t, int node_des) { vec_push(t, int, node_des); }
 
+
 #define traveler_timer timer_since_launch(c)
 
 traveler* traveler_create(graph* g, float distance_per_second)

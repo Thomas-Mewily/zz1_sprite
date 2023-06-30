@@ -2,10 +2,13 @@
 
 typedef struct 
 {
-   float hue;
-   float color_change_speed;
-   texture* steve;
-   graph* graph_test;
+    float hue;
+    float color_change_speed;
+    texture* steve;
+    float t;
+    int it_no_progress;
+    int timer_stop;
+    bool finished;
 } state;
 
 void set_bg_color(argument arg)
@@ -23,14 +26,10 @@ void scene_martin_load(argument arg)
     set_bg_color(arg);
     s->steve = texture_create(c, "asset/steve.png");
 
-    int nb_node = 10;
-    s->graph_test = graph_generate(nb_node, rectanglef(40, 40, window_width(c), window_height(c)), 0.2);
-
-    vec* path = graph_recuit_simule(s->graph_test, 0.5, &t_ud_geometric, 1000);
-    UNUSED(path);
-
-    debug;
-    //graph_set_order_label(s->graph_test, path);
+    s->t = 30;
+    s->it_no_progress = 0;
+    s->timer_stop = 0;
+    s->finished = false;
 }
 
 void scene_martin_unload(argument arg)
@@ -42,6 +41,7 @@ void scene_martin_unload(argument arg)
     // n'inclue pas froggyAnim dans cette affaire, il est innocent...
 }
 
+#define WAIT_TIME 200
 void scene_martin_update(argument arg)
 {
     obtenir_state;
@@ -54,6 +54,19 @@ void scene_martin_update(argument arg)
 
     
 
+    if (s->timer_stop >= WAIT_TIME && !s->finished)
+    {
+        vec_free_lazy( gs->path_rs);
+        gs->path_rs = graph_gen_starting_trajet(gs->g);
+        s->finished = graph_recuit_simule_n_it(gs->g, gs->path_rs, 30, &t_ud_geometric, &(s->t), &(s->it_no_progress));
+        gs->longueur_rs = path_calculate_length(gs->g, gs->path_rs);
+        vec_printf_int(gs->path_rs);
+        s->timer_stop = 0;
+    }
+    else
+    {
+        s->timer_stop ++;
+    }
 }
 void scene_martin_draw(argument arg)
 {
@@ -67,29 +80,35 @@ void scene_martin_draw(argument arg)
     // pen_texture_at(c, s->steve, texture_rect(s->steve), 400, 300, 1, 1);
     // pen_animation_at(c, s->froggyAnim, 10, 400, 3, 3, c->timer);
 
-    graph* g = s->graph_test;
-    int offset_x = 0;
-    int offset_y = 0;
-    float radius = 10;
-    float scale = 1;
-    pen_color(c,rgb(0,0,0));
-    repeat(i, graph_get_nb_node(g))
-    {
+    pen_graph(c, gs->g);
 
-        float x = graph_node_x(g,i);
-        float y =graph_node_y(g,i);
-        pen_circle(c,scale*x +offset_x,scale*y+offset_y, radius);
-        //SDL_Log("noeud n°%d, x = %F; y = %f", i, x, y);
-        
-        for(int k = 0; k < graph_node_get_nb_neighbors(g,i); k++)
-        {
-            int j = graph_get_node_neighbors(g,i,k);
-            float xj = graph_node_x(g,j);
-            float yj =graph_node_y(g,j);
-            pen_line(c,scale*x +offset_x,scale*y+offset_y,scale*xj +offset_x,scale*yj+offset_y);
-        }
-    }
+    pen_draw_trajet_full(c, gs->g, gs->path_rs);
+    //pen_draw_trajet(c, gs->g, gs->path_rs);
+
+    // Cancel camera zoom
+    camera_state cs = camera_get_state(c);
+    camera_set_state(c, camera_state_default());
+    // Not affected by scrolling or scalling
+    //pen_formatted_text_at_center(c, 0, 0, FONT_SIZE_NORMAL, 0, 0, "Temps Recuit : %.1f", gs->longueur_rs);
+    camera_set_state(c, cs);
+
 }
 
-bool scene_martin_event (argument arg) { obtenir_state; return false; }
+bool scene_martin_event (argument arg) 
+{ 
+    obtenir_state; 
+            //mousePress(ev->button.);
+    switch (ev->type)
+    {
+        //mousePress(ev->button.);
+        case SDL_KEYDOWN: //case SDL_KEYUP:
+        {
+            switch (ev->key.keysym.sym)
+            {
+                case SDLK_SPACE: s->timer_stop = WAIT_TIME; return  true; break;
+            }
+        }
+    }
+    return false;
+}
 void scene_martin_printf(argument arg) { obtenir_state; }

@@ -518,16 +518,34 @@ float pen_draw_join_direction(context* c, graph* g, int a, int b)
     return l1 / g->rectangle_length;
 }
 
+float _pen_draw_trajet(context* c, graph* g, trajet* t, float hue)
+{
+    if(t == null || trajet_length(t) <= 1) return hue;
+
+    for(int i = 0; i<trajet_length(t)-1; i++)
+    {
+        pen_color(c, hsv(mod(hue, 360), 1, 0.65));
+        pen_draw_join_direction(c, g, trajet_get(t, i), trajet_get(t, i+1));
+        hue += 360/8.0f;
+        //hue += 140.0f;
+    }
+    return hue;
+}
+
 void pen_draw_trajet(context* c, graph* g, trajet* t)
+{
+    _pen_draw_trajet(c, g, t, 140);
+}
+
+
+
+void pen_draw_trajet_full(context* c, graph* g, trajet* t)
 {
     if(t == null || trajet_length(t) <= 1) return;
 
     float hue = 140;
-    for(int i = 0; i<trajet_length(t)-1; i++)
+    for(int i = 0; i < trajet_length(t)-1; i++)
     {
-        pen_color(c, hsv(mod(hue, 360), 1, 1));
-        pen_draw_join_direction(c, g, trajet_get(t, i), trajet_get(t, i+1));
-        hue += 360/8.0f;
-        //hue += 140.0f;
+        hue = _pen_draw_trajet(c, g, graph_get_join(g, trajet_get(t, i), trajet_get(t, i+1))->distance_opti_node_a_passer, hue);
     }
 }

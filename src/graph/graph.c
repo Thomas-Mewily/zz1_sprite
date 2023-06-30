@@ -626,18 +626,15 @@ float path_calculate_length(graph* g, vec* path)
     if (elt_count <= 1) {return 0;}
     elt_count--;
     float length = 0;
-    UNUSED(length);
     for (int i = 0; i < elt_count; i++)
     {
         int a = vec_get(path, int, i);
         int b = vec_get(path, int, i+1);
-        join* j = graph_get_join(g, a, b);
-        UNUSED(j);
-
-        //length += j->distance;
+        if (a==b) {continue;}
+        length += graph_join_get_distance_opti(g, a, b);
     }
-    //return length;
-    return rand()%1000;
+    return length;
+    //return rand()%1000;
 }
 
 graph* graph_generate(int nb_node, rectf area_contained, float proba)
@@ -662,29 +659,37 @@ void graph_change_distances(graph* g)
     }
 }
 
-
-#define A 0.999
-float t_ud_geometric(float t) {return A * t;}
-
-vec* graph_recuit_simule(graph* g, float motivation, float(*t_update)(float), float t_start)
+trajet* graph_gen_starting_trajet(graph* g)
 {
-    int nb_node = graph_get_nb_node(g);
-    float t = t_start;
+    trajet* curr_path = vec_empty(int);
 
-    vec* curr_path = vec_empty(int);
-    vec* perm_path;
+    int nb_node = graph_get_nb_node(g);
 
     vec_add(curr_path, int, node_depart);
     for (int i = 1; i < nb_node; i++)
     {
-        vec_add(curr_path, int, node_depart);
+        vec_add(curr_path, int, i);
     }
     vec_add(curr_path, int, node_depart);
     //curr_path est de la forme [0 1 2 3 4 ... N-1 N 0]
 
-    int nb_no_progress_iter = 0;
-    int min_iter = nb_node * motivation;
-    while (nb_no_progress_iter < min_iter)
+    return curr_path;
+}
+
+
+#define A 0.999
+float t_ud_geometric(float* t) {return A * *t;}
+
+#define MOTIVATION 0.5
+bool graph_recuit_simule_n_it(graph* g, trajet* starting_path, int n, float(*t_update)(float*), float* t, int* nb_no_progress_iter)
+{
+    int nb_node = graph_get_nb_node(g);
+
+    vec* curr_path = starting_path;
+    vec* perm_path;
+
+    int min_iter = nb_node * MOTIVATION;
+    while (*nb_no_progress_iter < min_iter && n > 0)
     {    
         perm_path = vec_clone(curr_path);
         int a, b;
@@ -692,32 +697,40 @@ vec* graph_recuit_simule(graph* g, float motivation, float(*t_update)(float), fl
         {   a = rand()%(nb_node-1)+1;
             b = rand()%(nb_node-1)+1;
         } while (a == b);
+
+        vec_printf_int(perm_path);
+
         int tmp = vec_get(perm_path, int, a);
         vec_set(perm_path, int, a, vec_get(perm_path, int, b));
         vec_set(perm_path, int, b, tmp); 
+
+        vec_printf_int(perm_path);
         float curr_length = path_calculate_length(g, curr_path);
         float perm_length = path_calculate_length(g, perm_path);
         float delta =  perm_length - curr_length;
-        SDL_Log("delta %f\n", delta);
         bool swap = false;
         if (delta > 0) {swap = true;}
         else
         {
-            float p = expf(-(delta)/t);
-            SDL_Log("proba : %f\n", p);
+            float p = expf(-(delta)/ *t);
             if ( rand()%1000 < (int)(p*1000)) {swap = true;}
-            else { nb_no_progress_iter ++;}
+            else { *nb_no_progress_iter ++;}
         }
         if (swap)
         {
-            vec_copy(perm_path, curr_path, 0, perm_path->length, 0);
-            nb_no_progress_iter = 0;
+            
+            //vec_copy(perm_path, curr_path, 0, perm_path->length, 0);
+            for (int i = 0; i < perm_path->length; i++)
+            {
+                vec_set(curr_path, int, i, vec_get(perm_path, int, i));
+            }
+            
+            *nb_no_progress_iter = 0;
         }
-        t = t_update(t);
-        SDL_Log("nb it useless %d t %f\n", nb_no_progress_iter, t);
+        t_update(t);
+        n--;
     }
-
-    if (nb_no_progress_iter >= min_iter) {SDL_Log("Sorti de la boucle de manière officielle\n");}
-
-        return null;
+    if (*nb_no_progress_iter >= min_iter) {SDL_Log("Sorti de la boucle de manière officielle\n"); return true;}
+    vec_free_lazy(perm_path);
+    return false;
 }
