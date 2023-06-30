@@ -2,10 +2,12 @@
 
 typedef struct 
 {
-   float hue;
-   float color_change_speed;
-   texture* steve;
-   //graph* graph_test;
+    float hue;
+    float color_change_speed;
+    texture* steve;
+    float t;
+    int it_no_progress;
+    int timer_stop;
 } state;
 
 void set_bg_color(argument arg)
@@ -23,13 +25,10 @@ void scene_martin_load(argument arg)
     set_bg_color(arg);
     s->steve = texture_create(c, "asset/steve.png");
 
-    int nb_node = 10;
-    //s->graph_test = graph_generate(nb_node, rectanglef(0, 0, window_width(c), window_height(c)), 0.2);
+    s->t = 30;
+    s->it_no_progress = 0;
+    s->timer_stop = 0;
 
-    vec* path = graph_recuit_simule(gs->g, 0.5, &t_ud_geometric, 100);
-    vec_free_lazy( gs->path_rs);
-    gs->path_rs = path;
-    vec_printf_int(path);
 }
 
 void scene_martin_unload(argument arg)
@@ -41,6 +40,7 @@ void scene_martin_unload(argument arg)
     // n'inclue pas froggyAnim dans cette affaire, il est innocent...
 }
 
+#define WAIT_TIME 200
 void scene_martin_update(argument arg)
 {
     obtenir_state;
@@ -51,8 +51,18 @@ void scene_martin_update(argument arg)
     //camera_set_x(c, window_width(c)/2-input_mouse_x(c)/2);
     //camera_set_y(c, window_width(c)/2-input_mouse_y(c)/2);
 
-    
-
+    if (s->timer_stop >= WAIT_TIME)
+    {
+        vec_free_lazy( gs->path_rs);
+        gs->path_rs = graph_gen_starting_trajet(gs->g);
+        graph_recuit_simule_n_it(gs->g, gs->path_rs, 30, &t_ud_geometric, &(s->t), &(s->it_no_progress));
+        vec_printf_int(gs->path_rs);
+        s->timer_stop = 0;
+    }
+    else
+    {
+        s->timer_stop ++;
+    }
 }
 void scene_martin_draw(argument arg)
 {
