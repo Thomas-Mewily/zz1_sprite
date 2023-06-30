@@ -48,6 +48,7 @@ void global_state_load(context* c)
     //get_graph(c);
     gs->path_rs = vec_empty(int);
     global_state_new_get_graph(c);
+    gs->longueur_rs;
 
     
     /*
