@@ -524,8 +524,9 @@ void pen_draw_trajet(context* c, graph* g, trajet* t)
     float hue = 140;
     for(int i = 0; i<trajet_length(t)-1; i++)
     {
-        pen_color(c, hsv(hue, 1, 1));
+        pen_color(c, hsv(mod(hue, 360), 1, 1));
         pen_draw_join_direction(c, g, trajet_get(t, i), trajet_get(t, i+1));
-        hue += 360/10.0f;
+        hue += 360/8.0f;
+        //hue += 140.0f;
     }
 }
