@@ -10,7 +10,10 @@ typedef struct
     int length;
 } vec;
 
-#define vec_get(v, type, idx) (((type*)v->values)[vec_index_valid_or_die(v, (nuint)idx)])
+#define vec_index_valid_or_die(v, idx) check(vec_index_valid(v, idx));
+
+// crash if outside of range
+#define vec_get(v, type, idx) (((type*)v->values)[(vec_index_valid(v, (nuint)idx)) ? ((nuint)idx): ((nuint)-1)])
 #define vec_set(v, type, idx, value) vec_get(v, type, idx) = value
 
 #define vec_peek(v, type) (vec_get(v, type, v->length-1))
@@ -44,6 +47,7 @@ typedef struct
 {\
     vec* _v = (v);\
     int _idx = (idx);\
+    vec_index_valid_or_die(_v, _idx);\
     if(_idx+1 != _v->length)\
     {\
         vec_copy(_v, _v, (_idx+1)*_v->sizeof_value, (_v->length - _idx-1)*_v->sizeof_value, _idx*_v->sizeof_value);\
@@ -76,7 +80,7 @@ typedef struct
     vec* _v = (v);\
     int _idx = (idx);\
     type _value = (value);\
-    check(()"vec_insert() : index out of range", vec_index_valid(idx)));\
+    vec_index_valid_or_die(_v, _idx);\
     vec_resize_twice_if_needed(_v);\
     vec_copy(_v, _v, _idx*_v->sizeof_value, (_v->length - _idx)*_v->sizeof_value, (_idx + 1)*_v->sizeof_value);\
     ((type*)_v->values)[_idx] = _value;\
@@ -137,7 +141,6 @@ void vec_resize_twice_if_needed(vec* v);
 void vec_shrink_if_needed(vec* v);
 vec* vec_clone(vec* v);
 bool vec_index_valid(vec* v, nuint idx);
-nuint vec_index_valid_or_die(vec* v, nuint idx);
 bool vec_equal(vec* a, vec* b);
 
 bool vec_identical_metadata(vec* a, vec* b);

@@ -95,11 +95,6 @@ void vec_copy(vec* source, vec* destination, nuint sourceByteIdx, nuint sourceBy
 }
 
 bool vec_index_valid(vec* v, nuint idx) { return idx < (nuint)v->length; }
-nuint vec_index_valid_or_die(vec* v, nuint idx)
-{
-    check(vec_index_valid(v, idx));
-    return idx;
-}
 
 bool vec_equal(vec* a, vec* b)
 {

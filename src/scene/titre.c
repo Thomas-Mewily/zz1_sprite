@@ -54,6 +54,8 @@ void scene_titre_draw(argument arg)
     obtenir_state;
     pen_graph(c, gs->g);
 
+    //pen_circle(c, window_width(c)/2, window_height(c)/2, window_height(c)/32.0 * (s->nbFoisPresser+2));
+
     // Cancel camera zoom
     camera_state cs = camera_get_state(c);
     camera_set_state(c, camera_state_default());
@@ -61,8 +63,9 @@ void scene_titre_draw(argument arg)
     
     pen_formatted_text_at_center(c, 0, 0, FONT_SIZE_NORMAL, 0, 0, "Titre (G: %i nodes)", gs->nb_node);
     pen_text_at_center(c, "(FDRJHPM)", 0, FONT_SIZE_NORMAL, FONT_SIZE_NORMAL, 0, 0);
+
+    pen_formatted_text_at_center(c, 0, 2*FONT_SIZE_NORMAL, FONT_SIZE_NORMAL, 0, 0, "%i draw rectf", c->pen_nb_rectangle);
     camera_set_state(c, cs);
-    //pen_circle(c, window_width(c)/2, window_height(c)/2, window_height(c)/32.0 * (s->nbFoisPresser+2));
     //pen_formatted_text_at_center(c, window_width(c)/2,window_height(c)/2, FONT_SIZE_NORMAL, 0.5, 0.5, "UwU tick: %i", c->timer);
 }
 

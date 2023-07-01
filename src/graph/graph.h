@@ -46,7 +46,7 @@ struct join
     float old_testosterone;
 };
 
-#define NODE_RADIUS_PIXEL (c->screen_height/64.0)
+#define NODE_RADIUS_PIXEL (c->screen_height/48.0)
 
 
 float graph_node_length_pixel_from_point(context* c, graph* g, int idx, float x, float y);

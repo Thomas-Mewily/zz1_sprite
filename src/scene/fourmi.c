@@ -153,7 +153,8 @@ void scene_fourmi_update(argument arg)
     {
         simulate_ants(arg, 1, 100, true);
     }
-    if(c->nb_update % (graph_get_nb_node(gs->g)) == 0)
+    //if(c->nb_update % (1+(graph_get_nb_node(gs->g))/5) == 0)
+    if(c->nb_update % (1+(graph_get_nb_node(gs->g))/2) == 0)
     {
         simulate_ants(arg, 1, 500, false);
     }

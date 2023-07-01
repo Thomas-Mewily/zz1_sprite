@@ -26,11 +26,6 @@ color pen_get_color(context* c)
 
 void pen_clear(context* c) { SDL_RenderClear(renderer); }
 
-// todo : affected by pen size
-void pen_line(context* c, float x1, float y1, float x2, float y2) { pen_pixel_line(c, x1, y1, x2, y2); }
-void pen_dot(context* c, float x, float y) { pen_pixel(c, x, y); }
-void pen_rect(context* c, rectf r) { pen_pixel_rect(c, r); }
-
 #define X(x) camera_cam_pos_2_pixel_pos_x(c, x)
 #define Y(y) camera_cam_pos_2_pixel_pos_y(c, y)
 
@@ -39,33 +34,51 @@ rectf apply_offset(context* c, rectf r)
     return rectanglef(X(r.x), Y(r.y), r.w*camera_scale_x(c), r.h*camera_scale_y(c));
 }
 
-void pen_pixel(context* c, float x, float y) { SDL_RenderDrawPointF(renderer, X(x), Y(y)); }
-void pen_pixel_line(context* c, float x1, float y1, float x2, float y2) { SDL_RenderDrawLineF(renderer, X(x1), Y(y1), X(x2), Y(y2)); }
+// todo : affected by pen size
+void pen_line(context* c, float x1, float y1, float x2, float y2) { pen_pixel_line(c, X(x1), Y(y1), X(x2), Y(y2)); }
+void pen_dot(context* c, float x, float y) { pen_pixel(c, X(x), Y(y)); }
+void pen_rect(context* c, rectf r) { r = apply_offset(c, r); pen_pixel_rect(c, r); }
+
+
+
+
+void pen_pixel(context* c, float x, float y) { SDL_RenderDrawPointF(renderer, x, y); }
+void pen_pixel_line(context* c, float x1, float y1, float x2, float y2) { SDL_RenderDrawLineF(renderer, x1, y1, x2, y2); }
 void pen_pixel_rect(context* c, rectf r) 
 { 
-    r = apply_offset(c, r);
+    c->pen_nb_rectangle++;
     SDL_RenderFillRectF(renderer, &r);
 }
-void pen_circle(context* c, float x, float y, float radius) { pen_oval(c, x, y, radius, radius); }
-void pen_oval(context* c, float x, float y, float radius_x, float radius_y)
+
+void pen_pixel_oval(context* c, rectf dest)
 {
-    rectf dest_pixel = apply_offset(c, rectanglef(x-radius_x,y-radius_y,2*radius_x,2*radius_y));
-    if(dest_pixel.x > window_width(c) || dest_pixel.y > window_height(c) ||
-        dest_pixel.x +dest_pixel.w < 0 || dest_pixel.y +dest_pixel.h < 0
-      )
-      {
-        return; // ovale off screen
-      }
+
+    // ovale off screen
+    if(dest.x > window_width(c) || dest.y > window_height(c) || dest.x +dest.w < 0 || dest.y +dest.h < 0) return;
+    float radius_x = dest.w/2;
+    float radius_y = dest.h/2;
+    float x = dest.x+radius_x;
+    float y = dest.y+radius_y;
+    //printf("%f, %f\n", x, y);
 
     if((c->pen_mode) & PEN_MODE_FILLED)
     {
-        float stepPrecision = 2/c->camera_scale_y;
-        float rx_max = radius_x+1/c->camera_scale_y;
-        for(float rx = 0; rx < rx_max; rx+=stepPrecision)
+        int stepPrecision = 1; // 2 pixel tickness
+
+        float radius_begin; 
+        float radius_end; 
+        //radius_begin = maxif(0, radius_x-x);
+        //radius_end = maxif(0, radius_x+(window_width(c)-x));
+
+        //float rx_max = radius_end;  //radius_x;
+
+        radius_begin  = 0;
+        radius_end = radius_x;
+
+        for(float rx = radius_begin; rx < radius_end; rx+=stepPrecision)
         {
             float height = radius_y*sqrt(1-(1-rx/radius_x)*(1-rx/radius_x));
-            pen_rect(c, rectanglef(x-radius_x+rx,y-height, stepPrecision, 2*height));
-            pen_rect(c, rectanglef(x+radius_x-rx,y-height, stepPrecision, 2*height));
+            pen_pixel_rect(c, rectanglef(x-radius_x+rx,y-height, 2*(radius_x - rx), 2*height));
         }
     }else if((c->pen_mode) & PEN_MODE_HOLLOW)
     {
@@ -84,12 +97,20 @@ void pen_oval(context* c, float x, float y, float radius_x, float radius_y)
 
                 int new_x = cos(a)*radius_x;
                 int new_y = sin(a)*radius_y;
-                pen_line(c, x+old_x, y+old_y, x+new_x, y+new_y);
+                pen_pixel_line(c, x+old_x, y+old_y, x+new_x, y+new_y);
                 old_x = new_x;
                 old_y = new_y;
             }
         }
     }
+}
+
+
+void pen_circle(context* c, float x, float y, float radius) { pen_oval(c, x, y, radius, radius); }
+void pen_oval(context* c, float x, float y, float radius_x, float radius_y)
+{
+    rectf dest_pixel = apply_offset(c, rectanglef(x-radius_x,y-radius_y,2*radius_x,2*radius_y));
+    pen_pixel_oval(c, dest_pixel);
 }
 
 /*
@@ -307,6 +328,80 @@ void pen_unload(context* c)
     texture_free(c->_pen_font);
 }
 
+
+void pen_join_info (context* c, graph* g, int a, int b)
+{
+    if(a == b) { return; }
+    join* j = graph_get_join(g,a,b);
+    bool exist = graph_join_exist(g, a, b);
+
+    // node existe pas
+    if(exist == false && g->draw_text_info != GRAPH_DISPLAY_MODE_LOT_OF_TEXT) {  return; }
+
+    float xa = camera_graph_pos_2_cam_pos_x(c, g, graph_node_x(g,a));
+    float ya = camera_graph_pos_2_cam_pos_y(c, g, graph_node_y(g,a));
+    float xb = camera_graph_pos_2_cam_pos_x(c, g, graph_node_x(g,b));
+    float yb = camera_graph_pos_2_cam_pos_y(c, g, graph_node_y(g,b));
+
+    if(g->draw_text_info == GRAPH_DISPLAY_MODE_LOT_OF_TEXT || g->draw_text_info == GRAPH_DISPLAY_MODE_GRAPHIC || g->draw_text_info == GRAPH_DISPLAY_MODE_MINIMAL_TEXT)
+    {
+        bool big_graph = graph_get_nb_node(g) >= 17;
+        int node_not_pressed = -1;
+        if(big_graph)
+        {
+            if(graph_node_is_touched_by_mouse(c, g, a))
+            {
+                node_not_pressed = b;
+            }else if(graph_node_is_touched_by_mouse(c, g, b))
+            {
+                node_not_pressed = a;
+            }
+            if(node_not_pressed == -1) { return; }
+        }
+        //float txt_x = (x1 + x2)/2;
+        //float txt_y = (y1 + y2)/2;
+        float font_size = FONT_SIZE_SMALL;
+        float txt_y_offset = font_size*0.35;
+
+        float mx = camera_pixel_pos_2_cam_pos_x(c, input_mouse_x(c));
+        float my = camera_pixel_pos_2_cam_pos_y(c, input_mouse_y(c));
+
+        //float diag = (g->x_etendu*g->y_etendu);
+        //float coef1 = 1 + diag/(length(x1, y1, mx, my)+0.1*diag);
+        //float coef2 = 1 + diag/(length(x2, y2, mx, my)+0.1*diag);
+        
+        float avg = length(xa, ya, xb, yb);
+
+        float coefa = avg/2 + length(xb, yb, mx, my);
+        float coefb = avg/2 + length(xa, ya, mx, my);
+
+        if(big_graph)
+        {
+            coefa = 0.3;
+            coefb = 0.3;
+            if (node_not_pressed == a)
+            {
+                coefa = 1;
+            }else{ coefb = 1; }
+        }
+
+        //coef1 = 1;
+        //coef2 = 1;
+
+
+        float txt_x = (xa * coefa + xb * coefb) / ( coefa + coefb);
+        float txt_y = (ya * coefa + yb * coefb) / ( coefa + coefb);
+
+        pen_formatted_text_at_center(c, txt_x, txt_y-txt_y_offset, font_size, 0.5, 0.5, "%.1f",  graph_get_join(g, a, b)->distance);
+
+        if(g->draw_text_info == GRAPH_DISPLAY_MODE_LOT_OF_TEXT)
+        {
+            pen_formatted_text_at_center(c, txt_x, txt_y+txt_y_offset, font_size, 0.5, 0.5, "b%.1f",  graph_join_get_distance_opti(g, a, b));
+            pen_formatted_text_at_center(c, txt_x, txt_y+3*txt_y_offset, font_size, 0.5, 0.5, "f%.4f",  j->testosterone);
+        }
+    }
+}
+
 void pen_graph(context* c, graph* g)
 {
     /*
@@ -321,27 +416,45 @@ void pen_graph(context* c, graph* g)
     {
         repeat(i, graph_get_nb_node(g))
         {
-            pen_node(c, g, i);
-
             repeat(j, i)
             {   
                 pen_join(c, g, i, j);
+            }
+        }
+
+        repeat(i, graph_get_nb_node(g))
+        {
+
+            repeat(j, i)
+            {   
+                pen_join_info(c, g, i, j);
             }
         }
     }else
     {
         repeat(i, graph_get_nb_node(g))
         {
-            pen_node(c, g, i);
-
             for(int k = 0; k < graph_node_get_nb_neighbors(g, i); k++)
             {
                 int j = graph_get_node_neighbors(g,i,k);
                 pen_join(c, g, i, j);
             }
         }
+
+        repeat(i, graph_get_nb_node(g))
+        {
+            for(int k = 0; k < graph_node_get_nb_neighbors(g, i); k++)
+            {   
+                int j = graph_get_node_neighbors(g,i,k);
+                pen_join_info(c, g, i, j);
+            }
+        }
     }
 
+    repeat(i, graph_get_nb_node(g))
+    {
+        pen_node(c, g, i);
+    }
 
     //camera_set_state(c, cs);
 }
@@ -357,13 +470,13 @@ void pen_node (context* c, graph* g, int i)
     pen_oval(c, x, y, radius/c->camera_scale_x, radius/c->camera_scale_y);
 
     color co = rgb(192,192,192);
-    if(graph_get_nb_node(g) <= 32 && graph_node_is_touched_by_mouse(c,g,i))
+    if(graph_node_is_touched_by_mouse(c,g,i))
     {
         co = color_white;
     }
     pen_color(c, co);
 
-    radius *= 0.8;
+    radius *= 0.75;
     pen_oval(c, x, y, radius/c->camera_scale_x, radius/c->camera_scale_y);
     //pen_rect(c, rectanglef(x-radius/c->camera_scale_x/2, y-radius/c->camera_scale_y/2, radius/c->camera_scale_x, radius/c->camera_scale_y));
 
@@ -394,6 +507,7 @@ void pen_node (context* c, graph* g, int i)
     }
 }
 
+
 void pen_join (context* c, graph* g, int a, int b)
 {
     if(a == b) { return; }
@@ -407,53 +521,19 @@ void pen_join (context* c, graph* g, int a, int b)
     if(g->draw_text_info == GRAPH_DISPLAY_MODE_LOT_OF_TEXT || g->draw_text_info == GRAPH_DISPLAY_MODE_MINIMAL_TEXT_COLORED)
     {
         if(exist == false){ co = rgba(0,255,0,0); }
-        else if(j->distance_opti < j->distance)
+        else if(graph_join_get_distance_opti(g, a, b) < j->distance)
         {
             co = color_red;
         }
     }
     pen_color(c, co);
     
-    float x1 = camera_graph_pos_2_cam_pos_x(c, g, graph_node_x(g,a));
-    float y1 = camera_graph_pos_2_cam_pos_y(c, g, graph_node_y(g,a));
-    float x2 = camera_graph_pos_2_cam_pos_x(c, g, graph_node_x(g,b));
-    float y2 = camera_graph_pos_2_cam_pos_y(c, g, graph_node_y(g,b));
+    float xa = camera_graph_pos_2_cam_pos_x(c, g, graph_node_x(g,a));
+    float ya = camera_graph_pos_2_cam_pos_y(c, g, graph_node_y(g,a));
+    float xb = camera_graph_pos_2_cam_pos_x(c, g, graph_node_x(g,b));
+    float yb = camera_graph_pos_2_cam_pos_y(c, g, graph_node_y(g,b));
 
-    pen_line(c,x1, y1, x2, y2);
-
-    if(g->draw_text_info == GRAPH_DISPLAY_MODE_LOT_OF_TEXT || g->draw_text_info == GRAPH_DISPLAY_MODE_GRAPHIC || g->draw_text_info == GRAPH_DISPLAY_MODE_MINIMAL_TEXT)
-    {
-        //float txt_x = (x1 + x2)/2;
-        //float txt_y = (y1 + y2)/2;
-        float font_size = FONT_SIZE_SMALL;
-        float txt_y_offset = font_size*0.35;
-
-        float mx = camera_pixel_pos_2_cam_pos_x(c, input_mouse_x(c));
-        float my = camera_pixel_pos_2_cam_pos_y(c, input_mouse_y(c));
-
-        //float diag = (g->x_etendu*g->y_etendu);
-        //float coef1 = 1 + diag/(length(x1, y1, mx, my)+0.1*diag);
-        //float coef2 = 1 + diag/(length(x2, y2, mx, my)+0.1*diag);
-        
-        float avg = length(x1, y1, x2, y2);
-        float coef1 = avg/2 + length(x2, y2, mx, my);
-        float coef2 = avg/2 + length(x1, y1, mx, my);
-
-        //coef1 = 1;
-        //coef2 = 1;
-
-
-        float txt_x = (x1 * coef1 + x2 * coef2) / ( coef1 + coef2);
-        float txt_y = (y1 * coef1 + y2 * coef2) / ( coef1 + coef2);
-
-        pen_formatted_text_at_center(c, txt_x, txt_y-txt_y_offset, font_size, 0.5, 0.5, "%.1f",  graph_get_join(g, a, b)->distance);
-
-        if(g->draw_text_info == GRAPH_DISPLAY_MODE_LOT_OF_TEXT)
-        {
-            pen_formatted_text_at_center(c, txt_x, txt_y+txt_y_offset, font_size, 0.5, 0.5, "b%.1f",  graph_join_get_distance_opti(g, a, b));
-            pen_formatted_text_at_center(c, txt_x, txt_y+3*txt_y_offset, font_size, 0.5, 0.5, "f%.4f",  j->testosterone);
-        }
-    }
+    pen_line(c,xa, ya, xb, yb);
 }
 
 

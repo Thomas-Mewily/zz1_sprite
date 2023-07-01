@@ -97,6 +97,7 @@ void context_update(context* c)
 
 void context_draw(context* c)
 {
+    c->pen_nb_rectangle = 0;
     scene_draw(c, (scene*)(c->scene));
     SDL_RenderPresent(c->renderer);
 }

@@ -7,8 +7,14 @@ float camera_scale_y(context* c) { return c->camera_scale_y;}
 
 void camera_set_x(context* c, float v) { c->camera_x = v; }
 void camera_set_y(context* c, float v) { c->camera_y = v; }
-void camera_set_scale_x(context* c, float v) { c->camera_scale_x = v; }
-void camera_set_scale_y(context* c, float v) { c->camera_scale_y = v; }
+
+float camera_scale_range(float v)
+{
+    float max_precision = 100.0f;
+    return maxif(1/max_precision, minif(max_precision, v));
+}
+float camera_set_scale_x(context* c, float v) { c->camera_scale_x = camera_scale_range(v); return c->camera_scale_x; }
+float camera_set_scale_y(context* c, float v) { c->camera_scale_y = camera_scale_range(v); return c->camera_scale_y; }
 
 bool camera_load(context* c)
 {
@@ -36,20 +42,25 @@ void camera_update(context* c)
 
 void camera_zoom(context* c, float center_pixel_x, float center_pixel_y, float coef)
 {
+    if(coef == 1) return;
     float center_coef_x = center_pixel_x /(float)window_width(c);
     float center_coef_y = center_pixel_y /(float)window_height(c);
 
-    float new_scale_x = c->camera_scale_x*coef;
-    float new_scale_y = c->camera_scale_y*coef;
+    float old_scale_x = c->camera_scale_x;
+
+    float new_scale_x = camera_scale_range(c->camera_scale_x*coef);
+    float new_scale_y = camera_scale_range(c->camera_scale_y*coef);
+
+    coef =  new_scale_x / old_scale_x;
 
     float offset_x = (1-coef) * window_width(c);
     float offset_y = (1-coef) * window_height(c);
 
-    c->camera_x -= (offset_x*center_coef_x)/new_scale_x;
-    c->camera_y -= (offset_y*center_coef_y)/new_scale_y;
+    camera_set_x(c, camera_x(c) - (offset_x*center_coef_x)/new_scale_x);
+    camera_set_y(c, camera_y(c) - (offset_y*center_coef_y)/new_scale_y);
 
-    c->camera_scale_x = new_scale_x;
-    c->camera_scale_y = new_scale_y;
+    camera_set_scale_x(c, new_scale_x);
+    camera_set_scale_y(c, new_scale_y);
 }
 
 bool camera_event(context* c, event* ev)
@@ -118,10 +129,10 @@ camera_state camera_get_state(context* c)
 
 void camera_set_state(context* c, camera_state s)
 {
-    c->camera_x = s.x;
-    c->camera_y= s.y;
-    c->camera_scale_x = s.scale_x;
-    c->camera_scale_y = s.scale_y;
+    camera_set_x(c, s.x);
+    camera_set_y(c, s.y);
+    camera_set_scale_x(c, s.scale_x);
+    camera_set_scale_y(c, s.scale_y);
 }
 
 camera_state camera_state_create(float x, float y, float scale_x, float scale_y)

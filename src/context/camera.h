@@ -31,8 +31,8 @@ float camera_scale_y(context* c);
 
 void camera_set_x(context* c, float v);
 void camera_set_y(context* c, float v);
-void camera_set_scale_x(context* c, float v);
-void camera_set_scale_y(context* c, float v);
+float camera_set_scale_x(context* c, float v);
+float camera_set_scale_y(context* c, float v);
 
 bool camera_can_zoom(context* c);
 bool camera_can_scroll(context* c);

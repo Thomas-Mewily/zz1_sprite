@@ -8,6 +8,7 @@ typedef struct
 void scene_graph_joueur_load(argument arg)
 {
     obtenir_state;
+    gs->g->draw_text_info = GRAPH_DISPLAY_MODE_GRAPHIC;
     global_state_reset_traveler(c);
 }
 

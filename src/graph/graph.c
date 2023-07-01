@@ -540,18 +540,20 @@ void graph_calculer_distance_noeud(graph* g, int source)
         int best_a = -1;
         int best_b = -1;
 
-        for(int i = 0; i< prev->length; i++)
+        for(int i = prev->length-1; i >= 0; i--)
         {
             reach_info* info = &vec_get(prev, reach_info, i);
+            if(info->node_idx == -1) { continue; }
             float longueur_depuis_a = info->total_length;
             int a = info->node_idx;
 
             int a_nb_neighbors = graph_node_get_nb_neighbors(g, a);
-
+            int a_nb_neighbors_blanc = 0;
             for(int k = 0; k < a_nb_neighbors; k++)
             {   
                 int b = graph_get_node_neighbors(g, a, k);
                 if(graph_node_en_noir(g, b)) { continue; } // déjà parcouru
+                a_nb_neighbors_blanc++;
                 
                 join* j = graph_get_join(g, a, b);
                 if(!(j->_exist)) { continue; } // le join existe pas
@@ -565,8 +567,13 @@ void graph_calculer_distance_noeud(graph* g, int source)
                     best_b = b;
                 }
             }   
-        }
 
+            if(a_nb_neighbors_blanc == 0)
+            {
+                reach_info* ri = &vec_get(prev, reach_info, i);
+                ri->node_idx = -1; // plus de voisin
+            }
+        }
 
         if(best_a == -1)
         {

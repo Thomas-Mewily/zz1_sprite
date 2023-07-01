@@ -32,8 +32,10 @@ void global_state_reset_traveler(context* c)
 
 void global_state_new_get_graph(context* c)
 {
+    graph_display_mode displayMode = GRAPH_DISPLAY_MODE_MINIMAL_TEXT;
     if(gs->g != null)
     {
+        displayMode = gs->g->draw_text_info;
         graph_free(gs->g);
     }
 
@@ -58,6 +60,7 @@ void global_state_new_get_graph(context* c)
     //gs->g = graph_generate( 3, rectanglef(0, 0, 16, 9), 0.25f);
     gs->g = graph_generate( gs->nb_node, rectanglef(0, 0, sqrt(gs->nb_node)*16, sqrt(gs->nb_node)*9), 0.25f);
     graph_change_distances(gs->g);
+    gs->g->draw_text_info = displayMode;
     //gs->g = graph_complet(8);
     global_state_reset_traveler(c);
 }
@@ -127,6 +130,7 @@ void global_state_update(context* c)
 void global_state_draw(context* c)
 {
     UNUSED(c);
+    //pen_oval(c, window_width(c)/2, window_height(c)/2, window_width(c)/2, window_height(c)/2);
     //pen_graph(c, gs->g);
 }
 

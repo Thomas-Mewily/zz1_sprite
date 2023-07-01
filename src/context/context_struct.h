@@ -51,6 +51,8 @@ typedef struct
     bool   camera_can_scroll;
 
     uint32 pen_mode;
+    int    pen_nb_rectangle;
+
     //angle  pen_move_rotation;
     //bool   _pen_is_down;
     //vertex _pen_vertex[3];
