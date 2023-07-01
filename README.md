@@ -1,10 +1,16 @@
 # zz1_sprite
 
+This project use SDL2 and SDL_image only.
+
 in order to compile it, add a `bin` folder with the `.dll`
-Also add the `.a` .la `.dll` to `lib`
+Also add the `.a`, `.la` and `.dll` to `lib`
+
+SDL : https://github.com/libsdl-org/SDL/releases/tag/release-2.28.0
+SDL image : https://github.com/libsdl-org/SDL_image/releases
+
+Make sure you choose the `devel` version
 
 ![image](https://github.com/Thomas-Mewily/zz1_sprite/assets/40406187/f46707bf-7fe6-4a50-ae56-72fa59ff2792)
-
 ![image](https://github.com/Thomas-Mewily/zz1_sprite/assets/40406187/e623163d-3302-4a66-927c-426f0a45040f)
 
 Gcc compilation command :
