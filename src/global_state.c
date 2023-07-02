@@ -74,7 +74,7 @@ void global_state_load(context* c)
     //get_graph(c);
     gs->path_rs = vec_empty(int);
     global_state_new_get_graph(c);
-    gs->longueur_rs = 10E10;
+    gs->longueur_rs = INFINITY;
 
     
 
@@ -105,6 +105,7 @@ void global_state_unload(context* c)
     sprite_sheet_free(gs->diamant);
     animation_free(gs->diamant_anim);
     graph_free(gs->g);
+    vec_free_lazy(gs->path_rs);
 
     traveler_free(gs->goblin_traveler);
     free(gs);

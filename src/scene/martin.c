@@ -47,7 +47,7 @@ void scene_martin_update(argument arg)
     obtenir_state;
     set_bg_color(arg);
     s->hue += s->color_change_speed;
-    if (s->hue >= 360) {s->hue = 0;}
+    if (s->hue >= 360) { s->hue = 0;}
 
     //camera_set_x(c, window_width(c)/2-input_mouse_x(c)/2);
     //camera_set_y(c, window_width(c)/2-input_mouse_y(c)/2);
@@ -56,11 +56,11 @@ void scene_martin_update(argument arg)
 
     if (s->timer_stop >= WAIT_TIME && !s->finished)
     {
-        vec_free_lazy( gs->path_rs);
+        vec_free_lazy(gs->path_rs);
         gs->path_rs = graph_gen_starting_trajet(gs->g);
         s->finished = graph_recuit_simule_n_it(gs->g, gs->path_rs, 30, &t_ud_geometric, &(s->t), &(s->it_no_progress));
         gs->longueur_rs = path_calculate_length(gs->g, gs->path_rs);
-        vec_printf_int(gs->path_rs);
+        //vec_printf_int(gs->path_rs);
         s->timer_stop = 0;
     }
     else
