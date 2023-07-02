@@ -534,7 +534,7 @@ void graph_calculer_distance_noeud(graph* g, int source)
     
     forever
     {
-        float d_min = 10E10;
+        float d_min = INFINITY;
 
         int best_a_idx_in_prev = -1;
         int best_a = -1;
@@ -543,7 +543,7 @@ void graph_calculer_distance_noeud(graph* g, int source)
         for(int i = prev->length-1; i >= 0; i--)
         {
             reach_info* info = &vec_get(prev, reach_info, i);
-            if(info->node_idx == -1) { continue; }
+            //if(info->node_idx == -1) { continue; }
             float longueur_depuis_a = info->total_length;
             int a = info->node_idx;
 
@@ -570,8 +570,10 @@ void graph_calculer_distance_noeud(graph* g, int source)
 
             if(a_nb_neighbors_blanc == 0)
             {
-                reach_info* ri = &vec_get(prev, reach_info, i);
-                ri->node_idx = -1; // plus de voisin
+                vec_remove_at(prev, i);
+                best_a_idx_in_prev--;
+                //reach_info* ri = &vec_get(prev, reach_info, i);
+                //ri->node_idx = -1; // plus de voisin
             }
         }
 

@@ -68,7 +68,7 @@ void traveler_travel_node(traveler* t, int idx, bool optimized_mode)
             if(j == null) return;
             graph_calculer_distance_opti(t->g);
 
-            if(vec_get(j->distance_opti_node_a_passer, int, 0) == idx)
+            if(j->distance_opti_node_a_passer->length >= 1 && vec_get(j->distance_opti_node_a_passer, int, 0) == idx)
             {
                 for(int i = j->distance_opti_node_a_passer->length-1; i >= 0; i--)
                 {

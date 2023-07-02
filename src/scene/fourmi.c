@@ -87,7 +87,7 @@ float simulate_one_stupid_ant(argument arg, graph* g, float testo_to_add, bool a
         tr->node_action = TRAVELER_NODE_ACTION_NOTHINGS;
         traveler_add_travel(tr, t, true);
         traveler_travel_node(tr, 0, true);
-        tr->color = hsv(s->nb_wave*43, 1, 1);
+        tr->color = hsv(s->nb_wave*83, 1, 1);
 
         tr->reach_end_action = TRAVELER_END_STOP;
     }
@@ -149,12 +149,12 @@ void scene_fourmi_update(argument arg)
 {
     obtenir_state;
 
-    if(c->nb_update % 60 == 0)
+    if(c->nb_update % (50+(graph_get_nb_node(gs->g)/2)) == 0)
     {
         simulate_ants(arg, 1, 100, true);
     }
     //if(c->nb_update % (1+(graph_get_nb_node(gs->g))/5) == 0)
-    if(c->nb_update % (1+(graph_get_nb_node(gs->g))/2) == 0)
+    if(c->nb_update % (10+(graph_get_nb_node(gs->g))/2) == 0)
     {
         simulate_ants(arg, 1, 500, false);
     }
