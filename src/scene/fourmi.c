@@ -20,7 +20,7 @@ float simulate_one_stupid_ant(argument arg, graph* g, float testo_to_add, bool a
     {
         vec_push(node_to_visit, int, i+1);
     }
-    vec_printf_int(node_to_visit);
+    //vec_printf_int(node_to_visit);
 
     vec* probas = vec_empty(float);
 
@@ -142,7 +142,7 @@ void scene_fourmi_unload(argument arg)
         traveler* t = vec_get(s->visuel, traveler*, i);
         traveler_free(t);
     }
-    vec_free_lazy(vec_empty(traveler*));
+    vec_free_lazy(s->visuel);
 }
 
 void scene_fourmi_update(argument arg)

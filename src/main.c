@@ -44,30 +44,34 @@ int main(int argc, char *argv[])
     test_debug();
 
     context* c = context_create("Houzayfa M, Martin J, Thomas T. Version de " current_time, 960, 540, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+    memory_printf();
     
     window_center_coef(c, 0.5, 0.5);
 
     scene_set(c, titre);
 
+    memory_printf();
+
+
     while (!c->should_exit)
     {
         context_update(c);
+        if(c->should_exit) 
+        {
+            break;
+        }
         context_draw(c);
+        //memory_printf();
     }
 
     contexte_free(c);
     sdl_unload();
 
+    memory_printf();
+    
     return 0;
 }
 
 /*
-
-gcc -fdiagnostics-color=always -g ./src/*.c ./src/context/*.c ./src/util/*.c ./src/collection/*.c ./src/scene/*.c -Iinclude -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -o ./bin/main.exe
-gcc -O0 -fdiagnostics-color=always -g ./src/*.c ./src/context/*.c ./src/util/*.c ./src/collection/*.c ./src/scene/*.c -Iinclude -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -o ./bin/main.exe
-gcc -fdiagnostics-color=always -g ./src/*.c ./src/context/*.c ./src/util/*.c ./src/collection/*.c ./src/scene/*.c -Iinclude -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -o ./bin/main.exe
-./bin/main
-
-gcc -x c-header -H -o ./src/base.h.gch ./src/base.h
-gcc -x c-header -H -o base.h.gch ./src/base.h
+gcc -x c-header -H -o 
 */

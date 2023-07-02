@@ -47,6 +47,7 @@ void node_free(node* n)
 
 void join_free(join* n)
 {
+    if(n == null) { return; }
     vec_free_lazy(n->distance_opti_node_a_passer);
     // rien à faire
 }
@@ -113,14 +114,12 @@ void graph_free(graph* g)
    {
         repeat(j, i)
         {
-            if(graph_join_exist(g, i, j))
-            {
-                join_free(graph_get_join(g, i, j));
-            }
+            join_free(graph_get_join(g, i, j));
         }
         node_free(&(g->_nodes[i]));
         free(g->_joins[i]);
    }
+
    free(g->_joins);
    free(g->_nodes);
    g->_nb = 0;
@@ -394,7 +393,7 @@ graph* graph_gen_nul_equi(int nb_node, rectf area_contained)
 
     for (int i = 0; i < tableH; i++)
     {
-        occuped[i] = (bool*)calloc(sizeof(bool) * tableW);
+        occuped[i] = (bool*)calloc(sizeof(bool), tableW);
         if (!occuped[i]) {SDL_Log("L'allocation de la ligne %d a échoué\n", i); return null;}
     }
 
@@ -543,7 +542,7 @@ void graph_calculer_distance_noeud(graph* g, int source)
         for(int i = prev->length-1; i >= 0; i--)
         {
             reach_info* info = &vec_get(prev, reach_info, i);
-            //if(info->node_idx == -1) { continue; }
+            
             float longueur_depuis_a = info->total_length;
             int a = info->node_idx;
 
@@ -570,10 +569,9 @@ void graph_calculer_distance_noeud(graph* g, int source)
 
             if(a_nb_neighbors_blanc == 0)
             {
+                vec_free_lazy(vec_get(prev, reach_info, i).chemin);
                 vec_remove_at(prev, i);
                 best_a_idx_in_prev--;
-                //reach_info* ri = &vec_get(prev, reach_info, i);
-                //ri->node_idx = -1; // plus de voisin
             }
         }
 
@@ -612,13 +610,10 @@ void graph_calculer_distance_opti(graph* g)
     g->doit_calculer_distance_opti = false;
     repeat(i, graph_get_nb_node(g))
     {
-        repeat(j, graph_get_nb_node(g))
+        repeat(j, i)
         {
-            if(i != j)
-            {
-                graph_get_join(g, i, j)->distance_opti = 10E10;
-                vec_clear(graph_get_join(g, i, j)->distance_opti_node_a_passer);
-            }
+            graph_get_join(g, i, j)->distance_opti = INFINITY;
+            vec_clear(graph_get_join(g, i, j)->distance_opti_node_a_passer);
         }
     }
 

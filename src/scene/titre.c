@@ -22,11 +22,11 @@ void scene_titre_unload(argument arg)
     obtenir_state;
     camera_allow_scrolling(c, true);
     camera_allow_zoom(c, true);
-    
+    /*
     if(graph_get_nb_node(gs->g) >= 1)
     {
         graph_set_node_x_y(gs->g, 0, graph_node_x(gs->g, 0), graph_node_y(gs->g, 0));
-    }
+    }*/
 }
 
 void scene_titre_update(argument arg) 
@@ -60,11 +60,15 @@ void scene_titre_draw(argument arg)
     camera_state cs = camera_get_state(c);
     camera_set_state(c, camera_state_default());
     // Not affected by scrolling or scalling
-    
-    pen_formatted_text_at_center(c, 0, 0, FONT_SIZE_NORMAL, 0, 0, "Titre (G: %i nodes)", gs->nb_node);
-    pen_text_at_center(c, "(FDRJHPM)", 0, FONT_SIZE_NORMAL, FONT_SIZE_NORMAL, 0, 0);
 
-    pen_formatted_text_at_center(c, 0, 2*FONT_SIZE_NORMAL, FONT_SIZE_NORMAL, 0, 0, "%i draw rectf", c->pen_nb_rectangle);
+    float font_size = FONT_SIZE_NORMAL;
+    
+    pen_formatted_text_at_center(c, 0, 0, font_size, 0, 0, "Titre (G: %i nodes)", gs->nb_node);
+    pen_text_at_center(c, "(FDRJHPM)", 0, font_size, font_size, 0, 0);
+
+
+    pen_formatted_text_at_center(c, 0, 2*font_size, font_size, 0, 0, "%i draw rectf", c->pen_nb_rectangle);
+    pen_formatted_text_at_center(c, 0, 3*font_size, font_size, 0, 0, "%i malloc", memory_get_nb_malloc_actif());
     camera_set_state(c, cs);
     //pen_formatted_text_at_center(c, window_width(c)/2,window_height(c)/2, FONT_SIZE_NORMAL, 0.5, 0.5, "UwU tick: %i", c->timer);
 }
